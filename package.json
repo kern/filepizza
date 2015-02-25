@@ -2,9 +2,10 @@
   "name": "webdrop",
   "version": "0.0.0",
   "description": "Peer-to-peer file transfers in your browser",
-  "main": "lib/index.js",
+  "main": "server/index.js",
   "scripts": {
-      "start": "node lib/index.js"
+    "start": "node server/index.js",
+    "build": "./node_modules/.bin/browserify client/index.js -o static/app.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,7 @@
   },
   "homepage": "https://github.com/kern/webdrop",
   "dependencies": {
+    "browserify": "^9.0.3",
     "express": "^4.12.0"
   }
 }
