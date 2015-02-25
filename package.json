@@ -2,8 +2,9 @@
   "name": "webdrop",
   "version": "0.0.0",
   "description": "Peer-to-peer file transfers in your browser",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
+      "start": "node lib/index.js"
   },
   "repository": {
     "type": "git",
@@ -14,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/kern/webdrop/issues"
   },
-  "homepage": "https://github.com/kern/webdrop"
+  "homepage": "https://github.com/kern/webdrop",
+  "dependencies": {
+    "express": "^4.12.0"
+  }
 }
