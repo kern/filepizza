@@ -1,3 +1,5 @@
+// var Firebase = require("firebase");
+
 var files = []
 
 function handleFileSelect(evt) {
@@ -21,6 +23,12 @@ function handleFileSelect(evt) {
     metadata.push(metadaton)
   }
   document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+  // var firebase = new Firebase("https://webdrop.firebaseio.com/");
+  console.log(createID())
+  // firebase.set({
+  //   "id" : createID(),
+  //   "file_metadata" : metadata
+  // })
   // post metadata to server
 }
 
@@ -41,6 +49,27 @@ function handleDragOver(evt) {
   evt.stopPropagation();
   evt.preventDefault();
   evt.dataTransfer.dropEffect = 'copy';
+}
+
+function createID() {
+  var timestamp = Date.now()
+  var alphabet = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "a", "b", "c", "d", "e", "f", "g", "h", "i",
+                  "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B",
+                  "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
+                  "Y", "Z"]
+  var arr = []
+  var base = alphabet.length
+  while (timestamp > 0) {
+    var rem = parseInt(timestamp % base)
+    timestamp = parseInt(timestamp / base)
+    arr.push(alphabet[rem])
+  }
+  arr = arr.reverse()
+  id = arr.join("")
+  // add two random characters to ensure uniqueness between identical milliseconds
+  id += (alphabet[Math.floor(Math.random() * alphabet.length)])
+  id += (alphabet[Math.floor(Math.random() * alphabet.length)])
+  return id
 }
 
 var dropZone = document.getElementById('drop_zone');
