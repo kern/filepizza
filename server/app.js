@@ -1,4 +1,5 @@
 var express = require('express');
+var path = require('path');
 var app = module.exports = express();
 var db = require('./db');
 
@@ -8,7 +9,7 @@ db.child('greeting').on('value', function(snapshot) {
 });
 
 app.get('/', function (req, res) {
-  res.send(greeting);
+  res.sendFile(path.resolve(__dirname + '/../static/index.html'));
 });
 
 app.use(express.static(__dirname + '/../static'));
