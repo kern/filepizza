@@ -1,5 +1,3 @@
-// var Firebase = require("firebase");
-
 var files = []
 
 function handleFileSelect(evt) {
@@ -23,13 +21,14 @@ function handleFileSelect(evt) {
     metadata.push(metadaton)
   }
   document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
-  // var firebase = new Firebase("https://webdrop.firebaseio.com/");
-  console.log(createID())
-  // firebase.set({
-  //   "id" : createID(),
-  //   "file_metadata" : metadata
-  // })
-  // post metadata to server
+  var firebase = new Firebase("https://webdrop.firebaseio.com/");
+  var id = createID()
+  firebase.set({
+    id : {
+      "id" : id,
+      "file_metadata" : metadata
+    }
+  })
 }
 
 function send() { // perhaps need params for peer id or something
