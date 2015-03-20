@@ -4,7 +4,7 @@ import Actions from './Actions';
 var socket = module.exports = io.connect(window.location.origin);
 
 socket.on('token', function (token) {
-  Actions.updateToken(token);
+  Actions.setUploadToken(token);
 });
 
 socket.on('download', function (peerID) {

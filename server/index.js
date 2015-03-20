@@ -2,6 +2,7 @@ var Upload = require('./Upload');
 var express = require('express');
 var http = require('http');
 var path = require('path');
+var routes = require('./routes');
 var socketIO = require('socket.io');
 
 var app = express();
@@ -16,20 +17,7 @@ server.listen(process.env.PORT || 3000, function () {
 
 app.set('view engine', 'ejs');
 app.set('views', path.resolve(__dirname, '../views'));
-
-app.get('/', function (req, res) {
-  res.render('index');
-});
-
-app.get('/d/:token', function (req, res) {
-  var uploader = Upload.find(req.params.token);
-  res.render('download', {
-    token: uploader.token,
-    meta: uploader.metadata
-  });
-});
-
-app.use(express.static(__dirname + '/../static'));
+app.use(routes);
 
 io.on('connection', function (socket) {
 
@@ -43,6 +31,7 @@ io.on('connection', function (socket) {
 
   socket.on('download', function (data) {
     var uploader = Upload.find(data.token);
+    if (!uploader) return;
     uploader.socket.emit('download', data.peerID);
   });
 

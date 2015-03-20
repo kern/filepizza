@@ -6,10 +6,10 @@ export default alt.createActions(class Actions {
       'download',
       'receiveData',
       'requestDownload',
-      'setDownloadInfo',
       'sendToDownloader',
-      'updatePeerID',
-      'updateToken',
+      'setDownloadInfo',
+      'setPeerID',
+      'setUploadToken',
       'upload'
     )
   }

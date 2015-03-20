@@ -37,8 +37,8 @@ export default class App extends React.Component {
     if (this.state.readyToUpload) {
       return (
         <div>
-          <FileDescription file={this.state.file} />
-          <Tempalink token={this.state.token} />
+          <FileDescription file={this.state.uploadFile} />
+          <Tempalink token={this.state.uploadToken} />
         </div>
       );
 

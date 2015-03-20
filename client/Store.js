@@ -1,14 +1,13 @@
 import Actions from './Actions';
+import ChunkedBlob from './ChunkedBlob';
 import alt from './alt';
 import peer from './peer';
 import socket from './socket';
-import ChunkedBlob from './ChunkedBlob';
 
 const chunkSize = 1024;
 
 function downloadFile(name, blob) {
   let url = URL.createObjectURL(blob);
-
   let a = document.createElement('a');
   a.download = name;
   a.href = url;
@@ -23,8 +22,8 @@ export default alt.createStore(class Store {
 
     this.peerID = null;
 
-    this.token = null;
-    this.file = null;
+    this.uploadToken = null;
+    this.uploadFile = null;
     this.readyToUpload = false;
 
     this.downloadToken = null;
@@ -34,22 +33,22 @@ export default alt.createStore(class Store {
   }
 
   updateReadyStatus() {
-    this.readyToUpload = !!this.peerID && !!this.token && !!this.file;
+    this.readyToUpload = !!this.peerID && !!this.uploadToken && !!this.uploadFile;
     this.readyToDownload = !!this.peerID && !!this.downloadToken && !!this.downloadMetadata;
   }
 
-  onUpdatePeerID(id) {
+  onSetPeerID(id) {
     this.peerID = id;
     this.updateReadyStatus();
   }
 
-  onUpdateToken(token) {
-    this.token = token;
+  onSetUploadToken(token) {
+    this.uploadToken = token;
     this.updateReadyStatus();
   }
 
   onUpload(file) {
-    this.file = file;
+    this.uploadFile = file;
     this.updateReadyStatus();
 
     socket.emit('upload', {
@@ -77,7 +76,7 @@ export default alt.createStore(class Store {
   onSendToDownloader(peerID) {
     if (!this.readyToUpload) return;
 
-    let file = this.file;
+    let file = this.uploadFile;
     let conn = peer.connect(peerID);
     conn.on('open', function () {
       let chunks = Math.ceil(file.size / chunkSize);
