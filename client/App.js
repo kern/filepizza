@@ -3,53 +3,55 @@ import FileDescription from './FileDescription';
 import React from 'react';
 import Tempalink from './Tempalink';
 import socket from './socket';
-import upload from './upload';
-import download from './download';
+import Actions from './Actions';
+import Store from './Store';
 
 export default class App extends React.Component {
 
   constructor() {
 
-    super();
-    this.state = { token: null, file: null };
-
-    var self = this;
-    socket.on('token', function (t) {
-      self.setState({ token: t });
-    });
-
-    socket.on('download', function (t) {
-      if (self.state.file) upload(self.state.file, t);
-    });
-
-    socket.on('upload', function (data) {
-      download(window.metadata.name, new Blob([data]));
-    });
-
-    if (window.token) socket.emit('download', window.token);
+    this.state = Store.getState();
+    this._onChange = function() {
+      this.setState(Store.getState());
+    }.bind(this);
 
   }
 
-  useFile(file) {
-    this.setState({ file: file });
+  componentDidMount() {
+    Store.listen(this._onChange);
+  }
 
-    socket.emit('update', {
-      name: file.name,
-      size: file.size,
-      type: file.type
-    });
+  componentDidUnmount() {
+    Store.unlisten(this._onChange);
+  }
+
+  uploadFile(file) {
+    Actions.upload(file);
+  }
+
+  downloadFile() {
+    Actions.requestDownload();
   }
 
   render() {
-    if (this.state.file) {
+    if (this.state.readyToUpload) {
       return (
         <div>
           <FileDescription file={this.state.file} />
           <Tempalink token={this.state.token} />
         </div>
       );
+
+    } else if (this.state.readyToDownload) {
+      return (
+        <div>
+          <FileDescription file={this.state.downloadMetadata} />
+          <button onClick={this.downloadFile.bind(this)}>Download</button>
+        </div>
+      );
     } else {
-      return <DropZone onDrop={this.useFile.bind(this)} />;
+      return <DropZone onDrop={this.uploadFile.bind(this)} />;
     }
   }
+
 }

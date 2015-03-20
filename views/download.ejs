@@ -12,8 +12,10 @@
 
     <body>
         <script>
-            window.token = <%- JSON.stringify(token) %>;
-            window.metadata = <%- JSON.stringify(meta) %>;
+            window.WebDrop = {
+                token: <%- JSON.stringify(token) %>,
+                metadata: <%- JSON.stringify(meta) %>
+            };
         </script>
 
         <div id="app"></div>

@@ -1,4 +1,4 @@
-var Client = require('./Client');
+var Upload = require('./Upload');
 var express = require('express');
 var http = require('http');
 var path = require('path');
@@ -22,8 +22,7 @@ app.get('/', function (req, res) {
 });
 
 app.get('/d/:token', function (req, res) {
-  console.log("Downloading from:", req.params.token);
-  var uploader = Client.find(req.params.token);
+  var uploader = Upload.find(req.params.token);
   res.render('download', {
     token: uploader.token,
     meta: uploader.metadata
@@ -34,32 +33,21 @@ app.use(express.static(__dirname + '/../static'));
 
 io.on('connection', function (socket) {
 
-  var client = new Client(socket);
-  socket.emit('token', client.token);
+  var upload = null;
 
-  function log(type, data) {
-    console.log(client.token, '.', type, ':', data);
-  }
-
-  socket.on('upload', function (data) {
-    var downloader = Client.find(data.token);
-    downloader.socket.emit('upload', data.blob);
-    log('upload', data);
+  socket.on('upload', function (metadata) {
+    if (!upload) upload = new Upload(socket);
+    upload.metadata = metadata;
+    socket.emit('token', upload.token);
   });
 
-  socket.on('download', function (token) {
-    var uploader = Client.find(token);
-    uploader.socket.emit('download', client.token);
-    log('download', token);
-  });
-
-  socket.on('update', function (data) {
-    client.metadata = data;
-    log('update', data);
+  socket.on('download', function (data) {
+    var uploader = Upload.find(data.token);
+    uploader.socket.emit('download', data.peerID);
   });
 
   socket.on('disconnect', function () {
-    Client.remove(client);
+    if (upload) Upload.remove(upload);
   });
 
 });

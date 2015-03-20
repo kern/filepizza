@@ -4,7 +4,7 @@ var crypto = require('crypto');
 var tokenLength = 8;
 var tokens = {};
 
-var Client = module.exports = function (socket) {
+var Upload = module.exports = function (socket) {
 
   var maxNum = Math.pow(62, tokenLength);
   var numBytes = Math.ceil(Math.log(maxNum) / Math.log(256));
@@ -29,14 +29,14 @@ var Client = module.exports = function (socket) {
 
 };
 
-Client.exists = function (token) {
+Upload.exists = function (token) {
   return token in tokens;
 };
 
-Client.find = function (token) {
+Upload.find = function (token) {
   return tokens[token];
 };
  
-Client.remove = function (client) {
+Upload.remove = function (client) {
   delete tokens[client.token];
 };
