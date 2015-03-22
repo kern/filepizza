@@ -1,31 +1,35 @@
+const chunkSize = 32;
+
+function blobLength(b) {
+  if (typeof b.byteLength !== 'undefined') return b.byteLength;
+  if (typeof b.size !== 'undefined') return b.size;
+  return b.length;
+}
+
 export default class ChunkedBlob {
 
-  constructor(n) {
-    this.n = n;
-    this.count = n;
+  constructor() {
+    this.count = 0;
+    this.size = 0;
     this.chunks = [];
+    this.lastChunk = [];
   }
 
-  setChunk(i, b) {
-    if (i < 0 || i >= this.n)
-      throw new Error('Chunk out of range');
+  add(b) {
+    this.count++;
+    this.size += blobLength(b);
+    this.lastChunk.push(b);
 
-    if (this.chunks[i])
-      throw new Error('Chunk already set');
-
-    this.count--;
-    this.chunks[i] = b;
-  }
-
-  ready() {
-    return this.count === 0;
+    if (this.lastChunk.length === chunkSize) {
+      let chunk = new Blob(this.lastChunk);
+      this.chunks.push(chunk);
+      this.lastChunk = [];
+    }
   }
 
   toBlob() {
-    if (!this.ready())
-      throw new Error('Incomplete blob');
-
-    return new Blob(this.chunks);
+    let allChunks = this.chunks.concat(this.lastChunk);
+    return new Blob(allChunks);
   }
 
 }

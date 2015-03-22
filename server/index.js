@@ -23,10 +23,10 @@ io.on('connection', function (socket) {
 
   var upload = null;
 
-  socket.on('upload', function (metadata) {
+  socket.on('upload', function (metadata, res) {
     if (!upload) upload = new Upload(socket);
     upload.metadata = metadata;
-    socket.emit('token', upload.token);
+    res(upload.token);
   });
 
   socket.on('download', function (data) {

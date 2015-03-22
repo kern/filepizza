@@ -1,6 +1,12 @@
-import App from './App';
+import App from './components/App';
 import React from 'react';
-import Actions from './Actions';
+import DownloadActions from './actions/DownloadActions';
 
-if (window.WebDrop) Actions.setDownloadInfo(window.WebDrop);
+if (window.WebDrop) DownloadActions.setDownloadInfo({
+  token: window.WebDrop.token,
+  name: window.WebDrop.metadata.name,
+  size: window.WebDrop.metadata.size,
+  type: window.WebDrop.metadata.type
+})
+
 React.render(<App />, document.getElementById('app'));

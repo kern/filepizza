@@ -1,12 +1,8 @@
 import io from 'socket.io-client';
-import Actions from './Actions';
+import UploadActions from './actions/UploadActions';
 
-var socket = module.exports = io.connect(window.location.origin);
-
-socket.on('token', function (token) {
-  Actions.setUploadToken(token);
-});
+var socket = module.exports = io.connect();
 
 socket.on('download', function (peerID) {
-  Actions.sendToDownloader(peerID);
+  UploadActions.sendToDownloader(peerID);
 });
