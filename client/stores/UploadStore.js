@@ -1,10 +1,8 @@
-import PeerActions from '../actions/PeerActions';
 import PeerStore from './PeerStore';
 import Status from '../Status';
 import UploadActions from '../actions/UploadActions';
 import UploadFile from '../UploadFile';
 import alt from '../alt';
-import peer from '../peer';
 import socket from '../socket';
 
 const chunkSize = 32;
@@ -12,7 +10,6 @@ const chunkSize = 32;
 class UploadStatus extends Status {
   constructor() {
     super([
-      'offline',
       'ready',
       'processing',
       'uploading'
@@ -23,17 +20,12 @@ class UploadStatus extends Status {
 export default alt.createStore(class UploadStore {
 
   constructor() {
-    this.bindActions(PeerActions);
     this.bindActions(UploadActions);
 
+    this.status = new UploadStatus();
     this.token = null;
     this.file = null;
-    this.status = new UploadStatus();
-  }
-
-  onSetPeerID(id) {
-    this.waitFor(PeerStore.dispatchToken);
-    if (this.status.isOffline()) this.status.set('ready');
+    this.downloaders = [];
   }
 
   onUploadFile(file) {
@@ -54,33 +46,26 @@ export default alt.createStore(class UploadStore {
 
   onSendToDownloader(peerID) {
     if (!this.status.isUploading()) return;
+    this.downloaders.push(peerID); // TODO
 
-    let file = this.file;
-    let conn = peer.connect(peerID, {
-      reliable: true,
-      metadata: { chunkSize: chunkSize }
+    let conn = PeerStore.connect(peerID, {
+      chunkSize: chunkSize
     });
 
-    conn.on('open', function () {
+    let totalPackets = this.file.countPackets();
+    let i = 0;
 
-      let packets = file.countPackets();
-      let packet = 0;
-
-      function sendNextChunk() {
-        for (let i = 0; i < chunkSize; i++) {
-          if (packet >= packets) break;
-          let b = file.getPacket(packet);
-          conn.send(b);
-          packet++;
-        }
+    let sendNextChunk = () => {
+      for (let j = 0; i < totalPackets && j < chunkSize; i++, j++) {
+        let packet = this.file.getPacket(i);
+        conn.send(packet);
       }
+    }
 
-      conn.on('data', function (data) {
-        if (data === 'more') sendNextChunk();
-      });
+    conn.on('open', () => { sendNextChunk(); });
 
-      sendNextChunk();
-
+    conn.on('data', (data) => {
+      if (data === 'more') sendNextChunk();
     });
   }
 

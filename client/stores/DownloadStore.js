@@ -25,21 +25,17 @@ export default alt.createStore(class DownloadStore {
     this.bindActions(DownloadActions);
     this.bindActions(PeerActions);
 
-    this.conn = null;
     this.token = null;
     this.file = null;
     this.status = new DownloadStatus();
   }
 
-  onSetPeerID() {
-    this.waitFor(PeerStore.dispatchToken);
-    if (this.status.isOffline() && this.token) this.status.set('ready');
-  }
-
   onSetDownloadInfo(info) {
+    if (!this.status.isOffline()) return;
+    this.status.set('ready');
+
     this.token = info.token;
     this.file = new DownloadFile(info.name, info.size, info.type);
-    if (this.status.isOffline() && PeerStore.getPeerID()) this.status.set('ready');
   }
 
   onRequestDownload() {
@@ -52,11 +48,10 @@ export default alt.createStore(class DownloadStore {
     });
   }
 
-  onBeginDownload(conn) {
+  onPeerConnected(conn) {
     if (!this.status.isRequesting()) return;
     this.status.set('downloading');
 
-    this.conn = conn;
     let chunkSize = conn.metadata.chunkSize;
     let i = 0;
 
@@ -78,20 +73,9 @@ export default alt.createStore(class DownloadStore {
 
     conn.on('close', () => {
       if (!this.status.isDownloading()) return;
-      this._cancel();
+      this.status.set('cancelled');
+      this.file.clearPackets();
     });
-  }
-
-  onCancelDownload() {
-    if (!this.status.isRequesting() && !this.status.isDownloading()) return;
-    this._cancel();
-  }
-
-  _cancel() {
-    this.status.set('cancelled');
-    if (this.conn) this.conn.close();
-    this.conn = null;
-    this.file.clearPackets();
   }
 
 })

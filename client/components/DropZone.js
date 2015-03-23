@@ -14,13 +14,11 @@ export default class DropZone extends React.Component {
   }
 
   render() {
-    return (
-      <div className="drop-zone"
-        onDragOver={this.dragOver.bind(this)}
-        onDrop={this.drop.bind(this)}>
-        Drop a file here.
-      </div>
-    );
+    return <div className="drop-zone"
+      onDragOver={this.dragOver.bind(this)}
+      onDrop={this.drop.bind(this)}>
+      Drop a file here.
+    </div>;
   }
 
 }
