@@ -1,3 +1,18 @@
+.header {
+  padding-top: 10px;
+  padding-bottom: 15px;
+  text-align: center;
+}
+
+.header-title {
+  font: 40pt 'HelveticaNeue-Thin';
+  padding-bottom: 5px;
+}
+
+.header-subtitle {
+  font: 15pt 'HelveticaNeue-Light';
+}
+
 .drop-zone {
   border-radius: 5px;
   padding-top: 200px;

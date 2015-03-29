@@ -2,6 +2,7 @@ import DownloadActions from '../actions/DownloadActions';
 import DownloadStore from '../stores/DownloadStore';
 import DropZone from './DropZone';
 import FileDescription from './FileDescription';
+import Header from './Header';
 import PeerStore from '../stores/PeerStore';
 import React from 'react';
 import Tempalink from './Tempalink';
@@ -63,7 +64,10 @@ export default class App extends React.Component {
         <button onClick={this.downloadFile.bind(this)}>Download</button>
       </div>;
     } else {
-      return <DropZone onDrop={this.uploadFile.bind(this)} />;
+      return <div>
+        <Header />
+        <DropZone onDrop={this.uploadFile.bind(this)} />
+      </div>;
     }
   }
 
