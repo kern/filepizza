@@ -1,10 +1,9 @@
-#drop_zone {
-  border: 1.5px solid #bbb;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
+.drop-zone {
   border-radius: 5px;
-  padding: 25px;
+  padding-top: 200px;
+  padding-bottom: 200px;
   text-align: center;
-  font: 20pt 'Helvetica-Light';
-  color: #bbb;
+  font: 20pt 'HelveticaNeue-Light';
+  color: #444;
+  background-color: #eee;
 }
