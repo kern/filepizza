@@ -7,3 +7,24 @@
   color: #444;
   background-color: #eee;
 }
+
+.file-name {
+  padding-left: 4px;
+  font: 20pt 'HelveticaNeue-Light';
+}
+
+.file-size,
+.file-type {
+  font: 10pt 'HelveticaNeue';
+}
+
+a.tempalink {
+  border-radius: 5px;
+  background-color: #eee;
+  font: 16pt 'HelveticaNeue-Light';
+  text-decoration: none;
+  color: #222;
+  padding-left: 5px;
+  padding-bottom: 5px;
+  padding-right: 5px;
+}
