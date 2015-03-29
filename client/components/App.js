@@ -55,11 +55,13 @@ export default class App extends React.Component {
   render() {
     if (this.state.readyToUpload) {
       return <div>
+        <Header />
         <FileDescription file={this.state.uploadFile} />
         <Tempalink token={this.state.uploadToken} />
       </div>;
     } else if (this.state.readyToDownload) {
       return <div>
+        <Header />
         <FileDescription file={this.state.downloadFile} />
         <button onClick={this.downloadFile.bind(this)}>Download</button>
       </div>;
