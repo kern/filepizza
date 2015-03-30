@@ -28,15 +28,15 @@
     "react": "^0.13.0",
     "react-frozenhead": "^0.3.0",
     "react-router": "^0.13.1",
-    "socket.io": "^1.3.5"
-  },
-  "devDependencies": {
-    "alt": "^0.14.4",
-    "babelify": "^5.0.4",
-    "browserify": "^9.0.3",
+    "socket.io": "^1.3.5",
     "node-uuid": "^1.4.3",
     "peerjs": "^0.3.14",
     "socket.io-client": "^1.3.5",
+    "alt": "^0.14.4"
+  },
+  "devDependencies": {
+    "babelify": "^5.0.4",
+    "browserify": "^9.0.3",
     "watchify": "^2.4.0"
   },
   "engines": {
