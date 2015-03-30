@@ -1,44 +1,58 @@
+var DownloadFile = require('../client/DownloadFile');
+var React = require('react');
+var ReactRouter = require('react-router');
 var Upload = require('./Upload');
+var alt = require('../client/alt');
+var clientRoutes = require('../client/routes');
 var express = require('express');
 
-var router = module.exports = new express.Router();
+var routes = module.exports = new express.Router();
 
-router.get('/', function (req, res) {
-  res.render('index');
-});
+routes.use(express.static(__dirname + '/../static'));
 
-router.get('/d/:token', function (req, res, next) {
+routes.get('/d/:token', function (req, res, next) {
 
   var uploader = Upload.find(req.params.token);
   if (uploader) {
-    res.render('download', {
-      token: uploader.token,
-      meta: uploader.metadata
-    });
-  } else {
-    var err = new Error('Unknown token');
-    err.status = 404;
-    next(err);
+    res.locals.data = {
+      DownloadStore: {
+        status: 'ready',
+        token: uploader.token,
+        file: uploader.metadata
+      }
+    };
   }
+
+  next();
 
 });
 
-router.use(express.static(__dirname + '/../static'));
-
-router.use(function (req, res, next) {
+routes.use(function (req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
-router.use(function (err, req, res, next) {
+routes.use(function (err, req, res, next) {
 
+  // TODO: Get these error pages working with isomorphic react.
   var status = err.status || 500;
   var message = err.message || '';
 
-  res.status(status).render('error', {
-    status: status,
-    message: message
+  res.status(status);
+  next();
+
+});
+
+routes.use(function (req, res) {
+
+  alt.bootstrap(JSON.stringify(res.locals.data || {}));
+
+  ReactRouter.run(clientRoutes, req.url, function (Handler) {
+    var html = React.renderToString(<Handler data={alt.takeSnapshot()} />);
+    alt.recycle();
+    res.write('<!DOCTYPE html>');
+    res.end(html);
   });
 
 });

@@ -1,8 +1,8 @@
-import io from 'socket.io-client';
-import UploadActions from './actions/UploadActions';
+if (typeof window === 'undefined') {
+  var socket = {};
+} else {
+  let io = require('socket.io-client');
+  var socket = io.connect();
+}
 
-var socket = module.exports = io.connect();
-
-socket.on('download', function (peerID) {
-  UploadActions.sendToDownloader(peerID);
-});
+export default socket;

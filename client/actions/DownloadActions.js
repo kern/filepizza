@@ -4,7 +4,7 @@ export default alt.createActions(class DownloadActions {
   constructor() {
     this.generateActions(
       'requestDownload',
-      'setDownloadInfo'
+      'beginDownload'
     )
   }
 })

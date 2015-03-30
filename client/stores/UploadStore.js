@@ -1,72 +1,79 @@
-import PeerStore from './PeerStore';
-import Status from '../Status';
 import UploadActions from '../actions/UploadActions';
 import UploadFile from '../UploadFile';
 import alt from '../alt';
+import peer from '../peer';
 import socket from '../socket';
 
 const chunkSize = 32;
-
-class UploadStatus extends Status {
-  constructor() {
-    super([
-      'ready',
-      'processing',
-      'uploading'
-    ]);
-  }
-}
 
 export default alt.createStore(class UploadStore {
 
   constructor() {
     this.bindActions(UploadActions);
 
-    this.status = new UploadStatus();
+    this.status = 'ready';
     this.token = null;
     this.file = null;
-    this.downloaders = [];
+
+    this.inProgress = 0;
+    this.completed = 0;
   }
 
   onUploadFile(file) {
-    if (!this.status.isReady()) return;
-    this.status.set('processing');
-
+    if (this.status !== 'ready') return;
+    this.status = 'processing';
     this.file = new UploadFile(file);
+
     socket.emit('upload', {
       name: this.file.name,
       size: this.file.size,
       type: this.file.type
     }, (token) => {
-      this.status.set('uploading');
-      this.token = token;
-      this.emitChange();
+      this.setState({
+        status: 'uploading',
+        token: token
+      });
     });
   }
 
   onSendToDownloader(peerID) {
-    if (!this.status.isUploading()) return;
-    this.downloaders.push(peerID); // TODO
+    if (this.status !== 'uploading') return;
 
-    let conn = PeerStore.connect(peerID, {
-      chunkSize: chunkSize
+    let conn = peer.connect(peerID, {
+      reliable: true,
+      metadata: { chunkSize: chunkSize }
     });
 
+    let complete = false;
     let totalPackets = this.file.countPackets();
     let i = 0;
 
     let sendNextChunk = () => {
+      if (complete) return;
+
       for (let j = 0; i < totalPackets && j < chunkSize; i++, j++) {
         let packet = this.file.getPacket(i);
         conn.send(packet);
       }
+
+      if (i === totalPackets) complete = true;
     }
 
-    conn.on('open', () => { sendNextChunk(); });
+    conn.on('open', () => {
+      this.setState({ inProgress: this.inProgress + 1 });
+      sendNextChunk();
+    });
 
     conn.on('data', (data) => {
       if (data === 'more') sendNextChunk();
     });
+
+    conn.on('close', () => {
+      this.setState({
+        inProgress: this.inProgress - 1,
+        completed: this.completed + (complete ? 1 : 0)
+      });
+    });
   }
 
-})
+}, 'UploadStore')

@@ -4,7 +4,7 @@
   "description": "Peer-to-peer file transfers in your browser",
   "main": "server/index.js",
   "scripts": {
-    "start": "node server/index.js",
+    "start": "./node_modules/.bin/babel-node server/index.js",
     "build": "./node_modules/.bin/browserify -d -o static/app.js -t babelify client/index.js",
     "watch": "./node_modules/.bin/watchify -d -o static/app.js -t babelify client/index.js"
   },
@@ -19,19 +19,23 @@
   },
   "homepage": "https://github.com/kern/webdrop",
   "dependencies": {
+    "babel": "^4.7.16",
     "bases": "^0.2.1",
+    "classnames": "^1.2.0",
     "ejs": "^2.3.1",
     "express": "^4.12.0",
     "peer": "^0.2.8",
+    "react": "^0.13.0",
+    "react-frozenhead": "^0.3.0",
+    "react-router": "^0.13.1",
     "socket.io": "^1.3.5"
   },
   "devDependencies": {
     "alt": "^0.14.4",
     "babelify": "^5.0.4",
+    "browserify": "^9.0.3",
     "node-uuid": "^1.4.3",
     "peerjs": "^0.3.14",
-    "browserify": "^9.0.3",
-    "react": "^0.13.0",
     "socket.io-client": "^1.3.5",
     "watchify": "^2.4.0"
   },

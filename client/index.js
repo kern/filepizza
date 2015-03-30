@@ -1,12 +1,11 @@
-import App from './components/App';
 import React from 'react';
-import DownloadActions from './actions/DownloadActions';
+import ReactRouter from 'react-router';
+import routes from './routes';
+import alt from './alt';
 
-if (window.WebDrop) DownloadActions.setDownloadInfo({
-  token: window.WebDrop.token,
-  name: window.WebDrop.metadata.name,
-  size: window.WebDrop.metadata.size,
-  type: window.WebDrop.metadata.type
-})
+let bootstrap = document.documentElement.getAttribute('data-bootstrap');
+alt.bootstrap(bootstrap);
 
-React.render(<App />, document.getElementById('app'));
+ReactRouter.run(routes, ReactRouter.HistoryLocation, function (Handler) {
+  React.render(<Handler data={bootstrap} />, document);
+});

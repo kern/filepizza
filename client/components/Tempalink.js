@@ -2,9 +2,19 @@ import React from 'react';
 
 export default class Tempalink extends React.Component {
 
+  onClick() {
+    this.refs.input.getDOMNode().setSelectionRange(0, 9999);
+  }
+
   render() {
     var url = window.location.origin + '/d/' + this.props.token;
-    return <a href={url} className="tempalink">{url}</a>;
+    return <input
+      className="tempalink"
+      onClick={this.onClick.bind(this)}
+      readOnly
+      ref="input"
+      type="text"
+      value={url} />;
   }
 
 }
