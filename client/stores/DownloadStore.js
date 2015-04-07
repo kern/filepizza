@@ -15,9 +15,12 @@ export default alt.createStore(class DownloadStore {
     this.progress = 0;
 
     this.on('bootstrap', () => {
-      if (this.file && !(this.file instanceof DownloadFile))
-        this.file = new DownloadFile(this.file.name, this.file.size, this.file.type);
-    });
+      if (this.file && !(this.file instanceof DownloadFile)) {
+        this.file = new DownloadFile(this.file.name,
+                                     this.file.size,
+                                     this.file.type);
+      }
+    })
   }
 
   onRequestDownload() {
@@ -40,6 +43,7 @@ export default alt.createStore(class DownloadStore {
     conn.on('data', (data) => {
       if (this.status !== 'downloading') return;
 
+      console.log(data.byteLength);
       this.file.addPacket(data);
       i++;
 

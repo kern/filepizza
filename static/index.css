@@ -51,9 +51,9 @@
 }
 
 .arrow.arrow-animated .arrow-border {
-  -webkit-animation: rotate 2s infinite linear;
-  -moz-animation: rotate 2s infinite linear;
-  animation: rotate 2s infinite linear;
+  -webkit-animation: rotate 5s infinite linear;
+  -moz-animation: rotate 5s infinite linear;
+  animation: rotate 5s infinite linear;
 }
 
 .arrow .arrow-image {

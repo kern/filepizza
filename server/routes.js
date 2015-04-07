@@ -50,7 +50,7 @@ routes.use(function (req, res) {
 
   ReactRouter.run(clientRoutes, req.url, function (Handler) {
     var html = React.renderToString(<Handler data={alt.takeSnapshot()} />);
-    alt.recycle();
+    alt.flush();
     res.write('<!DOCTYPE html>');
     res.end(html);
   });

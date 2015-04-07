@@ -53,6 +53,7 @@ export default alt.createStore(class UploadStore {
 
       for (let j = 0; i < totalPackets && j < chunkSize; i++, j++) {
         let packet = this.file.getPacket(i);
+        console.log(packet.size);
         conn.send(packet);
       }
 
