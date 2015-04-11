@@ -1,16 +1,16 @@
-import uuid from 'node-uuid';
+import uuid from 'node-uuid'
 
-let id = uuid.v4();
+const id = uuid.v4()
 
 if (typeof window === 'undefined') {
-  var peer = { id: id };
+  var peer = { id: id }
 } else {
-  let Peer = require('peerjs');
+  let Peer = require('peerjs')
   var peer = new Peer(id, {
     host: window.location.hostname,
     port: window.location.port,
     path: '/peer'
-  });
+  })
 }
 
-export default peer;
+export default peer

@@ -1,4 +1,4 @@
-const packetSize = 16 * 1024
+const chunkSize = 256 * 1024
 
 export default class UploadFile {
 
@@ -9,16 +9,16 @@ export default class UploadFile {
     this.blob = file
   }
 
-  countPackets() {
-    return Math.ceil(this.size / packetSize)
+  countChunks() {
+    return Math.ceil(this.size / chunkSize)
   }
 
-  getPacket(i) {
-    if (i < 0 || i >= this.countPackets())
-      throw new Error('Packet out of bounds')
+  getChunk(i) {
+    if (i < 0 || i >= this.countChunks())
+      throw new Error('Chunk out of bounds')
 
-    let start = i * packetSize
-    let end = Math.min(start + packetSize, this.size)
+    let start = i * chunkSize
+    let end = Math.min(start + chunkSize, this.size)
     return this.blob.slice(start, end)
   }
 

@@ -1,4 +1,4 @@
-const chunkSize = 32;
+const rankSize = 16;
 
 function blobLength(b) {
   if (typeof b.byteLength !== 'undefined') return b.byteLength;
@@ -9,27 +9,27 @@ function blobLength(b) {
 export default class ChunkedBlob {
 
   constructor() {
-    this.count = 0;
     this.size = 0;
-    this.chunks = [];
-    this.lastChunk = [];
+    this.ranks = [[]];
   }
 
   add(b) {
-    this.count++;
     this.size += blobLength(b);
-    this.lastChunk.push(b);
+    this.ranks[0].push(b);
 
-    if (this.lastChunk.length === chunkSize) {
-      let chunk = new Blob(this.lastChunk);
-      this.chunks.push(chunk);
-      this.lastChunk = [];
+    for (let i = 0; i < this.ranks.length; i++) {
+      let rank = this.ranks[i]
+      if (rank.length === rankSize) {
+        this.ranks[i + 1] = this.ranks[i + 1] || []
+        this.ranks[i + 1].push(new Blob(rank))
+        this.ranks[i] = []
+      }
     }
   }
 
   toBlob() {
-    let allChunks = this.chunks.concat(this.lastChunk);
-    return new Blob(allChunks);
+    let allRanks = [].concat(...this.ranks)
+    return new Blob(allRanks)
   }
 
 }

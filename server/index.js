@@ -5,6 +5,7 @@ var path = require('path');
 var peer = require('peer');
 var routes = require('./routes');
 var socketIO = require('socket.io');
+var morgan = require('morgan');
 
 var app = express();
 var server = http.Server(app);
@@ -19,8 +20,9 @@ server.listen(process.env.PORT || 3000, function () {
 app.set('view engine', 'ejs');
 app.set('views', path.resolve(__dirname, '../views'));
 
-app.use(routes);
 app.use('/peer', peer.ExpressPeerServer(server));
+app.use(morgan('combined'));
+app.use(routes);
 
 io.on('connection', function (socket) {
 

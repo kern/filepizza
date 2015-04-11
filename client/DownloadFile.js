@@ -6,15 +6,15 @@ export default class DownloadFile {
     this.name = name
     this.size = size
     this.type = type
-    this.packets = new ChunkedBlob()
+    this.chunks = new ChunkedBlob()
   }
 
-  addPacket(b) {
-    this.packets.add(b)
+  addChunk(b) {
+    this.chunks.add(b)
   }
 
-  clearPackets() {
-    this.packets = new ChunkedBlob()
+  clearChunks() {
+    this.chunks = new ChunkedBlob()
   }
 
   isComplete() {
@@ -22,11 +22,11 @@ export default class DownloadFile {
   }
 
   getProgress() {
-    return this.packets.size / this.size
+    return this.chunks.size / this.size
   }
 
   download() {
-    let blob = this.packets.toBlob()
+    let blob = this.chunks.toBlob()
     let url = URL.createObjectURL(blob)
     let a = document.createElement('a')
     a.download = this.name

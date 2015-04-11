@@ -25,7 +25,7 @@ export default class DropZone extends React.Component {
     this.setState({ focus: false });
 
     let file = e.dataTransfer.files[0];
-    if (this.props.onDrop) this.props.onDrop(file);
+    if (this.props.onDrop && file) this.props.onDrop(file);
   }
 
   render() {
