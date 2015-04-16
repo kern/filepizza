@@ -27,3 +27,5 @@ node_modules
 # Users Environment Variables
 .lock-wscript
 
+# Compiled assets
+css/index.css

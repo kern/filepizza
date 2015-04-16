@@ -5,18 +5,8 @@ var Upload = require('./Upload')
 var alt = require('../client/alt')
 var clientRoutes = require('../client/routes')
 var express = require('express')
-var nib = require('nib')
-var path = require('path')
-var stylus = require('stylus')
 
 var routes = module.exports = new express.Router()
-
-routes.get('/css', function (req, res) {
-  // req.path = '/index.css'
-  res.send('foo')
-})
-
-routes.use(express.static(__dirname + '/../static'))
 
 routes.get('/d/:token', function (req, res, next) {
 

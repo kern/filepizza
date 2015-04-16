@@ -4,9 +4,7 @@
   "description": "Peer-to-peer file transfers in your browser",
   "main": "server/index.js",
   "scripts": {
-    "start": "./node_modules/.bin/babel-node server/index.js",
-    "build": "./node_modules/.bin/browserify -d -o static/app.js -t babelify client/index.js",
-    "watch": "./node_modules/.bin/watchify -d -o static/app.js -t babelify client/index.js"
+    "start": "./node_modules/.bin/babel-node server/index.js"
   },
   "repository": {
     "type": "git",
@@ -22,8 +20,8 @@
     "alt": "^0.14.4",
     "babel": "^4.7.16",
     "bases": "^0.2.1",
+    "browserify-middleware": "^5.0.2",
     "classnames": "^1.2.0",
-    "ejs": "^2.3.1",
     "express": "^4.12.0",
     "morgan": "^1.5.2",
     "nib": "^1.1.0",
@@ -39,8 +37,7 @@
   },
   "devDependencies": {
     "babelify": "^5.0.4",
-    "browserify": "^9.0.3",
-    "watchify": "^2.4.0"
+    "browserify": "^9.0.3"
   },
   "engines": {
     "node": "0.10.x"

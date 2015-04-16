@@ -17,12 +17,10 @@ server.listen(process.env.PORT || 3000, function () {
   console.log('WebDrop listening on %s:%s', host, port);
 });
 
-app.set('view engine', 'ejs');
-app.set('views', path.resolve(__dirname, '../views'));
-
 app.use('/peer', peer.ExpressPeerServer(server));
 app.use(morgan('combined'));
-app.use(routes);
+app.use(require('./assets'));
+app.use(require('./routes'));
 
 io.on('connection', function (socket) {
 
