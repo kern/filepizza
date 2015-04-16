@@ -1,4 +1,5 @@
 import uuid from 'node-uuid'
+import freeice from 'freeice'
 
 const id = uuid.v4()
 
@@ -9,7 +10,10 @@ if (typeof window === 'undefined') {
   var peer = new Peer(id, {
     host: window.location.hostname,
     port: window.location.port,
-    path: '/peer'
+    path: '/peer',
+    config: {
+      iceServers: freeice()
+    }
   })
 }
 
