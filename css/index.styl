@@ -50,7 +50,7 @@ p {
     height: 100%
     display: table
     background: rgba(0, 0, 0, 0)
-    
+
     &.drop-zone-focus {
         z-index: 1
         background: rgba(0, 0, 0, 0.5)
@@ -96,6 +96,7 @@ p {
     .spinner-image {
         display: block
         width: 150px
+        margin: 0 auto
     }
 
     .spinner-name {
@@ -106,6 +107,8 @@ p {
         text-overflow: ellipsis
         white-space: nowrap
         margin-top: 10px
+        margin: 0 auto
+        width: 65%
     }
 
     .spinner-size {
@@ -154,7 +157,7 @@ p {
     transition: 0.25s
     cursor: pointer
     text-transform: uppercase
-    
+
     &:hover, &:focus {
         box-shadow: inset 0 1px 1px green
         background: light-green
@@ -169,7 +172,7 @@ p {
     height: 60px
     overflow: hidden
     background: beige
-    
+
     .progress-bar-inner {
         float: left
         height: 100%
