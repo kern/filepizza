@@ -13,8 +13,7 @@ export default alt.createStore(class UploadStore {
     this.token = null
     this.file = null
 
-    this.inProgress = 0
-    this.completed = 0
+    this.peerProgress = {}
   }
 
   onUploadFile(file) {
@@ -45,15 +44,39 @@ export default alt.createStore(class UploadStore {
     let i = 0
 
     let sendNextChunk = () => {
+      this.peerProgress[peerID] = i/totalChunks
       if (i === totalChunks) return
       let packet = this.file.getChunk(i)
       conn.send(packet)
       i++
+      this.peerProgress[peerID] = i/totalChunks
+    }
+
+    let numInProgess = () => {
+      var keys = Object.keys(this.peerProgress)
+      var num = 0
+      for (var k = 0; k < keys.length; k++) {
+        if (this.peerProgress[keys[k]] < 1) {
+          num++
+        }
+      }
+      return num
+    }
+
+    let numCompleted = () => {
+      var keys = Object.keys(this.peerProgress)
+      var num = 0
+      for (var k = 0; k < keys.length; k++) {
+        if (this.peerProgress[keys[k]] == 1) {
+          num++
+        }
+      }
+      return num
     }
 
     conn.on('open', () => {
-      this.setState({ inProgress: this.inProgress + 1 })
       sendNextChunk()
+      this.setState({ inProgress: numInProgess()})
     })
 
     conn.on('data', (data) => {
@@ -62,8 +85,8 @@ export default alt.createStore(class UploadStore {
 
     conn.on('close', () => {
       this.setState({
-        inProgress: this.inProgress - 1,
-        completed: this.completed + (i === totalChunks ? 1 : 0)
+        inProgress: numInProgess(),
+        completed: numCompleted()
       })
     })
   }
