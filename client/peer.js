@@ -1,5 +1,4 @@
 import uuid from 'node-uuid'
-import freeice from 'freeice'
 
 const id = uuid.v4()
 
@@ -12,7 +11,17 @@ if (typeof window === 'undefined') {
     port: window.location.port,
     path: '/peer',
     config: {
-      iceServers: freeice()
+      iceServers: [{
+        'url': 'stun:stun.l.google.com:19302'
+      }, {
+        'url': 'turn:52.12.203.39:80',
+        'username': 'file',
+        'credential': 'pizza'
+      }, {
+        'url': 'turn:52.12.203.39:443',
+        'username': 'file',
+        'credential': 'pizza'
+      }]
     }
   })
 }
