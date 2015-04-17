@@ -10,7 +10,8 @@ export default class ProgressBar extends React.Component {
   render() {
     const failed = this.props.value < 0;
     const classes = classnames('progress-bar', {
-      'progress-bar-failed': failed
+      'progress-bar-failed': failed,
+      'progress-bar-small': this.props.small
     })
 
     const formatted = formatProgress(this.props.value)
@@ -30,5 +31,10 @@ export default class ProgressBar extends React.Component {
 }
 
 ProgressBar.propTypes = {
-  value: React.PropTypes.number.isRequired
+  value: React.PropTypes.number.isRequired,
+  small: React.PropTypes.boolean
+}
+
+ProgressBar.defaultProps = {
+  small: false
 }
