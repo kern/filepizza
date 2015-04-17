@@ -6,6 +6,7 @@ light-blue = #40C0CB
 light-gray = #EEE
 light-green = #AEE239
 light-red = #E23430
+light-yellow = #FFE476
 red = #C40D08
 
 @keyframes rotate {
@@ -197,6 +198,18 @@ p {
             float: none
             text-align: center
             margin-right: 0
+        }
+    }
+
+    &.progress-bar-in-progress {
+
+        .progress-bar-inner {
+            background: #FFCC00
+            box-shadow: inset 0 1px 1px light-yellow
+        }
+
+        .progress-bar-text {
+            color: black
         }
     }
 

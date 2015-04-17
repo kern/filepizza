@@ -9,8 +9,10 @@ export default class ProgressBar extends React.Component {
 
   render() {
     const failed = this.props.value < 0;
+    const inProgress = this.props.value < 1 && this.props.value > 0;
     const classes = classnames('progress-bar', {
       'progress-bar-failed': failed,
+      'progress-bar-in-progress': inProgress,
       'progress-bar-small': this.props.small
     })
 

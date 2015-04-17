@@ -70,7 +70,7 @@ export default class UploadPage extends React.Component {
             numCompleted++
           }
         }
-
+        keys.reverse()
         return <div className="page">
 
           <Spinner dir="up" animated {...this.state.file} />
@@ -80,7 +80,7 @@ export default class UploadPage extends React.Component {
           <p>This link will work as long as this page is open.</p>
 
           <div className="data">
-            { Object.keys(this.state.peerProgress).map((key) => {
+            { keys.map((key) => {
               return <ProgressBar value={this.state.peerProgress[key]} small />
             })}
           </div>
