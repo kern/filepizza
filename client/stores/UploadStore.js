@@ -61,6 +61,9 @@ export default alt.createStore(class UploadStore {
     })
 
     conn.on('close', () => {
+      if (this.peerProgress[peerID] < 1) {
+        this.peerProgress[peerID] = -1
+      }
       this.setState({ peerProgress: this.peerProgress })
     })
   }
