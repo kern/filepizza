@@ -63,6 +63,7 @@ export default class UploadPage extends React.Component {
         var keys = Object.keys(this.state.peerProgress)
         keys.reverse()
         return <div className="page">
+          <h1>FilePizza</h1>
           <Spinner dir="up" animated {...this.state.file} />
 
           <p>Send someone this link to download.</p>

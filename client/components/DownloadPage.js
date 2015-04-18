@@ -38,7 +38,7 @@ export default class DownloadPage extends React.Component {
     switch (this.state.status) {
       case 'ready':
         return <div className="page">
-
+          <h1>FilePizza</h1>
           <Spinner dir="down"
             name={this.state.file.name}
             size={this.state.file.size} />
@@ -50,7 +50,7 @@ export default class DownloadPage extends React.Component {
       case 'requesting':
       case 'downloading':
         return <div className="page">
-
+          <h1>FilePizza</h1>
           <Spinner dir="down" animated
             name={this.state.file.name}
             size={this.state.file.size} />
@@ -61,7 +61,7 @@ export default class DownloadPage extends React.Component {
 
       case 'cancelled':
         return <div className="page">
-
+          <h1>FilePizza</h1>
           <Spinner dir="down"
             name={this.state.file.name}
             size={this.state.file.size} />
@@ -72,7 +72,7 @@ export default class DownloadPage extends React.Component {
 
       case 'done':
         return <div className="page">
-
+          <h1>FilePizza</h1>
           <Spinner dir="down"
             name={this.state.file.name}
             size={this.state.file.size} />
