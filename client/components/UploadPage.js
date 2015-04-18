@@ -61,15 +61,6 @@ export default class UploadPage extends React.Component {
 
       case 'uploading':
         var keys = Object.keys(this.state.peerProgress)
-        var numInProgress = 0
-        var numCompleted = 0
-        for (var k = 0; k < keys.length; k++) {
-          if (this.state.peerProgress[keys[k]] < 1) {
-            numInProgress++
-          } else {
-            numCompleted++
-          }
-        }
         keys.reverse()
         return <div className="page">
 
