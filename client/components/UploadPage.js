@@ -43,7 +43,7 @@ export default class UploadPage extends React.Component {
           <DropZone onDrop={this.uploadFile.bind(this)} />
           <Spinner dir="up" />
 
-          <h1>WebDrop</h1>
+          <h1>FilePizza</h1>
           <p>The easiest way to send someone a file.</p>
           <p>Drag the file into this window to get started.</p>
 
@@ -54,7 +54,7 @@ export default class UploadPage extends React.Component {
 
           <Spinner dir="up" animated />
 
-          <h1>WebDrop</h1>
+          <h1>FilePizza</h1>
           <p>Processing...</p>
 
         </div>
