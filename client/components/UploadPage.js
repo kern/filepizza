@@ -1,5 +1,6 @@
 import Spinner from './Spinner'
 import DropZone from './DropZone'
+import ProgressBar from './ProgressBar'
 import React from 'react'
 import Tempalink from './Tempalink'
 import UploadActions from '../actions/UploadActions'
@@ -59,17 +60,20 @@ export default class UploadPage extends React.Component {
         </div>
 
       case 'uploading':
+        var keys = Object.keys(this.state.peerProgress)
+        keys.reverse()
         return <div className="page">
-
           <Spinner dir="up" animated {...this.state.file} />
 
-          <Tempalink token={this.state.token} />
           <p>Send someone this link to download.</p>
           <p>This link will work as long as this page is open.</p>
+          <Tempalink token={this.state.token} />
 
+          {keys.length > 0 ? <p>People Downloading Your File</p> : <p></p>}
           <div className="data">
-            <div className="datum"><strong>In Progress:</strong> {this.state.inProgress}</div>
-            <div className="datum"><strong>Completed:</strong> {this.state.completed}</div>
+            { keys.map((key) => {
+              return <ProgressBar value={this.state.peerProgress[key]} small />
+            })}
           </div>
 
         </div>

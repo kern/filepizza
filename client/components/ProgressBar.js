@@ -9,8 +9,11 @@ export default class ProgressBar extends React.Component {
 
   render() {
     const failed = this.props.value < 0;
+    const inProgress = this.props.value < 1 && this.props.value > 0;
     const classes = classnames('progress-bar', {
-      'progress-bar-failed': failed
+      'progress-bar-failed': failed,
+      'progress-bar-in-progress': inProgress,
+      'progress-bar-small': this.props.small
     })
 
     const formatted = formatProgress(this.props.value)
@@ -18,17 +21,23 @@ export default class ProgressBar extends React.Component {
     return <div className={classes}>
       {failed
         ? <div className="progress-bar-text">Failed</div>
-        : <div
+        : inProgress ? <div
           className="progress-bar-inner"
           style={{width: formatted}}>
           <div className="progress-bar-text">
             {formatted}
           </div>
-        </div>}
+        </div>
+        : <div className="progress-bar-text">Done</div>}
       </div>
   }
 }
 
 ProgressBar.propTypes = {
-  value: React.PropTypes.number.isRequired
+  value: React.PropTypes.number.isRequired,
+  small: React.PropTypes.boolean
+}
+
+ProgressBar.defaultProps = {
+  small: false
 }
