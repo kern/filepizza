@@ -172,7 +172,7 @@ p {
 .progress-bar {
     height: 60px
     overflow: hidden
-    background: beige
+    background: green
 
     .progress-bar-inner {
         float: left
@@ -183,10 +183,12 @@ p {
     }
 
     .progress-bar-text {
-        float: right
+        float: none
+        margin-right: 0
+
         font: 14px/60px "Quicksand", sans-serif
         color: white
-        margin-right: 5px
+        text-align: center
         text-transform: uppercase
     }
 
@@ -197,12 +199,11 @@ p {
         .progress-bar-text {
             float: none
             text-align: center
-            margin-right: 0
         }
     }
 
     &.progress-bar-in-progress {
-
+        background: beige
         .progress-bar-inner {
             background: #FFCC00
             box-shadow: inset 0 1px 1px light-yellow
@@ -210,6 +211,8 @@ p {
 
         .progress-bar-text {
             color: black
+            float: right
+            margin-right: 5px
         }
     }
 

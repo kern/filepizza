@@ -21,13 +21,14 @@ export default class ProgressBar extends React.Component {
     return <div className={classes}>
       {failed
         ? <div className="progress-bar-text">Failed</div>
-        : <div
+        : inProgress ? <div
           className="progress-bar-inner"
           style={{width: formatted}}>
           <div className="progress-bar-text">
             {formatted}
           </div>
-        </div>}
+        </div>
+        : <div className="progress-bar-text">Done</div>}
       </div>
   }
 }
