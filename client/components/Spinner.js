@@ -20,8 +20,6 @@ export default class Spinner extends React.Component {
 
     return <div className={classes}>
 
-      <div className="spinner-border" />
-
       <div className="spinner-content">
 
         <img
@@ -34,6 +32,10 @@ export default class Spinner extends React.Component {
         {this.props.size === null ? null
           : <div className="spinner-size">{formatSize(this.props.size)}</div>}
 
+      </div>
+
+      <div className="spinner-background">
+        <img src='/images/spinner-pizza.png' width="300" height="300"/>
       </div>
 
     </div>
