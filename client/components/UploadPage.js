@@ -63,13 +63,13 @@ export default class UploadPage extends React.Component {
         var keys = Object.keys(this.state.peerProgress)
         keys.reverse()
         return <div className="page">
-
           <Spinner dir="up" animated {...this.state.file} />
 
-          <Tempalink token={this.state.token} />
           <p>Send someone this link to download.</p>
           <p>This link will work as long as this page is open.</p>
+          <Tempalink token={this.state.token} />
 
+          {keys.length > 0 ? <p>People Downloading Your File</p> : <p></p>}
           <div className="data">
             { keys.map((key) => {
               return <ProgressBar value={this.state.peerProgress[key]} small />
