@@ -14,11 +14,19 @@ if (typeof window === 'undefined') {
       iceServers: [{
         'url': 'stun:stun.l.google.com:19302'
       }, {
-        'url': 'turn:52.12.203.39:80',
+        'url': 'turn:52.12.205.113:3478?transport=udp',
         'username': 'file',
         'credential': 'pizza'
       }, {
-        'url': 'turn:52.12.203.39:443',
+        'url': 'turn:52.12.205.113:3479?transport=udp',
+        'username': 'file',
+        'credential': 'pizza'
+      }, {
+        'url': 'turn:52.12.205.113:3478?transport=tcp',
+        'username': 'file',
+        'credential': 'pizza'
+      }, {
+        'url': 'turn:52.12.205.113:3479?transport=tcp',
         'username': 'file',
         'credential': 'pizza'
       }]
