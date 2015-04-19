@@ -27,4 +27,4 @@ routes.get('/js', browserify(path.resolve(__dirname, '../client/index.js'), {
   transform: 'babelify'
 }))
 
-routes.use('/images', express.static(path.resolve(__dirname, '../images')))
+routes.use(express.static(path.resolve(__dirname, '../static')))
