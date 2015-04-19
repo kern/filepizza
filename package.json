@@ -1,5 +1,5 @@
 {
-  "name": "webdrop",
+  "name": "filepizza",
   "version": "0.0.0",
   "description": "Peer-to-peer file transfers in your browser",
   "main": "server/index.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:kern/webdrop.git"
+    "url": "git@github.com:kern/filepizza.git"
   },
   "author": "Alex Kern <alex@kern.io>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kern/webdrop/issues"
+    "url": "https://github.com/kern/filepizza/issues"
   },
-  "homepage": "https://github.com/kern/webdrop",
+  "homepage": "https://github.com/kern/filepizza",
   "dependencies": {
     "alt": "^0.14.4",
     "babel": "^4.7.16",
