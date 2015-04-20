@@ -35,7 +35,7 @@ export default class ProgressBar extends React.Component {
 
 ProgressBar.propTypes = {
   value: React.PropTypes.number.isRequired,
-  small: React.PropTypes.boolean
+  small: React.PropTypes.bool
 }
 
 ProgressBar.defaultProps = {
