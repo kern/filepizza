@@ -34,9 +34,7 @@ export default class Spinner extends React.Component {
 
       </div>
 
-      <div className="spinner-background">
-        <img src='/images/spinner-pizza.png' width="300" height="300"/>
-      </div>
+      <img src="/images/pizza.png" className="spinner-background" />
 
     </div>
   }
