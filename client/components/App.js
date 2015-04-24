@@ -12,7 +12,7 @@ export default class App extends React.Component {
         <meta property="og:url" content="http://file.pizza" />
         <meta property="og:title" content="FilePizza - Send Files, Easily" />
         <meta property="og:description" content="Peer-to-peer file transfers in your web browser." />
-        <meta property="og:image" content="/images/fb.png" />
+        <meta property="og:image" content="http://file.pizza/images/fb.png" />
         <title>FilePizza - Send Files, Easily</title>
 
         <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Quicksand:300,400,700" />
