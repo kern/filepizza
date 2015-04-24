@@ -18,7 +18,7 @@ if (typeof window === 'undefined') {
         'username': 'file',
         'credential': 'pizza'
       }, {
-        'url': 'turn:52.12.205.113:3479?transport=udp',
+        'url': 'turn:52.12.205.113:80?transport=udp',
         'username': 'file',
         'credential': 'pizza'
       }, {
@@ -26,7 +26,7 @@ if (typeof window === 'undefined') {
         'username': 'file',
         'credential': 'pizza'
       }, {
-        'url': 'turn:52.12.205.113:3479?transport=tcp',
+        'url': 'turn:52.12.205.113:80?transport=tcp',
         'username': 'file',
         'credential': 'pizza'
       }]
