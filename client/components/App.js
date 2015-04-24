@@ -9,8 +9,9 @@ export default class App extends React.Component {
       <FrozenHead>
 
         <meta charSet="utf-8" />
-        <meta property="og:url" content="file.pizza" />
+        <meta property="og:url" content="http://file.pizza" />
         <meta property="og:title" content="FilePizza - Send Files, Easily" />
+        <meta property="og:description" content="Peer-to-peer file transfers in your web browser." />
         <meta property="og:image" content="/images/fb.png" />
         <title>FilePizza - Send Files, Easily</title>
 
