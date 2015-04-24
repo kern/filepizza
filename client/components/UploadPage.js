@@ -1,7 +1,8 @@
-import Spinner from './Spinner'
+import Centered from './Centered'
 import DropZone from './DropZone'
 import ProgressBar from './ProgressBar'
 import React from 'react'
+import Spinner from './Spinner'
 import Tempalink from './Tempalink'
 import UploadActions from '../actions/UploadActions'
 import UploadStore from '../stores/UploadStore'
@@ -38,31 +39,34 @@ export default class UploadPage extends React.Component {
   render() {
     switch (this.state.status) {
       case 'ready':
-        return <div className="page">
 
-          <DropZone onDrop={this.uploadFile.bind(this)} />
-          <Spinner dir="up" />
+        return <DropZone onDrop={this.uploadFile.bind(this)}>
+          <Centered ver>
 
-          <h1>FilePizza</h1>
-          <p>The easiest way to send someone a file.</p>
-          <p>Drag the file into this window to get started.</p>
+            <Spinner dir="up" />
 
-        </div>
+            <h1>FilePizza</h1>
+            <p>The easiest way to send someone a file.</p>
+            <p>Drag the file into this window to get started.</p>
+
+          </Centered>
+        </DropZone>
 
       case 'processing':
-        return <div className="page">
+        return <Centered ver>
 
           <Spinner dir="up" animated />
 
           <h1>FilePizza</h1>
           <p>Processing...</p>
 
-        </div>
+        </Centered>
 
       case 'uploading':
         var keys = Object.keys(this.state.peerProgress)
         keys.reverse()
-        return <div className="page">
+        return <Centered ver>
+
           <h1>FilePizza</h1>
           <Spinner dir="up" animated {...this.state.file} />
 
@@ -70,14 +74,14 @@ export default class UploadPage extends React.Component {
           <p>This link will work as long as this page is open.</p>
           <Tempalink token={this.state.token} />
 
-          {keys.length > 0 ? <p>People Downloading Your File</p> : <p></p>}
+          {keys.length > 0 ? <p>Download Progress</p> : null}
           <div className="data">
-            { keys.map((key) => {
-              return <ProgressBar value={this.state.peerProgress[key]} small />
+            {keys.map((key) => {
+              return <ProgressBar small value={this.state.peerProgress[key]} />
             })}
           </div>
 
-        </div>
+        </Centered>
     }
   }
 

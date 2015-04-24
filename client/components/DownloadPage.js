@@ -1,7 +1,8 @@
+import Centered from './Centered'
 import DownloadActions from '../actions/DownloadActions'
 import DownloadButton from './DownloadButton'
-import ProgressBar from './ProgressBar'
 import DownloadStore from '../stores/DownloadStore'
+import ProgressBar from './ProgressBar'
 import React from 'react'
 import Spinner from './Spinner'
 import peer from '../peer'
@@ -37,7 +38,8 @@ export default class DownloadPage extends React.Component {
   render() {
     switch (this.state.status) {
       case 'ready':
-        return <div className="page">
+        return <Centered ver>
+
           <h1>FilePizza</h1>
           <Spinner dir="down"
             name={this.state.file.name}
@@ -45,11 +47,12 @@ export default class DownloadPage extends React.Component {
 
           <DownloadButton onClick={this.downloadFile.bind(this)} />
 
-        </div>
+        </Centered>
 
       case 'requesting':
       case 'downloading':
-        return <div className="page">
+        return <Centered ver>
+
           <h1>FilePizza</h1>
           <Spinner dir="down" animated
             name={this.state.file.name}
@@ -57,10 +60,11 @@ export default class DownloadPage extends React.Component {
 
           <ProgressBar value={this.state.progress} />
 
-        </div>
+        </Centered>
 
       case 'cancelled':
-        return <div className="page">
+        return <Centered ver>
+
           <h1>FilePizza</h1>
           <Spinner dir="down"
             name={this.state.file.name}
@@ -68,10 +72,11 @@ export default class DownloadPage extends React.Component {
 
           <ProgressBar value={-1} />
 
-        </div>
+        </Centered>
 
       case 'done':
-        return <div className="page">
+        return <Centered ver>
+
           <h1>FilePizza</h1>
           <Spinner dir="down"
             name={this.state.file.name}
@@ -79,7 +84,7 @@ export default class DownloadPage extends React.Component {
 
           <ProgressBar value={1} />
 
-        </div>
+        </Centered>
     }
   }
 

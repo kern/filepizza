@@ -14,13 +14,13 @@ export default class App extends React.Component {
         <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Quicksand:300,400,700" />
         <link rel="stylesheet" href="/css" />
 
+        <script src="/js" />
+
       </FrozenHead>
 
       <body>
-        <div className="container">
-          <RouteHandler />
-          <script src="/js" />
-        </div>
+        <RouteHandler />
+        <script>FilePizza()</script>
       </body>
     </html>
   }
