@@ -11,4 +11,4 @@ Peer-to-peer file transfers in your browser
 
 ## License
 
-MIT
+BSD
