@@ -2,9 +2,9 @@
   "name": "filepizza",
   "version": "0.0.0",
   "description": "Peer-to-peer file transfers in your browser",
-  "main": "lib/server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "./node_modules/.bin/babel-node lib/server.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -35,7 +35,8 @@
     "react-router": "^0.13.1",
     "socket.io": "^1.3.5",
     "stylus": "^0.50.0",
-    "webrtcsupport": "^2.1.2"
+    "webrtcsupport": "^2.1.2",
+    "xkcd-password": "^1.2.0"
   },
   "engines": {
     "node": "0.10.x"
