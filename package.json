@@ -20,7 +20,6 @@
     "alt": "^0.14.4",
     "babel": "^4.7.16",
     "babelify": "^5.0.4",
-    "bases": "^0.2.1",
     "browserify": "^9.0.3",
     "browserify-middleware": "^5.0.2",
     "classnames": "^1.2.0",
