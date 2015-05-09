@@ -31,6 +31,7 @@
     "peer": "^0.2.8",
     "react": "^0.13.0",
     "react-frozenhead": "^0.3.0",
+    "react-google-analytics": "^0.2.0",
     "react-router": "^0.13.1",
     "socket.io": "^1.3.5",
     "stylus": "^0.50.0",
