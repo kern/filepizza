@@ -213,3 +213,29 @@ p {
         }
     }
 }
+
+label.myLabel input[type="file"] {
+    position: fixed;
+    top: -1000px;
+}
+
+.myLabel {
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    padding: 2px 5px;
+    margin: 2px;
+    background: #EEE;
+    display: inline-block;
+}
+.myLabel:hover {
+    background: #CCC;
+}
+.myLabel:active {
+    background: #CCF;
+}
+.myLabel :invalid + span {
+    color: #A44;
+}
+.myLabel :valid + span {
+    color: #4A4;
+}
