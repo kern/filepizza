@@ -3,6 +3,7 @@ dark-gray = #333
 gray = #777
 green = #8FBE00
 light-blue = #40C0CB
+light-gray = #EEE
 light-green = #AEE239
 light-red = #E23430
 light-yellow = #FFE476
@@ -224,21 +225,23 @@ p.subtitle {
 }
 
 label.select-file-label input[type="file"] {
-    position: fixed;
-    top: -1000px;
+    position: fixed
+    top: -1000px
 }
 
 .select-file-label {
-    border: 2px solid #CCC;
-    border-radius: 4px;
-    padding: 2px 5px;
-    margin-top: 5px;
-    background: #EEE;
-    display: inline-block;
-}
-.select-file-label:hover {
-    background: #CCC;
-}
-.select-file-label:active {
-    background: #BBB;
+    border: 2px solid gray
+    border-radius: 4px
+    padding: 2px 5px
+    margin-top: 5px
+    background: light-gray
+    display: inline-block
+    cursor: pointer
+    transition: all 0.25s ease
+
+    &:hover, &:active {
+        border-color: beige
+        background: white
+        color: red
+    }
 }
