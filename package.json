@@ -28,6 +28,7 @@
     "filepizza-socket": "./node_modules/filepizza-socket",
     "morgan": "^1.5.2",
     "nib": "^1.1.0",
+    "node-uuid": "^1.4.3",
     "peer": "^0.2.8",
     "react": "^0.13.0",
     "react-frozenhead": "^0.3.0",
