@@ -25,10 +25,6 @@ h1 {
     margin: 0 0 10px;
 }
 
-h1.with-subtitle {
-  margin: 0;
-}
-
 a {
   color: gray
 }
@@ -39,14 +35,9 @@ strong {
 
 p {
     color: gray;
-    font: 16px/22px "Quicksand", sans-serif;
+    font: 18px/22px "Quicksand", sans-serif;
     text-align: center;
     margin: 0 0;
-}
-
-p.subtitle {
-  font: 18px/24px "Quicksand", sans-serif;
-  margin-bottom: 10px;
 }
 
 p.byline {
@@ -243,16 +234,11 @@ p.byline {
     }
 }
 
-label.select-file-label input[type="file"] {
-    position: fixed
-    top: -1000px
-}
-
 .select-file-label {
     border: 2px solid gray
     border-radius: 4px
     padding: 2px 5px
-    margin-top: 5px
+    margin-top: 10px
     background: light-gray
     display: inline-block
     cursor: pointer
@@ -262,5 +248,10 @@ label.select-file-label input[type="file"] {
         border-color: beige
         background: white
         color: red
+    }
+
+    input[type="file"] {
+        position: fixed
+        top: -1000px
     }
 }
