@@ -36,6 +36,7 @@
     "react-google-analytics": "^0.2.0",
     "react-router": "^0.13.1",
     "socket.io": "^1.3.5",
+    "socket.io-client": "^1.3.5",
     "stylus": "^0.50.0",
     "webrtcsupport": "^2.1.2",
     "xkcd-password": "^1.2.0"
