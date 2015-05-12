@@ -1,7 +1,7 @@
 {
   "name": "filepizza",
   "version": "0.0.0",
-  "description": "Peer-to-peer file transfers in your browser",
+  "description": "Free peer-to-peer file transfers in your browser.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -28,12 +28,15 @@
     "filepizza-socket": "./node_modules/filepizza-socket",
     "morgan": "^1.5.2",
     "nib": "^1.1.0",
+    "node-uuid": "^1.4.3",
     "peer": "^0.2.8",
+    "peerjs": "^0.3.14",
     "react": "^0.13.0",
     "react-frozenhead": "^0.3.0",
     "react-google-analytics": "^0.2.0",
     "react-router": "^0.13.1",
     "socket.io": "^1.3.5",
+    "socket.io-client": "^1.3.5",
     "stylus": "^0.50.0",
     "webrtcsupport": "^2.1.2",
     "xkcd-password": "^1.2.0"
