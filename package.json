@@ -30,6 +30,7 @@
     "nib": "^1.1.0",
     "node-uuid": "^1.4.3",
     "peer": "^0.2.8",
+    "peerjs": "^0.3.14",
     "react": "^0.13.0",
     "react-frozenhead": "^0.3.0",
     "react-google-analytics": "^0.2.0",
