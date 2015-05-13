@@ -1,6 +1,6 @@
-# FilePizza
+![wordmark](static/images/wordmark.png)
 
-**Free peer-to-peer file transfers in your browser**
+###Free peer-to-peer file transfers in your browser
 
 Cooked up by [Alex Kern](http://kern.io) & [Neeraj Baid](http://neeraj.io) while eating *Sliver* @ UC Berkeley.
 
