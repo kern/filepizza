@@ -4,7 +4,7 @@
 
 Cooked up by [Alex Kern](http://kern.io) & [Neeraj Baid](http://neeraj.io) while eating *Sliver* @ UC Berkeley.
 
-![XKCD 949](http://imgs.xkcd.com/comics/file_transfer.png)
+[![XKCD 949](http://imgs.xkcd.com/comics/file_transfer.png)](https://xkcd.com/949/)
 
 ## Overview
 
