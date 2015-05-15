@@ -8,14 +8,19 @@ Cooked up by [Alex Kern](http://kern.io) & [Neeraj Baid](http://neeraj.io) while
 
 ## Overview
 
-FilePizza enables private and much faster P2P file transfer over the web.
+FilePizza enables fast and private peer-to-peer file transfers in your web browser.
 
-By using web protocol [WebRTC](http://www.webrtc.org), we eliminate the slow and costly initial upload step traditionally required when sharing files via Dropbox/CloudApp/etc. For most files, this is a big deal. Instead of first sending the file to an external server, the sender immediately gets a link they can distribute. And when a recipient clicks it, they connect directly to the sender’s computer to complete the download, eliminating the server middleman. Because the file is never actually saved on, or even touches, our servers, the transfer is incredibly private and secure.
+By using [WebRTC](http://www.webrtc.org), FilePizza eliminates the initial upload traditionally required when sharing files via file sharing services (e.g. Dropbox). Instead of transmitting files through an intermediary server, the sender initializes a transfer and receives a "tempalink" they can distribute. When recipients click on this link, they connect directly to the sender’s browser to complete the download. Because the file never touches the server, the transfer is fast, private, and secure. For larger files, this is an especially big deal.
 
 ## Usage
 
     $ npm install
     $ npm start
+
+## Requirements
+
+* node `0.10.x`
+* npm `2.x.x`
 
 ## License
 
