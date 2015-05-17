@@ -22,6 +22,15 @@ By using [WebRTC](http://www.webrtc.org), FilePizza eliminates the initial uploa
 * node `0.12.x`
 * npm `2.x.x`
 
+## Troubleshooting
+
+If you receive a `Error: EMFILE, too many open files` error when running `npm
+start` on a Mac, this is a result of Browserify's compilation step opening up a
+large number of npm modules all at once. You'll have to increase the maximum
+number of open files allowed on your system:
+
+    $ sysctl -w kern.maxfiles=20480
+
 ## License
 
 BSD
