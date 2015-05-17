@@ -19,7 +19,7 @@ By using [WebRTC](http://www.webrtc.org), FilePizza eliminates the initial uploa
 
 ## Requirements
 
-* node `0.10.x`
+* node `0.12.x`
 * npm `2.x.x`
 
 ## License
