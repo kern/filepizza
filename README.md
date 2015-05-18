@@ -17,6 +17,10 @@ By using [WebRTC](http://www.webrtc.org), FilePizza eliminates the initial uploa
     $ npm install
     $ npm start
 
+You can specify the port that FilePizza's HTTP server uses by setting the `PORT` environment variable:
+
+    $ env PORT=8080 npm start
+
 ## Requirements
 
 * node `0.12.x`
