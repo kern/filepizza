@@ -1,6 +1,6 @@
 {
   "name": "filepizza",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Free peer-to-peer file transfers in your browser.",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git@github.com:kern/filepizza.git"
   },
-  "author": "Alex Kern <alex@kern.io>",
+  "author": "Alex Kern <alex@kern.io> (http://kern.io)",
   "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/kern/filepizza/issues"
@@ -42,6 +42,10 @@
     "xkcd-password": "^1.2.0"
   },
   "engines": {
-    "node": "0.10.x"
+    "node": "0.12.x"
+  },
+  "preferGlobal": "true",
+  "bin": {
+    "filepizza" : "index.js"
   }
 }
