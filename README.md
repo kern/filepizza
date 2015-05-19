@@ -1,6 +1,6 @@
 ![wordmark](static/images/wordmark.png)
 
-###Free peer-to-peer file transfers in your browser
+### Free peer-to-peer file transfers in your browser
 
 Cooked up by [Alex Kern](http://kern.io) & [Neeraj Baid](http://neeraj.io) while eating *Sliver* @ UC Berkeley.
 
@@ -12,19 +12,27 @@ FilePizza enables fast and private peer-to-peer file transfers in your web brows
 
 By using [WebRTC](http://www.webrtc.org), FilePizza eliminates the initial upload traditionally required when sharing files via file sharing services (e.g. Dropbox). Instead of transmitting files through an intermediary server, the sender initializes a transfer and receives a "tempalink" they can distribute. When recipients click on this link, they connect directly to the sender’s browser to complete the download. Because the file never touches the server, the transfer is fast, private, and secure. For larger files, this is an especially big deal.
 
-## Usage
-
-    $ npm install
-    $ npm start
-
-You can specify the port that FilePizza's HTTP server uses by setting the `PORT` environment variable:
-
-    $ env PORT=8080 npm start
+A hosted instance of FilePizza is available at [file.pizza](http://file.pizza).
 
 ## Requirements
 
 * node `0.12.x`
 * npm `2.x.x`
+
+## Installation
+
+    $ npm install filepizza -g
+    $ filepizza
+
+You can specify the port that FilePizza's HTTP server uses by setting the `PORT` environment variable (default 3000):
+
+    $ env PORT=8080 filepizza
+
+## Development
+
+    $ git clone https://github.com/kern/filepizza.git
+    $ npm install
+    $ npm start
 
 ## Troubleshooting
 
