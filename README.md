@@ -34,6 +34,26 @@ You can specify the port that FilePizza's HTTP server uses by setting the `PORT`
     $ npm install
     $ npm start
 
+FilePizza is an isomorphic React application which uses the Flux application architecture. ES6 features are used liberally and compiled using Babel. Views are rendered on the server, store data is serialized and sent to the client, which then picks up where the server left off.
+
+Both client and server JavaScript files can be found in `lib/`. `lib/server.js` and `lib/client.js` are the server and client entrypoints, respectively. `lib/components/`, `lib/stores/`, and `lib/actions/` contain the corresponding Flux modules, implemented using [alt](https://github.com/goatslacker/alt). `lib/routes.js` serves as the isomorphic routes file using [react-router](https://github.com/rackt/react-router).
+
+Stylesheets are automatically compiled using Stylus and are available at `/css`. Client-side JavaScript is compiled using Browserify and is available at `/js`.
+
+## FAQ
+
+**Where are my files sent?** Your files never touch our server. Instead, they are sent directly from the uploader's browser to the downloader's browser using WebRTC. This requires that the uploader leave their browser window open until the transfer is complete.
+
+**Can multiple people download my file at once?** Yes! Just send them your tempalink.
+
+**How big can my files be?** Chrome has issues supporting files >500 MB. Firefox does not have any issues with large files, however.
+
+**What happens when I close my browser?** The tempalink is invalidated, and all downloads in progress will fail. All completed transfers will be unaffected.
+
+**Are my files encrypted?** Yes, all WebRTC communications are automatically encrypted using public-key cryptography.
+
+**My files are sending slowly!** Transfer speed is dependent on your network connection.
+
 ## Troubleshooting
 
 If you receive a `Error: EMFILE, too many open files` error when running `npm
