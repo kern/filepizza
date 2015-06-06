@@ -38,21 +38,35 @@ p {
     font: 18px/22px "Quicksand", sans-serif;
     text-align: center;
     margin: 0;
+
+    &.notice {
+        margin: 10px 0;
+    }
 }
 
-p.byline {
-    position: absolute;
-    bottom: 0;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 15px;
-    left: 0;
-    right: 0;
-    font: 16px/22px "Quicksand", sans-serif;
+body {
+    display: table;
+    width: 100%;
 }
 
-p.notice {
-    margin: 10px 0;
+.byline {
+    display: table-row;
+    font: 12px/40px "Quicksand", sans-serif;
+    text-align: center;
+    color: gray;
+    height: 40px;
+}
+
+.container {
+    display: table-row;
+    vertical-align: center;
+}
+
+.page {
+    display: flex
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
 }
 
 .drop-zone {
