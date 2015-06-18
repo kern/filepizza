@@ -18,7 +18,7 @@
   "homepage": "https://github.com/kern/filepizza",
   "dependencies": {
     "alt": "^0.14.4",
-    "babel": "^4.7.16",
+    "babel": "^5.5.8",
     "babelify": "^5.0.4",
     "browserify": "^9.0.3",
     "browserify-middleware": "^5.0.2",
@@ -45,7 +45,5 @@
     "node": "0.12.x"
   },
   "preferGlobal": "true",
-  "bin": {
-    "filepizza" : "index.js"
-  }
+  "bin": "./index.js"
 }
