@@ -29,3 +29,8 @@ node_modules/*
 
 # Compiled assets
 css/index.css
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
