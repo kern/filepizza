@@ -7,7 +7,8 @@ light-gray = #EEE
 light-green = #AEE239
 light-red = #E23430
 light-yellow = #FFE476
-red = #AE1E1D
+red = #B11C17
+yellow = #DEAC11
 
 @keyframes rotate {
     from { transform: rotate(0deg) }
@@ -50,20 +51,19 @@ body {
 }
 
 .footer {
-    display: table;
-    width: 100%;
-    padding: 20px;
-
-    form {
-        text-align: center;
-        display: table-row;
-    }
+    text-align: center;
+    color: gray;
+    padding: 20px 0 10px
 
     p {
-        display: table-row;
         font: 12px/20px "Quicksand", sans-serif;
-        text-align: center;
-        color: gray;
+    }
+
+    form p {
+        display: inline;
+    }
+
+    .byline {
         padding: 0 10px;
     }
 }
@@ -276,7 +276,7 @@ body {
     transition: all 0.25s ease
 
     &:hover, &:active {
-        border-color: beige
+        border-color: yellow
         background: white
         color: red
     }
@@ -284,5 +284,24 @@ body {
     input[type="file"] {
         position: fixed
         top: -1000px
+    }
+}
+
+.donate-button {
+    border: 2px solid red
+    border-radius: 4px
+    padding: 2px 5px
+    margin-right: 10px
+    background: yellow
+    display: inline-block
+    cursor: pointer
+    transition: all 0.25s ease
+    font: 12px/1 "Quicksand", sans-serif
+    color: white
+
+    &:hover, &:active {
+        border-color: yellow
+        background: white
+        color: red
     }
 }
