@@ -27,6 +27,7 @@
     "filepizza-peerjs": "^1.0.0",
     "filepizza-socket": "^1.0.0",
     "morgan": "^1.5.2",
+    "newrelic": "^1.21.1",
     "nib": "^1.1.0",
     "node-uuid": "^1.4.3",
     "peer": "^0.2.8",
