@@ -42,13 +42,13 @@ Stylesheets are automatically compiled using Stylus and are available at `/css`.
 
 ## FAQ
 
-**Where are my files sent?** Your files never touch our server. Instead, they are sent directly from the uploader's browser to the downloader's browser using WebRTC. This requires that the uploader leave their browser window open until the transfer is complete.
+**Where are my files sent?** Your files never touch our server. Instead, they are sent directly from the uploader's browser to the downloader's browser using WebTorrent and WebRTC. This requires that the uploader leave their browser window open until the transfer is complete.
 
 **Can multiple people download my file at once?** Yes! Just send them your tempalink.
 
 **How big can my files be?** Chrome has issues supporting files >500 MB. Firefox does not have any issues with large files, however.
 
-**What happens when I close my browser?** The tempalink is invalidated. If a downloader has completed the transfer, it will continue to seed to incomplete downloaders, but no new downloads may be initiated.
+**What happens when I close my browser?** The tempalink is invalidated. If a downloader has completed the transfer, that downloader will continue to seed to incomplete downloaders, but no new downloads may be initiated.
 
 **Are my files encrypted?** Yes, all WebRTC communications are automatically encrypted using public-key cryptography.
 
