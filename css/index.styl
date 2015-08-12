@@ -45,15 +45,18 @@ p {
     }
 }
 
-body {
-    display: table;
-    width: 100%;
-}
-
 .footer {
-    text-align: center;
-    color: gray;
-    padding: 20px 0 10px
+    width: 640px
+    height: 60px
+    text-align: center
+    color: gray
+    padding: 10px 0 10px
+    position: fixed
+    bottom: 0
+    left: calc(50vw - 320px)
+    right: calc(50vw - 320px)
+    border-radius: 5px 5px 0 0
+    background white
 
     p {
         font: 12px/20px "Quicksand", sans-serif;
@@ -69,17 +72,15 @@ body {
 }
 
 .container {
-    display: table-row;
-    vertical-align: center;
-    height: 100%;
+    height: 100vh
 }
 
 .page {
     display: flex
-    padding-top: 8vh;
     flex-direction: column;
     justify-content: center;
     height: 100%;
+    min-height: 640px;
 }
 
 .drop-zone {
