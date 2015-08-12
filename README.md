@@ -48,7 +48,7 @@ Stylesheets are automatically compiled using Stylus and are available at `/css`.
 
 **How big can my files be?** Chrome has issues supporting files >500 MB. Firefox does not have any issues with large files, however.
 
-**What happens when I close my browser?** The tempalink is invalidated, and all downloads in progress will fail. All completed transfers will be unaffected.
+**What happens when I close my browser?** The tempalink is invalidated. If a downloader has completed the transfer, it will continue to seed to incomplete downloaders, but no new downloads may be initiated.
 
 **Are my files encrypted?** Yes, all WebRTC communications are automatically encrypted using public-key cryptography.
 
@@ -63,6 +63,6 @@ number of open files allowed on your system:
 
     $ sysctl -w kern.maxfiles=20480
 
-## License
+## License & Acknowledgements
 
-BSD
+FilePizza is released under the [BSD 3-Clause license](https://github.com/kern/filepizza/blob/master/LICENSE). A huge thanks to [WebTorrent](https://github.com/feross/webtorrent) which we use for the file transfers under the hood.
