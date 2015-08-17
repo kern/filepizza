@@ -36,6 +36,7 @@
     "socket.io": "^1.3.5",
     "socket.io-client": "^1.3.5",
     "stylus": "^0.50.0",
+    "twilio": "^2.3.0",
     "webrtcsupport": "^2.1.2",
     "webtorrent": "^0.56.0",
     "winston": "^1.0.1",
