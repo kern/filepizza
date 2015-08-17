@@ -28,6 +28,10 @@ You can specify the port that FilePizza's HTTP server uses by setting the `PORT`
 
     $ env PORT=8080 filepizza
 
+If you'd like to use [Twilio's STUN/TURN service](https://www.twilio.com/stun-turn) for better connectivity behind NATs, you can specify your SID and token like so:
+
+    $ env TWILIO_SID=abcdef TWILIO_TOKEN=ghijkl filepizza
+
 ## Development
 
     $ git clone https://github.com/kern/filepizza.git
