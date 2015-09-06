@@ -4,14 +4,14 @@
   "description": "Free peer-to-peer file transfers in your browser.",
   "scripts": {
     "clean": "rm -rf dist && mkdir -p dist",
-    "build": "npm run build:server && npm run build:client",
-    "build:server": "./node_modules/.bin/babel lib -d dist -s inline",
-    "build:client": "./node_modules/.bin/browserify lib/client.js -t babelify -o dist/client.js -d",
-    "watch": "./node_modules/.bin/nodemon -w lib --exec 'npm run build && npm run start'",
-    "publish": "npm run clean && npm run publish:build && npm publish",
-    "publish:build": "npm run publish:build:server && npm run publish:build:client",
-    "publish:build:server": "./node_modules/.bin/babel lib -d dist",
-    "publish:build:client": "./node_modules/.bin/browserify lib/client.js -t babelify -t uglifyify | ./node_modules/.bin/uglifyjs -c > dist/client.js",
+    "prepublish": "npm run build:prod",
+    "build:prod": "npm run build:prod:server && npm run build:prod:client",
+    "build:prod:server": "./node_modules/.bin/babel lib -d dist",
+    "build:prod:client": "./node_modules/.bin/browserify lib/client.js -t babelify -t uglifyify | ./node_modules/.bin/uglifyjs -c > dist/client.js",
+    "build:dev": "npm run build:dev:server && npm run build:dev:client",
+    "build:dev:server": "./node_modules/.bin/babel lib -d dist -s inline",
+    "build:dev:client": "./node_modules/.bin/browserify lib/client.js -t babelify -o dist/client.js -d",
+    "watch": "./node_modules/.bin/nodemon -w lib --exec 'npm run build:dev && npm run start'",
     "start": "node index.js"
   },
   "repository": {
