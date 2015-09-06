@@ -29,6 +29,7 @@ node_modules/*
 .lock-wscript
 
 # Compiled assets
+dist
 css/index.css
 
 # New Relic

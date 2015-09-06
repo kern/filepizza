@@ -7,9 +7,4 @@ try {
   // Don't load New Relic if the configuration file doesn't exist.
 }
 
-require('babel/register')({
-  only: new RegExp(__dirname + '/lib' + '|' +
-                   __dirname + '/node_modules/filepizza')
-})
-
-module.exports = require('./lib/server')
+module.exports = require('./dist/server')
