@@ -1,6 +1,6 @@
 {
   "name": "filepizza",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Free peer-to-peer file transfers in your browser.",
   "scripts": {
     "clean": "rm -rf dist && mkdir -p dist",
