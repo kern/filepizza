@@ -7,7 +7,7 @@
     "prepublish": "npm run build:prod",
     "build:prod": "npm run build:prod:server && npm run build:prod:client",
     "build:prod:server": "./node_modules/.bin/babel lib -d dist",
-    "build:prod:client": "./node_modules/.bin/browserify lib/client.js -t babelify -t uglifyify | ./node_modules/.bin/uglifyjs -c > dist/client.js",
+    "build:prod:client": "./node_modules/.bin/browserify lib/client.js -t babelify -t uglifyify | ./node_modules/.bin/uglifyjs -cm > dist/client.js",
     "build:dev": "npm run build:dev:server && npm run build:dev:client",
     "build:dev:server": "./node_modules/.bin/babel lib -d dist -s inline",
     "build:dev:client": "./node_modules/.bin/browserify lib/client.js -t babelify -o dist/client.js -d",
