@@ -34,3 +34,6 @@ css/index.css
 
 # New Relic
 newrelic.js
+
+# SSL Keys
+*.pem
