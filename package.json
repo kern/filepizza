@@ -42,7 +42,6 @@
     "stylus": "^0.50.0",
     "twilio": "^2.3.0",
     "webrtcsupport": "^2.1.2",
-    "webtorrent": "^0.56.0",
     "winston": "^1.0.1",
     "xkcd-password": "^1.2.0"
   },
