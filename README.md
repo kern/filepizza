@@ -1,16 +1,8 @@
-![wordmark](static/images/wordmark.png)
+<a href="https://xkcd.com/949/"><img src="http://imgs.xkcd.com/comics/file_transfer.png" alt="XKCD 949" width="30%" align="right" /></a> <img src="static/images/wordmark.png" alt="FilePizza wordmark" width="50%" /> <h3>Peer-to-peer file transfers in your browser</h3>
 
-### Free peer-to-peer file transfers in your browser
+*Cooked up by [Alex Kern](http://kern.io) & [Neeraj Baid](http://neeraj.io) while eating Sliver @ UC Berkeley.*
 
-Cooked up by [Alex Kern](http://kern.io) & [Neeraj Baid](http://neeraj.io) while eating *Sliver* @ UC Berkeley.
-
-[![XKCD 949](http://imgs.xkcd.com/comics/file_transfer.png)](https://xkcd.com/949/)
-
-## Overview
-
-FilePizza enables fast and private peer-to-peer file transfers in your web browser.
-
-By using [WebRTC](http://www.webrtc.org), FilePizza eliminates the initial upload traditionally required when sharing files via file sharing services (e.g. Dropbox). Instead of transmitting files through an intermediary server, the sender initializes a transfer and receives a "tempalink" they can distribute. When recipients click on this link, they connect directly to the sender’s browser to complete the download. Because the file never touches the server, the transfer is fast, private, and secure. For larger files, this is an especially big deal.
+Using [WebRTC](http://www.webrtc.org), FilePizza eliminates the initial upload step required by other web-based file sharing services. When senders initialize a transfer, they receive a "tempalink" they can distribute to recipients. Upon visiting this link, recipients' browsers connect directly to the sender’s browser and may begin downloading the selected file. Because data is never stored in an intermediary server, the transfer is fast, private, and secure.
 
 A hosted instance of FilePizza is available at [file.pizza](http://file.pizza).
 
