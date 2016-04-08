@@ -71,9 +71,9 @@ app.use(expressWinston.logger({
   expressFormat: true
 }))
 
-// if (process.env.NODE_ENV === 'production') {
-//   app.use(forceSSL)
-// }
+if (process.env.NODE_ENV === 'production') {
+  app.use(forceSSL)
+}
 
 app.get('/js', require('./middleware/javascript'))
 app.get('/css', require('./middleware/css'))

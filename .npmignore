@@ -6,3 +6,9 @@ css/index.css
 
 # New Relic
 newrelic.js
+
+# FilePizza
+src
+resources
+log
+*.pem

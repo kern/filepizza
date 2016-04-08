@@ -50,3 +50,4 @@ Icon
 src
 resources
 log
+*.pem
