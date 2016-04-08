@@ -42,7 +42,7 @@ export default alt.createStore(class UploadStore {
           fileName: file.name,
           fileSize: file.size,
           fileType: file.type,
-          infoHash: torrent.infoHash
+          infoHash: torrent.magnetURI
         }, (token) => {
           this.setState({
             status: 'uploading',
@@ -50,7 +50,7 @@ export default alt.createStore(class UploadStore {
             fileName: file.name,
             fileSize: file.size,
             fileType: file.type,
-            infoHash: torrent.infoHash
+            infoHash: torrent.magnetURI
           })
         })
 

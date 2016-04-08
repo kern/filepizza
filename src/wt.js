@@ -1,3 +1,4 @@
+import WebTorrent from 'webtorrent'
 import socket from 'filepizza-socket'
 
 export function getClient() {

@@ -46,6 +46,20 @@ server.on('error', function (err) {
   process.exit(1)
 })
 
+process.on('unhandledRejection', (reason, p) => {
+  p.catch(err => {
+    log.error('Exiting due to unhandled rejection!')
+    log.error(err)
+    process.exit(1)
+  })
+})
+
+process.on('uncaughtException', err => {
+  log.error('Exiting due to uncaught exception!')
+  log.error(err)
+  process.exit(1)
+})
+
 server.listen(port, function (err) {
   var host = server.address().address
   var port = server.address().port
@@ -57,9 +71,9 @@ app.use(expressWinston.logger({
   expressFormat: true
 }))
 
-if (process.env.NODE_ENV === 'production') {
-  app.use(forceSSL)
-}
+// if (process.env.NODE_ENV === 'production') {
+//   app.use(forceSSL)
+// }
 
 app.get('/js', require('./middleware/javascript'))
 app.get('/css', require('./middleware/css'))

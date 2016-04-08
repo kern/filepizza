@@ -4,8 +4,6 @@ module.exports = function (err, req, res, next) {
   var message = err.message || ''
   var stack = process.env.NODE_ENV === 'production' ? null : err.stack || null
 
-  console.log(err)
-
   req.url = '/error'
   res.status(status)
   res.locals.data = {

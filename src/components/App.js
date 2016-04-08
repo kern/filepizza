@@ -43,7 +43,6 @@ export default class App extends React.Component {
         <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Quicksand:300,400,700|Lobster+Two" />
         <link rel="stylesheet" href="/css" />
 
-        <script src="//cdn.jsdelivr.net/webtorrent/latest/webtorrent.min.js" />
         <Bootstrap data={this.props.data} />
         <script src="/js" />
 
