@@ -1,6 +1,6 @@
 {
   "name": "filepizza",
-  "version": "0.2.4",
+  "version": "1.0.0",
   "description": "Free peer-to-peer file transfers in your browser.",
   "preferGlobal": "true",
   "bin": "./dist/index.js",
