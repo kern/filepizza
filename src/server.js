@@ -71,7 +71,11 @@ app.use(expressWinston.logger({
   expressFormat: true
 }))
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.FORCE_SSL) {
+  app.set('forceSSLOptions', {
+    trustXFPHeader: true
+  })
+
   app.use(forceSSL)
 }
 
