@@ -32,6 +32,7 @@ exports.getICEServers = function () {
         return resolve({})
       }
 
+      winston.info('Retrieved ICE servers from Twilio', token.ice_servers)
       setTimeout(clearCache, CACHE_LIFETIME)
       resolve(token.ice_servers)
     })
