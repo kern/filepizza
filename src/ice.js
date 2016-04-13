@@ -2,7 +2,10 @@ var twilio = require('twilio')
 var winston = require('winston')
 
 if (process.env.TWILIO_SID && process.env.TWILIO_TOKEN) {
-  var client = twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN)
+  var twilioSID = process.env.TWILIO_SID
+  var twilioToken = process.env.TWILIO_TOKEN
+  var client = twilio(twilioSID, twilioToken)
+  // winston.info('Created Twilio client', { sid: twilioSID, token: twilioToken })
 } else {
   var client = null
 }
@@ -28,8 +31,8 @@ exports.getICEServers = function () {
   cachedPromise = new Promise(function (resolve, reject) {
     client.tokens.create({}, function(err, token) {
       if (err) {
-        winston.error(err.message)
-        return resolve({})
+        winston.error(err)
+        return resolve(DEFAULT_ICE_SERVERS)
       }
 
       winston.info('Retrieved ICE servers from Twilio', token.ice_servers)
