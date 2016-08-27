@@ -34,6 +34,11 @@ fi
 #export TWILIO_SID=abcdef
 #export TWILIO_TOKEN=ghijkl
 
+# ssl/tls encryption
+#export SECURE=1
+#export SSL_KEY=
+#export SSL_CERT=
+
 # When settings sensitive information here (API token) remeber to secure the file to prevent other users from reading it!
 
 # enable production mode
