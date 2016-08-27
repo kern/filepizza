@@ -34,7 +34,7 @@ fi
 #export TWILIO_SID=abcdef
 #export TWILIO_TOKEN=ghijkl
 
-# When settings sensitive information here (redis password) remeber to secure the file to prevent other users from reading it!
+# When settings sensitive information here (API token) remeber to secure the file to prevent other users from reading it!
 
 # enable production mode
 export NODE_ENV=production
@@ -42,5 +42,5 @@ export NODE_ENV=production
 #finally start FilePizza
 echo "Started FilePizza..."
 
-../index.js $@
+./index.js $@
 
