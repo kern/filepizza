@@ -10,7 +10,7 @@ if (process.env.NODE_ENV === 'production') {
   const webpackMiddleware = require('webpack-dev-middleware')
   const webpack = require('webpack')
   const config = require('../../webpack.config.js')
-  config.output.filename = '/js'
+  config.output.filename = '/app.js'
   config.output.path = '/'
   module.exports = webpackMiddleware(webpack(config))
 }
