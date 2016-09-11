@@ -79,8 +79,8 @@ if (process.env.FORCE_SSL) {
   app.use(forceSSL)
 }
 
-app.get('/js', require('./middleware/javascript'))
-app.get('/css', require('./middleware/css'))
+app.get('/app.js', require('./middleware/javascript'))
+app.get('/app.css', require('./middleware/css'))
 app.use(require('./middleware/static'))
 
 app.use([
