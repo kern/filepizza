@@ -20,6 +20,7 @@ module.exports = function (req, res) {
     var html = React.renderToString(<Handler data={alt.takeSnapshot()} />)
     alt.flush()
   
+    res.setHeader('Content-Type', 'text/html');
     if (isNotFound(state)) res.status(404)
     res.write('<!DOCTYPE html>\n')
     res.end(html)
