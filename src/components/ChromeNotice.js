@@ -4,7 +4,7 @@ import SupportStore from '../stores/SupportStore'
 
 function getState() {
   return {
-    active: SupportStore.getState().isChrome && DownloadStore.getState().fileSize >= 500000000 
+    active: SupportStore.getState().isChrome && DownloadStore.getState().fileSize >= 500000000
   }
 }
 
@@ -24,7 +24,7 @@ export default class ChromeNotice extends React.Component {
     SupportStore.listen(this._onChange)
   }
 
-  componentDidUnmount() {
+  componentWillUnmount() {
     DownloadStore.unlisten(this._onChange)
     SupportStore.unlisten(this._onChange)
   }
