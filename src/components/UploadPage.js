@@ -16,6 +16,8 @@ export default class UploadPage extends React.Component {
     this._onChange = () => {
       this.setState(UploadStore.getState())
     }
+
+    this.uploadFile = this.uploadFile.bind(this)
   }
 
   componentDidMount() {
@@ -25,7 +27,7 @@ export default class UploadPage extends React.Component {
   componentWillUnmount() {
     UploadStore.unlisten(this._onChange)
   }
-  
+
   uploadFile(file) {
     UploadActions.uploadFile(file)
   }
@@ -41,7 +43,7 @@ export default class UploadPage extends React.Component {
     switch (this.state.status) {
       case 'ready':
 
-        return <DropZone onDrop={this.uploadFile.bind(this)}>
+        return <DropZone onDrop={this.uploadFile}>
           <div className="page">
 
             <Spinner dir="up" />
