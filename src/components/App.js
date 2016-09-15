@@ -24,7 +24,7 @@ export default class App extends React.Component {
     SupportStore.listen(this._onChange)
   }
 
-  componentDidUnmount() {
+  componentWillUnmount() {
     SupportStore.unlisten(this._onChange)
   }
 

@@ -23,7 +23,7 @@ export default class DownloadPage extends React.Component {
     DownloadStore.listen(this._onChange)
   }
 
-  componentDidUnmount() {
+  componentWillUnmount() {
     DownloadStore.unlisten(this._onChange)
   }
 
