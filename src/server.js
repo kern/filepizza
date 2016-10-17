@@ -26,6 +26,7 @@ if (process.env.SECURE) {
 }
 
 var io = socketIO(server)
+io.set('transports', ['polling'])
 
 var logDir = path.resolve(__dirname, '../log')
 
