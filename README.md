@@ -13,6 +13,10 @@ A hosted instance of FilePizza is available at [file.pizza](http://file.pizza).
 
 ## Installation
 
+The recommended way to deploy FilePizza is as a [Docker container](https://hub.docker.com/r/kern/filepizza).
+
+You can also install FilePizza via the command-line:
+
     $ npm install filepizza -g
     $ filepizza
 
