@@ -17,7 +17,7 @@ export default class ErrorPage extends React.Component {
     ErrorStore.listen(this._onChange)
   }
 
-  componentDidUnmount() {
+  componentWillUnmount() {
     ErrorStore.unlisten(this._onChange)
   }
 

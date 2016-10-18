@@ -5,6 +5,11 @@ export default class DropZone extends React.Component {
   constructor() {
     super()
     this.state = { focus: false }
+
+    this.onDragEnter = this.onDragEnter.bind(this)
+    this.onDragLeave = this.onDragLeave.bind(this)
+    this.onDragOver = this.onDragOver.bind(this)
+    this.onDrop = this.onDrop.bind(this)
   }
 
   onDragEnter() {
@@ -31,10 +36,10 @@ export default class DropZone extends React.Component {
 
   render() {
     return <div className="drop-zone" ref="root"
-      onDragEnter={this.onDragEnter.bind(this)}
-      onDragLeave={this.onDragLeave.bind(this)}
-      onDragOver={this.onDragOver.bind(this)}
-      onDrop={this.onDrop.bind(this)}>
+      onDragEnter={this.onDragEnter}
+      onDragLeave={this.onDragLeave}
+      onDragOver={this.onDragOver}
+      onDrop={this.onDrop}>
 
       <div className="drop-zone-overlay"
         hidden={!this.state.focus}

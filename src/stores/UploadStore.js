@@ -29,8 +29,8 @@ export default alt.createStore(class UploadStore {
 
         const updateSpeed = () => {
           this.setState({
-            speedUp: torrent.swarm.uploadSpeed(),
-            peers: torrent.swarm.wires.length
+            speedUp: torrent.uploadSpeed,
+            peers: torrent.numPeers
           })
         }
 

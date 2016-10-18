@@ -17,13 +17,15 @@ export default class DownloadPage extends React.Component {
     this._onChange = () => {
       this.setState(DownloadStore.getState())
     }
+
+    this.downloadFile = this.downloadFile.bind(this)
   }
 
   componentDidMount() {
     DownloadStore.listen(this._onChange)
   }
 
-  componentDidUnmount() {
+  componentWillUnmount() {
     DownloadStore.unlisten(this._onChange)
   }
 
@@ -43,7 +45,7 @@ export default class DownloadPage extends React.Component {
 
           <ChromeNotice />
           <p className="notice">Peers: {this.state.peers} &middot; Up: {formatSize(this.state.speedUp)} &middot; Down: {formatSize(this.state.speedDown)}</p>
-          <DownloadButton onClick={this.downloadFile.bind(this)} />
+          <DownloadButton onClick={this.downloadFile} />
 
         </div>
 
