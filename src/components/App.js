@@ -39,10 +39,8 @@ export default class App extends React.Component {
         <meta property="og:description" content="Peer-to-peer file transfers in your web browser." />
         <meta property="og:image" content="http://file.pizza/images/fb.png" />
         <title>FilePizza - Your files, delivered.</title>
-
-        <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Quicksand:300,400,700|Lobster+Two" />
+        <link rel="stylesheet" href="/fonts/fonts.css" />
         <link rel="stylesheet" href="/app.css" />
-
         <Bootstrap data={this.props.data} />
         <script src="https://cdn.jsdelivr.net/webtorrent/latest/webtorrent.min.js" />
         <script src="/app.js" />
