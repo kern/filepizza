@@ -42,7 +42,7 @@ export default class App extends React.Component {
         <link rel="stylesheet" href="/fonts/fonts.css" />
         <link rel="stylesheet" href="/app.css" />
         <Bootstrap data={this.props.data} />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/webtorrent/0.98.5/webtorrent.min.js" />
+        <script src="https://cdn.jsdelivr.net/webtorrent/latest/webtorrent.min.js" />
         <script src="/app.js" />
 
       </FrozenHead>
