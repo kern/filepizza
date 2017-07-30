@@ -1,10 +1,10 @@
 <a href="https://xkcd.com/949/"><img src="http://imgs.xkcd.com/comics/file_transfer.png" alt="XKCD 949" width="30%" align="right" /></a> <img src="static/images/wordmark.png" alt="FilePizza wordmark" width="50%" /> <h3>Peer-to-peer file transfers in your browser</h3>
 
-*Cooked up by [Alex Kern](http://kern.io) & [Neeraj Baid](http://neeraj.io) while eating Sliver @ UC Berkeley.*
+*Cooked up by [Alex Kern](https://kern.io) & [Neeraj Baid](http://neeraj.io) while eating Sliver @ UC Berkeley.*
 
 Using [WebRTC](http://www.webrtc.org), FilePizza eliminates the initial upload step required by other web-based file sharing services. When senders initialize a transfer, they receive a "tempalink" they can distribute to recipients. Upon visiting this link, recipients' browsers connect directly to the sender’s browser and may begin downloading the selected file. Because data is never stored in an intermediary server, the transfer is fast, private, and secure.
 
-A hosted instance of FilePizza is available at [file.pizza](http://file.pizza).
+A hosted instance of FilePizza is available at [file.pizza](https://file.pizza).
 
 ## Requirements
 
