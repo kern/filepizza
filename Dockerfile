@@ -1,14 +1,9 @@
 FROM node:latest
-MAINTAINER Alex Kern <alex@pavlovml.com>
+MAINTAINER Alex Kern <alex@kern.io>
  
-# install
-RUN mkdir -p /filepizza
-WORKDIR /filepizza
-COPY package.json Makefile ./
-RUN make install
 COPY . ./
+RUN npm install && npm run build
 
-# run
 ENV NODE_ENV production
 EXPOSE 80
-CMD ./dist/index.js
+CMD node ./dist/index.js

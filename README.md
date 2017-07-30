@@ -15,30 +15,26 @@ A hosted instance of FilePizza is available at [file.pizza](http://file.pizza).
 
 The recommended way to deploy FilePizza is as a [Docker container](https://hub.docker.com/r/kern/filepizza).
 
-You can also install FilePizza via the command-line:
+    $ docker run -p 8080:8080 -e PORT=8080 -it kern/filepizza:latest
 
-    $ npm install filepizza -g
-    $ filepizza
+You can also use [zeit/now](https://zeit.co/now):
 
-You can specify the port that FilePizza's HTTP server uses by setting the `PORT` environment variable (default 3000):
+    $ now --npm --public -e NODE_ENV=production
 
-    $ env PORT=8080 filepizza
-
-If you'd like to use [Twilio's STUN/TURN service](https://www.twilio.com/stun-turn) for better connectivity behind NATs, you can specify your SID and token like so:
-
-    $ env TWILIO_SID=abcdef TWILIO_TOKEN=ghijkl filepizza
+If you'd like to use [Twilio's STUN/TURN service](https://www.twilio.com/stun-turn) for better connectivity behind NATs, you can specify your SID and token using the `TWILIO_SID` and `TWILIO_TOKEN` environment variables, respectively.
 
 ## Development
 
     $ git clone https://github.com/kern/filepizza.git
     $ npm install
-    $ npm run watch
+    $ npm build
+    $ npm start
 
 FilePizza is an isomorphic React application which uses the Flux application architecture. ES6 features are used liberally and compiled using Babel. Views are rendered on the server, store data is serialized and sent to the client, which then picks up where the server left off.
 
 Both client and server JavaScript files can be found in `lib/`. `lib/server.js` and `lib/client.js` are the server and client entrypoints, respectively. `lib/components/`, `lib/stores/`, and `lib/actions/` contain the corresponding Flux modules, implemented using [alt](https://github.com/goatslacker/alt). `lib/routes.js` serves as the isomorphic routes file using [react-router](https://github.com/rackt/react-router).
 
-Stylesheets are automatically compiled using Stylus and are available at `/css`. Client-side JavaScript is compiled using Browserify and is available at `/js`.
+Client-side JavaScript and CSS are compiled using webpack and are available at `/app.js`.
 
 ## FAQ
 
