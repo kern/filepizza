@@ -67,6 +67,9 @@
     "webpack-dev-middleware": "^1.6.1",
     "webrtcsupport": "^2.2.0",
     "winston": "^1.0.1",
-    "xkcd-password": "^1.2.0"
+    "xkcd-password": "^1.2.0",
+    "noop-loader": "*",
+    "null-loader": "*",
+    "stylus": "^0.50.0"
   }
 }
