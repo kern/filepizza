@@ -30,7 +30,7 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
-        'DISABLE_GA': process.env.DISABLE_GA,
+        'DISABLE_GA': JSON.stringify(process.env.DISABLE_GA),
       }
     })
   ],
