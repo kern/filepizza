@@ -6,6 +6,8 @@ Using [WebRTC](http://www.webrtc.org), FilePizza eliminates the initial upload s
 
 A hosted instance of FilePizza is available at [file.pizza](https://file.pizza).
 
+The Dockerfile in this branch is modified to disable Google Analytics by default, which should be preferable for self-hosted instances.
+
 ## Requirements
 
 * node `0.12.x`
@@ -13,9 +15,9 @@ A hosted instance of FilePizza is available at [file.pizza](https://file.pizza).
 
 ## Installation
 
-The recommended way to deploy FilePizza is as a [Docker container](https://hub.docker.com/r/kern/filepizza).
+The recommended way to deploy FilePizza is as a [Docker container](https://hub.docker.com/r/andreipoe/filepizza-no-ga).
 
-    $ docker run -p 8080:8080 -e PORT=8080 -it kern/filepizza:latest
+    $ docker run -d --name filepizza --restart unless-stopped -p 8080:8080 -e PORT=8080 andreipoe/filepizza-no-ga
 
 You can also use [zeit/now](https://zeit.co/now):
 
@@ -25,7 +27,7 @@ If you'd like to use [Twilio's STUN/TURN service](https://www.twilio.com/stun-tu
 
 ## Development
 
-    $ git clone https://github.com/kern/filepizza.git
+    $ git clone https://github.com/andreipoe/filepizza.git -b disable-ga
     $ npm install
     $ npm build
     $ npm start

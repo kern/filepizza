@@ -1,7 +1,7 @@
 FROM node:latest
 MAINTAINER Alex Kern <alex@kern.io>
 
-ENV DISABLE_GA no
+ENV DISABLE_GA yes
  
 COPY . ./
 RUN npm install && npm run build
