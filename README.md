@@ -27,7 +27,7 @@ If you'd like to use [Twilio's STUN/TURN service](https://www.twilio.com/stun-tu
 
     $ git clone https://github.com/kern/filepizza.git
     $ npm install
-    $ npm build
+    $ npm run-script build
     $ npm start
 
 FilePizza is an isomorphic React application which uses the Flux application architecture. ES6 features are used liberally and compiled using Babel. Views are rendered on the server, store data is serialized and sent to the client, which then picks up where the server left off.
