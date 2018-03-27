@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:alpine
 MAINTAINER Alex Kern <alex@kern.io>
  
 COPY . ./
