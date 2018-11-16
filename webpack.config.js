@@ -1,4 +1,5 @@
 const nib = require("nib");
+const webpack = require('webpack')
 
 module.exports = {
   entry: "./lib/client",
@@ -26,11 +27,24 @@ module.exports = {
     ]
   },
 
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': {
+        'GA_ACCESS_TOKEN': JSON.stringify(process.env.GA_ACCESS_TOKEN),
+      }
+    })
+  ],
+
   node: {
     fs: "empty"
   },
 
   stylus: {
     use: [nib()]
-  }
+  },
+
+  rules: [{
+    test: /react-google-analytics/,
+    use: process.env.GA_ACCESS_TOKEN ? 'null-loader' : 'noop-loader'
+  }]
 };
