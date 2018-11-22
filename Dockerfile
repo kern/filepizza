@@ -1,6 +1,8 @@
 FROM node:latest
 MAINTAINER Alex Kern <alex@kern.io>
- 
+
+ENV GA_ACCESS_TOKEN
+
 COPY . ./
 RUN npm install && npm run build
 

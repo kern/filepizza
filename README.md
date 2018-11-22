@@ -23,6 +23,8 @@ You can also use [zeit/now](https://zeit.co/now):
 
 If you'd like to use [Twilio's STUN/TURN service](https://www.twilio.com/stun-turn) for better connectivity behind NATs, you can specify your SID and token using the `TWILIO_SID` and `TWILIO_TOKEN` environment variables, respectively.
 
+If you want to use [Google Analytics](https://marketingplatform.google.com/about/analytics/), you can specify your UA code using the `GA_ACCESS_TOKEN="UA-00000000-1"` environment variable.
+
 ## Development
 
     $ git clone https://github.com/kern/filepizza.git
