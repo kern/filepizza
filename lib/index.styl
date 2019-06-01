@@ -82,10 +82,6 @@ p {
     }
 }
 
-.container {
-    height: 100vh
-}
-
 .page {
     display: flex
     flex-direction: column;
@@ -121,35 +117,32 @@ p {
 }
 
 .spinner {
-    position: relative
-    z-index: -1
     width: 300px
-    height: 300px
+    min-height: 300px
     margin: 0 auto 20px
 
     display: flex
+    flex-direction: column
     align-items: center
+    align-content: center
     justify-content: center
 
-    .spinner-background {
-        display: block
+    &:before {
+        background: url(/images/pizza.png) center center / 300px 300px no-repeat
+        content: ""
+        position: absolute
         width: 300px
         height: 300px
-        position: absolute
-        top: 0
-        left: 0
         transition: transform 1s
         z-index: -1
     }
 
-    &.spinner-animated .spinner-background {
+    &.spinner-animated:before {
         animation: rotate 5s infinite linear
     }
 
     .spinner-image {
-        display: block
-        width: 150px
-        margin: 0 auto
+        width: 50%
     }
 
     .spinner-name {
@@ -160,8 +153,6 @@ p {
         text-overflow: ellipsis
         white-space: nowrap
         margin-top: 10px
-        margin: 0 auto
-        width: 220px
     }
 
     .spinner-size {
@@ -175,15 +166,25 @@ p {
 }
 
 .tempalink {
-    background: beige
-    color: dark-gray
-    border: 0
-    margin: 20px 0
-    font: 18px/1 monospace
-    height: 60px
-    padding: 20px
-    text-align: center
-    width: 100%
+    display: flex
+    flex-direction: column
+
+    input {
+        background: beige
+        color: dark-gray
+        border: 0
+        margin: 20px 0
+        font: 18px/1 monospace
+        height: 60px
+        padding: 20px
+        text-align: center
+        width: 100%
+    }
+
+    img {
+        margin: auto
+        padding-bottom: 60px
+    }
 }
 
 .data {
