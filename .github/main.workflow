@@ -16,6 +16,6 @@ action "AWS deploy" {
     "AWS_SECRET_ACCESS_KEY",
     "AWS_REGION",
   ]
-  args = "deploy create-deployment --application-name AppECS-filepizza-filepizza --deployment-config-name CodeDeployDefault.ECSAllAtOnce --deployment-group-name DgpECS-filepizza-filepizza --s3-location bucket=codedeploydemobucket,bundleType=zip,key=HelloWorld_App.zip"
+  args = "deploy --region us-west-2 create-deployment --application-name AppECS-filepizza-filepizza --deployment-config-name CodeDeployDefault.ECSAllAtOnce --deployment-group-name DgpECS-filepizza-filepizza --s3-location bucket=codedeploydemobucket,bundleType=zip,key=HelloWorld_App.zip"
   runs = "aws"
 }
