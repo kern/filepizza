@@ -1,6 +1,6 @@
 workflow "Build on push" {
-  resolves = ["Docker build, tag, and push"]
   on = "push"
+  resolves = ["GitHub Action for AWS"]
 }
 
 action "Docker build, tag, and push" {
@@ -11,4 +11,11 @@ action "Docker build, tag, and push" {
 
 action "AWS deployment" {
   uses = "actions/aws/cli@efb074ae4510f2d12c7801e4461b65bf5e8317e6"
+}
+
+action "GitHub Action for AWS" {
+  uses = "actions/aws/cli@efb074ae4510f2d12c7801e4461b65bf5e8317e6"
+  needs = ["Docker build, tag, and push"]
+  secrets = ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  runs = "aws"
 }
