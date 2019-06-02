@@ -1,7 +1,5 @@
 FROM node:alpine
-MAINTAINER Alex Kern <alex@kern.io>
-
-ENV GA_ACCESS_TOKEN
+MAINTAINER Alexander Kern <filepizza@kern.io>
 
 COPY . ./
 RUN npm install && npm run build
