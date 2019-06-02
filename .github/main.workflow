@@ -1,6 +1,6 @@
 workflow "Build on push" {
   on = "push"
-  resolves = ["GitHub Action for AWS"]
+  resolves = ["Docker build, tag, and push"]
 }
 
 action "Docker build, tag, and push" {
