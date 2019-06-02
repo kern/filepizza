@@ -1,6 +1,6 @@
 workflow "Build on push" {
   on = "push"
-  resolves = ["Docker build, tag, and push"]
+  resolves = ["AWS deploy"]
 }
 
 action "Docker build, tag, and push" {
