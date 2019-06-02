@@ -11,7 +11,11 @@ action "Docker build, tag, and push" {
 action "GitHub Action for AWS" {
   uses = "actions/aws/cli@efb074ae4510f2d12c7801e4461b65bf5e8317e6"
   needs = ["Docker build, tag, and push"]
-  secrets = ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+  secrets = [
+    "AWS_ACCESS_KEY_ID",
+    "AWS_SECRET_ACCESS_KEY",
+    "AWS_REGION",
+  ]
   args = "deploy create-deployment --application-name AppECS-filepizza-filepizza --deployment-config-name CodeDeployDefault.ECSAllAtOnce --deployment-group-name DgpECS-filepizza-filepizza --s3-location bucket=codedeploydemobucket,bundleType=zip,key=HelloWorld_App.zip"
   runs = "aws"
 }
