@@ -1,0 +1,13 @@
+on: push
+name: Build on push
+jobs:
+  build:
+    name: Docker build, tag, and push
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Docker build, tag, and push
+      uses: pangzineng/Github-Action-One-Click-Docker@master
+      env:
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
