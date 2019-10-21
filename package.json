@@ -9,7 +9,7 @@
   "homepage": "https://github.com/kern/filepizza",
   "scripts": {
     "start": "node ./dist/index.js",
-    "build": "babel src --ignore __tests__,__mocks__ --out-dir dist && webpack -p ./src/client"
+    "build": "babel src --ignore __tests__,__mocks__ --out-dir dist && webpack -p ./src/client && rm -rf dist/static && cp -R src/static dist/static"
   },
   "repository": {
     "type": "git",

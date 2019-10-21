@@ -16,12 +16,6 @@ var port =
 var io = socketIO(server);
 io.set("transports", ["polling"]);
 
-if (!process.env.QUIET) {
-  winston.add(winston.transports.Console, {
-    level: "info"
-  });
-}
-
 server.on("error", function(err) {
   winston.error(err.message);
   process.exit(1);
