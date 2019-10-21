@@ -2,7 +2,7 @@ const nib = require("nib");
 const webpack = require('webpack')
 
 module.exports = {
-  entry: "./lib/client",
+  entry: "./src/client",
   target: "web",
 
   output: {
