@@ -1,7 +1,6 @@
 var db = require("./db");
 var express = require("express");
 var expressWinston = require("express-winston");
-var forceSSL = require("express-force-ssl");
 var fs = require("fs");
 var http = require("http");
 var https = require("https");
@@ -11,23 +10,9 @@ var socketIO = require("socket.io");
 var winston = require("winston");
 
 var app = express();
-
-if (process.env.SECURE) {
-  var server = https.Server(
-    {
-      key: fs.readFileSync(process.env.SSL_KEY || "key.pem"),
-      cert: fs.readFileSync(process.env.SSL_CERT || "cert.pem")
-    },
-    app
-  );
-  var port = process.env.PORT || 443;
-  var insecurePort = process.env.INSECURE_PORT || 80;
-  http.Server(app).listen(80);
-} else {
-  var server = http.Server(app);
-  var port =
-    process.env.PORT || (process.env.NODE_ENV === "production" ? 80 : 3000);
-}
+var server = http.Server(app);
+var port =
+  process.env.PORT || (process.env.NODE_ENV === "production" ? 80 : 3000);
 
 var io = socketIO(server);
 io.set("transports", ["polling"]);
@@ -78,14 +63,6 @@ if (!process.env.QUIET) {
       expressFormat: true
     })
   );
-}
-
-if (process.env.FORCE_SSL) {
-  app.set("forceSSLOptions", {
-    trustXFPHeader: true
-  });
-
-  app.use(forceSSL);
 }
 
 app.get("/app.js", require("./middleware/javascript"));
