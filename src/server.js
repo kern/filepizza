@@ -5,7 +5,6 @@ var fs = require("fs");
 var http = require("http");
 var https = require("https");
 var ice = require("./ice");
-var path = require("path");
 var socketIO = require("socket.io");
 var winston = require("winston");
 
@@ -17,19 +16,11 @@ var port =
 var io = socketIO(server);
 io.set("transports", ["polling"]);
 
-var logDir = path.resolve(__dirname, "../log");
-
-winston.add(winston.transports.DailyRotateFile, {
-  filename: logDir + "/access.log",
-  level: "info"
-});
-
-winston.add(winston.transports.File, {
-  filename: logDir + "/error.log",
-  level: "error",
-  handleExceptions: true,
-  json: false
-});
+if (!process.env.QUIET) {
+  winston.add(winston.transports.Console, {
+    level: "info"
+  });
+}
 
 server.on("error", function(err) {
   winston.error(err.message);
