@@ -138,6 +138,11 @@ small {
     align-content: center
     justify-content: center
 
+    @media (max-width: 600px) {
+        width: 150px
+        min-height: 150px
+    }
+
     &:before {
         background: url(/images/pizza.png) center center / 300px 300px no-repeat
         content: ""
@@ -146,6 +151,11 @@ small {
         height: 300px
         transition: transform 1s
         z-index: -1
+
+        @media (max-width: 600px) {
+            width: 150px
+            height: 150px
+        }
     }
 
     &.spinner-animated:before {
