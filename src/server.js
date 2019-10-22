@@ -70,7 +70,7 @@ io.on("connection", function(socket) {
       upload.fileSize = metadata.fileSize;
       upload.fileType = metadata.fileType;
       upload.infoHash = metadata.infoHash;
-      res(upload.token);
+      res({ token: upload.token, shortToken: upload.shortToken });
     });
   });
 

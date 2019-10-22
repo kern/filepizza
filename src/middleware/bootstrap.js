@@ -3,9 +3,7 @@ var express = require('express')
 
 var routes = module.exports = new express.Router()
 
-routes.get(/^\/([a-z]+\/[a-z]+\/[a-z]+\/[a-z]+)$/, function (req, res, next) {
-
-  var uploader = db.find(req.params[0])
+function bootstrap (uploader, req, res, next) {
   if (uploader) {
     res.locals.data = {
       DownloadStore: {
@@ -24,5 +22,14 @@ routes.get(/^\/([a-z]+\/[a-z]+\/[a-z]+\/[a-z]+)$/, function (req, res, next) {
     err.status = 404
     next(err)
   }
+}
 
+routes.get(/^\/([a-z]+\/[a-z]+\/[a-z]+\/[a-z]+)$/, function (req, res, next) {
+  var uploader = db.find(req.params[0])
+  return bootstrap(uploader, req, res, next)
+})
+
+routes.get(/^\/download\/(\w+)$/, function (req, res, next) {
+  var uploader = db.findShort(req.params[0])
+  return bootstrap(uploader, req, res, next)
 })

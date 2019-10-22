@@ -24,6 +24,7 @@ export default alt.createStore(
       this.speedUp = 0;
       this.status = "ready";
       this.token = null;
+      this.shortToken = null;
     }
 
     onUploadFile(file) {
@@ -51,10 +52,11 @@ export default alt.createStore(
               fileType: file.type,
               infoHash: torrent.magnetURI
             },
-            token => {
+            (res) => {
               this.setState({
                 status: "uploading",
-                token: token,
+                token: res.token,
+                shortToken: res.shortToken,
                 fileName: file.name,
                 fileSize: file.size,
                 fileType: file.type,

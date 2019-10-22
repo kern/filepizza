@@ -81,7 +81,7 @@ export default class UploadPage extends React.Component {
           <p>Send someone this link to download.</p>
           <p>This link will work as long as this page is open.</p>
           <p>Peers: {this.state.peers} &middot; Up: {formatSize(this.state.speedUp)}</p>
-          <Tempalink token={this.state.token} />
+          <Tempalink token={this.state.token} shortToken={this.state.shortToken} />
 
         </div>
     }

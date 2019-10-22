@@ -10,6 +10,7 @@ export default (
   <Route handler={App}>
     <DefaultRoute handler={UploadPage} />
     <Route name="download" path="/:a/:b/:c/:d" handler={DownloadPage} />
+    <Route name="download-short" path="/download/:a" handler={DownloadPage} />
     <Route name="error" path="error" handler={ErrorPage} />
     <NotFoundRoute handler={ErrorPage} />
   </Route>

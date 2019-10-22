@@ -62,13 +62,6 @@ export default class App extends React.Component {
           </div>
           <footer className="footer">
             <p>
-              <script
-                id="fb13c4g"
-                dangerouslySetInnerHTML={{
-                  __html:
-                    "(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=kern&button=compact&url=http%3A%2F%2Fgithub.com%2Fkern%2Ffilepizza';f.title='Flattr';f.height=20;f.width=110;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fb13c4g');"
-                }}
-              />{" "}
               Donations: <strong>1P7yFQAC3EmpvsB7K9s6bKPvXEP1LPoQnY</strong>
             </p>
 

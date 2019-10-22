@@ -7,21 +7,28 @@ export default class Tempalink extends React.Component {
     this.onClick = this.onClick.bind(this)
   }
 
-  onClick() {
-    this.refs.input.getDOMNode().setSelectionRange(0, 9999)
+  onClick(e) {
+    e.target.setSelectionRange(0, 9999)
   }
 
   render() {
     var url = window.location.origin + '/' + this.props.token
-    return <div className="tempalink">
-      <input
-        onClick={this.onClick}
-        readOnly
-        ref="input"
-        type="text"
-        value={url} />
+    var shortUrl = window.location.origin + '/download/' + this.props.shortToken
 
-        <QRCode text={url} />
+    return <div className="tempalink">
+      <div className="long-url">
+        <input
+          onClick={this.onClick}
+          readOnly
+          type="text"
+          value={url} />
+      </div>
+
+      <div className="short-url">
+        or, for short: <span>{shortUrl}</span>
+      </div>
+
+      <QRCode text={url} />
     </div>
   }
 

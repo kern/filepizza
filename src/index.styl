@@ -49,14 +49,14 @@ p {
 
 .footer {
     width: 100%
-    height: 60px
     text-align: center
     color: gray
     padding: 10px 0 10px
-    position: relative
+    position: fixed
     bottom: 0
     border-radius: 5px 5px 0 0
     background white
+    box-shadow 0 -2px 4px light-gray
 
     iframe {
       display: inline-block;
@@ -165,16 +165,32 @@ p {
     display: flex
     flex-direction: column
 
-    input {
+    .long-url input {
         background: beige
         color: dark-gray
         border: 0
-        margin: 20px 0
+        margin: 20px 0 0
         font: 18px/1 monospace
         height: 60px
         padding: 20px
         text-align: center
         width: 100%
+    }
+
+    .short-url {
+        background: light-gray
+        color: dark-gray
+        border: 0
+        margin: 0 0 20px
+        height: 40px
+        padding: 10px 20px
+        text-align: center
+        width: 100%
+        font: 14px/1 "Quicksand", sans-serif;
+
+        span {
+            font: 14px/1 monospace
+        }
     }
 
     img {
@@ -202,7 +218,9 @@ p {
     background: green
     border: none
     color: white
-    width: 100%
+    width: calc(100vw - 40px)
+    margin: 0 20px
+    border-radius: 4px
     font: bold 18px/20px "Quicksand", sans-serif
     transition: 0.25s
     cursor: pointer
@@ -223,6 +241,9 @@ p {
     overflow: hidden
     background: green
     transition: all 1s ease
+    width: calc(100vw - 40px)
+    margin: 0 20px
+    border-radius: 4px
 
     .progress-bar-inner {
         float: left
@@ -230,6 +251,7 @@ p {
         background: green
         box-shadow: inset 0 1px 1px light-green
         overflow: hidden
+        border-radius: 4px
     }
 
     .progress-bar-text {
