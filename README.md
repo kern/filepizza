@@ -15,7 +15,7 @@ A hosted instance of FilePizza is available at [file.pizza](https://file.pizza).
 
 The recommended way to deploy FilePizza is as a [Docker container](https://hub.docker.com/r/kern/filepizza).
 
-    $ docker run -p 8080:8080 -e PORT=8080 -it kern/filepizza:latest
+    $ docker run -p 8080:8080 -e PORT=8080 -it kern/filepizza:master
 
 You can also use [zeit/now](https://zeit.co/now):
 
