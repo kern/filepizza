@@ -14,7 +14,7 @@ tokenGenerator.initWithWordList(toppings)
 export function create(socket) {
 
   return tokenGenerator.generate(TOKEN_OPTIONS).then((parts) => {
-    const token = parts.join('-')
+    const token = parts.join('/')
     let result = {
       token: token,
       socket: socket

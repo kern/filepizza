@@ -3,7 +3,7 @@ var express = require('express')
 
 var routes = module.exports = new express.Router()
 
-routes.get(/^\/([a-z]+-[a-z]+-[a-z]+-[a-z]+)$/, function (req, res, next) {
+routes.get(/^\/([a-z]+\/[a-z]+\/[a-z]+\/[a-z]+)$/, function (req, res, next) {
 
   var uploader = db.find(req.params[0])
   if (uploader) {
