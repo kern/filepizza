@@ -47,6 +47,17 @@ p {
     }
 }
 
+small {
+    color: gray;
+    font: 12px/22px "Quicksand", sans-serif;
+    text-align: center;
+    margin: 0;
+
+    &.notice {
+        margin: 0 0 10px;
+    }
+}
+
 .footer {
     width: 100%
     text-align: center
@@ -163,39 +174,51 @@ p {
 
 .tempalink {
     display: flex
-    flex-direction: column
+    width: calc(100vw - 40px)
+    max-width: 1024px
+    margin 20px auto
 
     .long-url input {
         background: beige
         color: dark-gray
         border: 0
-        margin: 20px 0 0
+        margin: 0
         font: 18px/1 monospace
         height: 60px
         padding: 20px
         text-align: center
         width: 100%
+        border-radius: 4px 4px 0 0
     }
 
     .short-url {
         background: light-gray
         color: dark-gray
-        border: 0
-        margin: 0 0 20px
         height: 40px
         padding: 10px 20px
         text-align: center
         width: 100%
         font: 14px/1 "Quicksand", sans-serif;
+        border-radius: 0 0 4px 4px
 
         span {
             font: 14px/1 monospace
         }
     }
 
+    .qr {
+      flex: none
+      padding-right: 40px
+    }
+
+    .urls {
+      flex: auto
+    }
+
     img {
-        margin: auto
-        padding-bottom: 60px
+        height: 100px
+        width: 100px
+        display: block
     }
 }
 

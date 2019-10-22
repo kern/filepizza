@@ -50,7 +50,7 @@ export default class UploadPage extends React.Component {
 
             <h1>FilePizza</h1>
             <p>Free peer-to-peer file transfers in your browser.</p>
-            <p>We never store anything. Files only served fresh.</p>
+            <small className="notice">We never store anything. Files only served fresh.</small>
             <p>
               <label className="select-file-label">
                 <input type="file" onChange={this.handleSelectedFile} required/>
@@ -79,7 +79,7 @@ export default class UploadPage extends React.Component {
             size={this.state.fileSize} />
 
           <p>Send someone this link to download.</p>
-          <p>This link will work as long as this page is open.</p>
+          <small className="notice">This link will work as long as this page is open.</small>
           <p>Peers: {this.state.peers} &middot; Up: {formatSize(this.state.speedUp)}</p>
           <Tempalink token={this.state.token} shortToken={this.state.shortToken} />
 

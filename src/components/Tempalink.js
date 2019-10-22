@@ -16,19 +16,22 @@ export default class Tempalink extends React.Component {
     var shortUrl = window.location.origin + '/download/' + this.props.shortToken
 
     return <div className="tempalink">
-      <div className="long-url">
-        <input
-          onClick={this.onClick}
-          readOnly
-          type="text"
-          value={url} />
+      <div className="qr">
+        <QRCode text={url} />
       </div>
+      <div className="urls">
+        <div className="long-url">
+          <input
+            onClick={this.onClick}
+            readOnly
+            type="text"
+            value={url} />
+        </div>
 
-      <div className="short-url">
-        or, for short: <span>{shortUrl}</span>
+        <div className="short-url">
+          or, for short: <span>{shortUrl}</span>
+        </div>
       </div>
-
-      <QRCode text={url} />
     </div>
   }
 
