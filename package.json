@@ -1,6 +1,6 @@
 {
   "name": "filepizza",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Free peer-to-peer file transfers in your browser.",
   "preferGlobal": "true",
   "bin": "./dist/index.js",
@@ -10,6 +10,7 @@
   "scripts": {
     "start": "babel-node ./src/index.js",
     "start:prod": "node ./dist/index.js",
+    "prepublishOnly": "npm run build",
     "build": "babel src --ignore __tests__,__mocks__ --out-dir dist && webpack -p ./src/client && rm -rf dist/static && cp -R src/static dist/static"
   },
   "repository": {

@@ -8,7 +8,6 @@ css/index.css
 newrelic.js
 
 # FilePizza
-src
 resources
 log
 *.pem
