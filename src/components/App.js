@@ -62,7 +62,7 @@ export default class App extends React.Component {
           </div>
           <footer className="footer">
             <p>
-              Donations: <strong>1P7yFQAC3EmpvsB7K9s6bKPvXEP1LPoQnY</strong>
+              BTC Donations: <strong>1P7yFQAC3EmpvsB7K9s6bKPvXEP1LPoQnY</strong>
             </p>
 
             <p className="byline">
