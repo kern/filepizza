@@ -237,6 +237,43 @@ small {
     }
 }
 
+@media screen and (max-width: 850px) {
+    .tempalink {
+        display: flex
+        flex-direction: column;
+        width: calc(100vw - 40px)
+        max-width: 1024px
+        margin 20px auto
+
+        .qr {
+            margin: auto;
+            justify-content: center
+            padding: 20px
+        }
+
+        .short-url {
+            display: flex
+            flex-direction: column
+            height: 70px
+
+            span {
+                word-break: break-all
+                padding: 2px
+            }
+        }
+
+        .long-url input {
+            rows: auto
+        }
+    }
+}
+
+@media screen and (max-height: 360px) {
+    .container {
+        margin-bottom: 60px
+    }
+}
+
 .data {
     color: gray
     font: 14px/20px "Quicksand", sans-serif
