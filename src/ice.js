@@ -16,6 +16,14 @@ var DEFAULT_ICE_SERVERS = [
   }
 ];
 
+if (process.env.EXTRA_ICE_SERVERS) {
+  const extraICEServers =
+    process.env.EXTRA_ICE_SERVERS.split(',').map(function(server) {
+      return { urls: server.trim() }
+    })
+  DEFAULT_ICE_SERVERS += extraICEServers
+}
+
 var CACHE_LIFETIME = 5 * 60 * 1000; // 5 minutes
 var cachedPromise = null;
 

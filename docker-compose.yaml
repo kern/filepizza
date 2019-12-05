@@ -1,0 +1,15 @@
+version: '3'
+services:
+  filepizza:
+    image: kern/filepizza:latest
+    restart: always
+    build:
+      context: .
+    ports:
+      - 3333:3333
+    environment:
+      - PORT=3333
+      - EXTRA_ICE_SERVERS=turn:localhost:3478
+  coturn:
+    image: instrumentisto/coturn:latest
+    network_mode: host
