@@ -10,18 +10,14 @@ if (process.env.TWILIO_SID && process.env.TWILIO_TOKEN) {
   var client = null;
 }
 
-var DEFAULT_ICE_SERVERS = [
+var ICE_SERVERS = [
   {
     urls: "stun:stun.l.google.com:19302"
   }
 ];
 
-if (process.env.EXTRA_ICE_SERVERS) {
-  const extraICEServers =
-    process.env.EXTRA_ICE_SERVERS.split(',').map(function(server) {
-      return { urls: server.trim() }
-    })
-  DEFAULT_ICE_SERVERS += extraICEServers
+if (process.env.ICE_SERVERS) {
+  ICE_SERVERS = JSON.parse(process.env.ICE_SERVERS)
 }
 
 var CACHE_LIFETIME = 5 * 60 * 1000; // 5 minutes
@@ -32,7 +28,7 @@ function clearCache() {
 }
 
 exports.getICEServers = function() {
-  if (client == null) return Promise.resolve(DEFAULT_ICE_SERVERS);
+  if (client == null) return Promise.resolve(ICE_SERVERS);
   if (cachedPromise) return cachedPromise;
 
   cachedPromise = new Promise(function(resolve, reject) {
