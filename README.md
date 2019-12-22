@@ -21,7 +21,7 @@ You can also use [zeit/now](https://zeit.co/now):
 
     $ now --npm --public -e NODE_ENV=production
 
-If you'd like to use [Twilio's STUN/TURN service](https://www.twilio.com/stun-turn) for better connectivity behind NATs, you can specify your SID and token using the `TWILIO_SID` and `TWILIO_TOKEN` environment variables, respectively.
+You can specify your own ICE STUN/TURN servers for better connectivity behind NATs by passing a JSON encoding of the array via env var `ICE_SERVERS`. Alternatively, if you'd like to use [Twilio's STUN/TURN service](https://www.twilio.com/stun-turn), you can specify your SID and token using the `TWILIO_SID` and `TWILIO_TOKEN` environment variables, respectively.
 
 If you want to use [Google Analytics](https://marketingplatform.google.com/about/analytics/), you can specify your UA code using the `GA_ACCESS_TOKEN="UA-00000000-1"` environment variable.
 
