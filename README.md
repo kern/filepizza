@@ -17,9 +17,14 @@ The recommended way to deploy FilePizza is as a [Docker container](https://hub.d
 
     $ docker run -p 8080:8080 -e PORT=8080 -it kern/filepizza:master
 
-You can also use [zeit/now](https://zeit.co/now):
+WebRTC only works over HTTPS, so you'll either have to get a signed HTTPS key/certificate from a CA such as [Let's Encrypt](https://letsencrypt.org/getting-started/)) or generate your own [self-signed pair](https://devcenter.heroku.com/articles/ssl-certificate-self) and trust it. Then, to run FilePizza with HTTPS termination:
 
-    $ now --npm --public -e NODE_ENV=production
+    $ docker run \
+        -p 8080:8080 -e PORT=8080 \
+        -e HTTPS_KEY=/config/server.key \
+        -e HTTPS_CERT=/config/server.crt \
+        -v mylocalpath:/config \
+        -it kern/filepizza:master
 
 You can specify your own ICE STUN/TURN servers for better connectivity behind NATs by passing a JSON encoding of the array via env var `ICE_SERVERS`. Alternatively, if you'd like to use [Twilio's STUN/TURN service](https://www.twilio.com/stun-turn), you can specify your SID and token using the `TWILIO_SID` and `TWILIO_TOKEN` environment variables, respectively.
 
