@@ -13,7 +13,7 @@ A hosted instance of FilePizza is available at [file.pizza](https://file.pizza).
 
 ## Installation
 
-The recommended way to deploy FilePizza is as a [Docker container](https://hub.docker.com/r/kern/filepizza). WebRTC only works over HTTPS, so you'll either have to get a signed HTTPS key/certificate from a CA such as [Let's Encrypt](https://letsencrypt.org/getting-started/)) or generate your own [self-signed pair](https://devcenter.heroku.com/articles/ssl-certificate-self) and trust it. Then, to run FilePizza (with HTTPS termination):
+The recommended way to deploy FilePizza is as a [Docker container](https://hub.docker.com/r/kern/filepizza). WebRTC only works over HTTPS, so you'll either have to get a signed HTTPS key/certificate from a CA such as [Let's Encrypt](https://letsencrypt.org/getting-started/) or generate your own [self-signed pair](https://devcenter.heroku.com/articles/ssl-certificate-self) and trust it. Then, to run FilePizza (with HTTPS termination):
 
     $ docker run \
         -p 8080:8080 -e PORT=8080 \
