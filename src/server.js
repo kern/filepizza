@@ -6,10 +6,6 @@ var ice = require("./ice");
 var socketIO = require("socket.io");
 var winston = require("winston");
 
-var app = express();
-var port =
-  process.env.PORT || (process.env.NODE_ENV === "production" ? 80 : 3000);
-
 process.on("unhandledRejection", (reason, p) => {
   p.catch(err => {
     log.error("Exiting due to unhandled rejection!");
@@ -24,27 +20,31 @@ process.on("uncaughtException", err => {
   process.exit(1);
 });
 
+var app = express();
+var port =
+  process.env.PORT || (process.env.NODE_ENV === "production" ? 80 : 3000);
+
+if (!process.env.QUIET) {
+  app.use(
+    expressWinston.logger({
+      winstonInstance: winston,
+      expressFormat: true
+    })
+  );
+}
+
+app.get("/app.js", require("./middleware/javascript"));
+app.use(require("./middleware/static"));
+
+app.use([
+  require("./middleware/bootstrap"),
+  require("./middleware/error"),
+  require("./middleware/react")
+]);
+
 function bootServer(server) {
   var io = socketIO(server);
   io.set("transports", ["polling"]);
-
-  if (!process.env.QUIET) {
-    app.use(
-      expressWinston.logger({
-        winstonInstance: winston,
-        expressFormat: true
-      })
-    );
-  }
-
-  app.get("/app.js", require("./middleware/javascript"));
-  app.use(require("./middleware/static"));
-
-  app.use([
-    require("./middleware/bootstrap"),
-    require("./middleware/error"),
-    require("./middleware/react")
-  ]);
 
   io.on("connection", function(socket) {
     var upload = null;
@@ -90,7 +90,7 @@ if (process.env.HTTPS_KEY && process.env.HTTPS_CERT) {
   var server = https.createServer({
     key: fs.readFileSync(process.env.HTTPS_KEY),
     cert: fs.readFileSync(process.env.HTTPS_CERT),
-  })
+  }, app)
   bootServer(server)
 } else {
   // no HTTPS
