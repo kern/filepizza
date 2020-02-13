@@ -42,6 +42,14 @@ app.use([
   require("./middleware/react")
 ]);
 
+const TRACKERS = process.env.WEBTORRENT_TRACKERS
+  ? process.env.WEBTORRENT_TRACKERS.split(',').map(t => [t.trim()])
+  : [
+    ["wss://tracker.openwebtorrent.com"],
+    ["wss://tracker.btorrent.xyz"],
+    ["wss://tracker.fastcast.nz"]
+  ];
+
 function bootServer(server) {
   var io = socketIO(server);
   io.set("transports", ["polling"]);
@@ -61,9 +69,9 @@ function bootServer(server) {
       });
     });
 
-    socket.on("rtcConfig", function(_, res) {
+    socket.on("trackerConfig", function(_, res) {
       ice.getICEServers().then(function(iceServers) {
-        res({ iceServers: iceServers });
+        res({ rtcConfig: { iceServers }, announce: TRACKERS });
       });
     });
 
