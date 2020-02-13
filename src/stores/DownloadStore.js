@@ -34,8 +34,8 @@ export default alt.createStore(class DownloadStore {
     if (this.status !== 'ready') return
     this.status = 'requesting'
 
-    getClient().then((client) => {
-      client.add(this.infoHash, (torrent) => {
+    getClient().then(client => {
+      client.add(this.infoHash, { announce: client.tracker.announce }, (torrent) => {
         this.setState({ status: 'downloading' })
 
         const updateSpeed = () => {

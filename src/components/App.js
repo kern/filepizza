@@ -62,7 +62,7 @@ export default class App extends React.Component {
           </div>
           <footer className="footer">
             <p>
-              BTC Donations: <strong>1P7yFQAC3EmpvsB7K9s6bKPvXEP1LPoQnY</strong>
+              <strong>Like FilePizza?</strong> Support it&apos;s development with a <a href="https://commerce.coinbase.com/checkout/247b6ffe-fb4e-47a8-9a76-e6b7ef83ea22">donation in crypto</a>.
             </p>
 
             <p className="byline">
