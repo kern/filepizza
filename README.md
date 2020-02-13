@@ -24,6 +24,8 @@ The recommended way to deploy FilePizza is as a [Docker container](https://hub.d
 
 You can specify your own ICE STUN/TURN servers for better connectivity behind NATs by passing a JSON encoding of the array via env var `ICE_SERVERS`. Alternatively, if you'd like to use [Twilio's STUN/TURN service](https://www.twilio.com/stun-turn), you can specify your SID and token using the `TWILIO_SID` and `TWILIO_TOKEN` environment variables, respectively.
 
+You can specify your own Webtorrent tracker(s) using the `WEBTORRENT_TRACKERS` environment variable, comma-delimited.
+
 If you want to use [Google Analytics](https://marketingplatform.google.com/about/analytics/), you can specify your UA code using the `GA_ACCESS_TOKEN="UA-00000000-1"` environment variable.
 
 ## Development

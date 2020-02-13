@@ -3,11 +3,13 @@ import alt from "../alt";
 import socket from "filepizza-socket";
 import { getClient } from "../wt";
 
-const TRACKERS = [
-  ["wss://tracker.btorrent.xyz"],
-  ["wss://tracker.openwebtorrent.com"],
-  ["wss://tracker.fastcast.nz"]
-];
+const TRACKERS = process.env.WEBTORRENT_TRACKERS
+  ? process.env.WEBTORRENT_TRACKERS.split(',').map(t => t.trim())
+  : [
+    ["wss://tracker.openwebtorrent.com"],
+    ["wss://tracker.btorrent.xyz"],
+    ["wss://tracker.fastcast.nz"]
+  ];
 
 const SPEED_REFRESH_TIME = 2000;
 
