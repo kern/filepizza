@@ -66,4 +66,4 @@ number of open files allowed on your system:
 
 ## License & Acknowledgements
 
-FilePizza is released under the [BSD 3-Clause license](https://github.com/kern/filepizza/blob/master/LICENSE). A huge thanks to [WebTorrent](https://github.com/feross/webtorrent) which we use for the file transfers under the hood.
+FilePizza is released under the [BSD 3-Clause license](https://github.com/kern/filepizza/blob/master/LICENSE). A huge thanks to [WebTorrent](https://github.com/feross/webtorrent) which we use for the file transfers under the hood, and to [iblowyourdesign](https://dribbble.com/iblowyourdesign) for the pizza illustration.
