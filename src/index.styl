@@ -3,10 +3,10 @@
 beige = #F9F2E7
 dark-gray = #333
 gray = #777
-green = #8FBE00
+green = #3F6B29
 light-blue = #40C0CB
 light-gray = #EEE
-light-green = #AEE239
+light-green = #4BB74C
 light-red = #E23430
 light-yellow = #FFE476
 red = #B11C17
@@ -166,7 +166,7 @@ small {
 
     .spinner-image {
         display: block;
-        height: 150px;
+        width: 40%;
     }
 
     .spinner-name {
@@ -292,9 +292,9 @@ small {
 
 .download-button {
     display: block
-    box-shadow: inset 0 1px 1px light-green
+    box-shadow: inset 0 1px 1px green
     padding: 20px
-    background: green
+    background: light-green
     border: none
     color: white
     width: calc(100vw - 40px)
@@ -307,19 +307,19 @@ small {
     text-transform: uppercase
 
     &:hover, &:focus {
-        box-shadow: inset 0 1px 1px green
-        background: light-green
+        box-shadow: inset 0 1px 1px lighten(green, 10%)
+        background: lighten(light-green, 10%)
     }
 
     &:active {
-        background: green
+        background: light-green
     }
 }
 
 .progress-bar {
     height: 60px
     overflow: hidden
-    background: green
+    background: light-green
     transition: all 1s ease
     width: calc(100vw - 40px)
     max-width: 800px
@@ -329,8 +329,8 @@ small {
     .progress-bar-inner {
         float: left
         height: 100%
-        background: green
-        box-shadow: inset 0 1px 1px light-green
+        background: light-green
+        box-shadow: inset 0 1px 1px green
         overflow: hidden
         border-radius: 4px
     }
@@ -400,20 +400,20 @@ small {
 }
 
 .donate-button {
-    border: 2px solid red
+    border: 2px solid green
     border-radius: 4px
     padding: 2px 5px
     margin-right: 10px
-    background: yellow
+    background: light-green
     display: inline-block
     cursor: pointer
     transition: all 0.25s ease
     font: 12px/1 "Quicksand", sans-serif
     color: white
+    text-decoration: none
 
     &:hover, &:active {
-        border-color: yellow
-        background: white
-        color: red
+        border-color: light-green
+        color: white
     }
 }
