@@ -1,14 +1,14 @@
-import Bootstrap from "./Bootstrap";
-import ErrorPage from "./ErrorPage";
 import FrozenHead from "react-frozenhead";
 import React from "react";
-import SupportStore from "../stores/SupportStore";
-import { RouteHandler } from "react-router";
-import ga from "react-google-analytics";
+import { RouteHandler } from 'react-router';
+import ga from 'react-google-analytics';
+import SupportStore from '../stores/SupportStore';
+import ErrorPage from "./ErrorPage";
+import Bootstrap from './Bootstrap';
 
 if (process.env.GA_ACCESS_TOKEN) {
   ga("create", process.env.GA_ACCESS_TOKEN, "auto");
-  ga("send", "pageview");
+  ;;ga('send', 'pageview')
 }
 
 export default class App extends React.Component {
@@ -18,7 +18,7 @@ export default class App extends React.Component {
 
     this._onChange = () => {
       this.setState(SupportStore.getState());
-    };
+    }
   }
 
   componentDidMount() {
@@ -62,7 +62,13 @@ export default class App extends React.Component {
           </div>
           <footer className="footer">
             <p>
-              <strong>Like FilePizza?</strong> Support its development! <a href="https://commerce.coinbase.com/checkout/247b6ffe-fb4e-47a8-9a76-e6b7ef83ea22" className="donate-button">donate</a>
+              <strong>Like FilePizza?</strong> Support its development!{' '}
+              <a
+                href="https://commerce.coinbase.com/checkout/247b6ffe-fb4e-47a8-9a76-e6b7ef83ea22"
+                className="donate-button"
+              >
+                donate
+              </a>
             </p>
 
             <p className="byline">
@@ -85,7 +91,7 @@ export default class App extends React.Component {
             </p>
           </footer>
           <script>FilePizza()</script>
-          { process.env.GA_ACCESS_TOKEN ? <ga.Initializer /> : <div></div> }
+          {process.env.GA_ACCESS_TOKEN ? <ga.Initializer /> : <div></div>}
         </body>
       </html>
     );

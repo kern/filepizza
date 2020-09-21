@@ -1,12 +1,11 @@
 const nib = require("nib");
 const webpack = require('webpack')
-
-module.exports = {
+;module.exports = {
   entry: "./src/client",
   target: "web",
 
   output: {
-    filename: "dist/bundle.js"
+    filename: "dist/bundle.js",
   },
 
   module: {
@@ -14,37 +13,39 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: "babel-loader"
+        loader: "babel-loader",
       },
       {
         test: /\.json$/,
-        loader: "json"
+        loader: "json",
       },
       {
         test: /\.styl$/,
-        loader: "style-loader!css-loader!stylus-loader"
-      }
-    ]
+        loader: "style-loader!css-loader!stylus-loader",
+      },
+    ],
   },
 
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
-        'GA_ACCESS_TOKEN': JSON.stringify(process.env.GA_ACCESS_TOKEN),
-      }
-    })
+        GA_ACCESS_TOKEN: JSON.stringify(process.env.GA_ACCESS_TOKEN),
+      },
+    }),
   ],
 
   node: {
-    fs: "empty"
+    fs: "empty",
   },
 
   stylus: {
-    use: [nib()]
+    use: [nib()],
   },
 
-  rules: [{
-    test: /react-google-analytics/,
-    use: process.env.GA_ACCESS_TOKEN ? 'null-loader' : 'noop-loader'
-  }]
+  rules: [
+    {
+      test: /react-google-analytics/,
+      use: process.env.GA_ACCESS_TOKEN ? 'null-loader' : 'noop-loader',
+    },
+  ],
 };

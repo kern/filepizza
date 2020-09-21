@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 export default class DownloadButton extends React.Component {
   constructor() {
@@ -11,15 +11,14 @@ export default class DownloadButton extends React.Component {
   }
 
   render() {
-    return <button
-      className="download-button"
-      onClick={this.onClick}>
-      Download
-    </button>
+    return (
+      <button className="download-button" onClick={this.onClick}>
+        Download
+      </button>
+    )
   }
-
 }
 
 DownloadButton.propTypes = {
-  onClick: React.PropTypes.func.isRequired
+  onClick: React.PropTypes.func.isRequired,
 }

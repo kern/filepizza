@@ -1,5 +1,5 @@
-import React from 'react'
-import QRCode from 'react-qr'
+import React from 'react';
+import QRCode from 'react-qr';
 
 export default class Tempalink extends React.Component {
   constructor() {
@@ -12,27 +12,25 @@ export default class Tempalink extends React.Component {
   }
 
   render() {
-    var url = window.location.origin + '/' + this.props.token
-    var shortUrl = window.location.origin + '/download/' + this.props.shortToken
+    const url = `${window.location.origin}/${this.props.token}`;
+    const shortUrl
+      = window.location.origin + '/download/' + this.props.shortToken
 
-    return <div className="tempalink">
-      <div className="qr">
-        <QRCode text={url} />
-      </div>
-      <div className="urls">
-        <div className="long-url">
-          <input
-            onClick={this.onClick}
-            readOnly
-            type="text"
-            value={url} />
+    return (
+      <div className="tempalink">
+        <div className="qr">
+          <QRCode text={url} />
         </div>
+        <div className="urls">
+          <div className="long-url">
+            <input onClick={this.onClick} readOnly type="text" value={url} />
+          </div>
 
-        <div className="short-url">
-          or, for short: <span>{shortUrl}</span>
+          <div className="short-url">
+            or, for short: <span>{shortUrl}</span>
+          </div>
         </div>
       </div>
-    </div>
+    )
   }
-
 }

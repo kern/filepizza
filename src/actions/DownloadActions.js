@@ -1,9 +1,8 @@
-import alt from '../alt'
+import alt from '../alt';
 
 export default alt.createActions(class DownloadActions {
-  constructor() {
-    this.generateActions(
-      'requestDownload'
-    )
-  }
-})
+    constructor() {
+      this.generateActions('requestDownload');
+    }
+  },
+)

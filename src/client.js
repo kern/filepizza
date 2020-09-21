@@ -2,21 +2,24 @@ import "babel-polyfill";
 import "./index.styl";
 import React from "react";
 import ReactRouter from "react-router";
-import routes from "./routes";
-import alt from "./alt";
-import webrtcSupport from "webrtcsupport";
+import webrtcSupport from 'webrtcsupport';
+import routes from './routes';
+import alt from './alt';
 import SupportActions from "./actions/SupportActions";
 
-let bootstrap = document.getElementById("bootstrap").innerHTML;
+const bootstrap = document.getElementById("bootstrap").innerHTML;
 alt.bootstrap(bootstrap);
 
 window.FilePizza = () => {
-  ReactRouter.run(routes, ReactRouter.HistoryLocation, function(Handler) {
+  ReactRouter.run(routes, ReactRouter.HistoryLocation, Handler => {
     React.render(<Handler data={bootstrap} />, document);
-  });
+  })
+  if (!webrtcSupport.support) {
+    SupportActions.noSupport();
+  }
 
-  if (!webrtcSupport.support) SupportActions.noSupport();
-
-  let isChrome = navigator.userAgent.toLowerCase().indexOf("chrome") > -1;
-  if (isChrome) SupportActions.isChrome();
+  const isChrome = navigator.userAgent.toLowerCase().includes('chrome')
+;if (isChrome) {
+    SupportActions.isChrome()
+  }
 };

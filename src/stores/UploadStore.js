@@ -1,6 +1,6 @@
-import UploadActions from "../actions/UploadActions";
-import alt from "../alt";
-import socket from "filepizza-socket";
+import socket from 'filepizza-socket';
+import UploadActions from '../actions/UploadActions';
+import alt from '../alt';
 import { getClient } from "../wt";
 
 const SPEED_REFRESH_TIME = 2000;
@@ -22,7 +22,9 @@ export default alt.createStore(
     }
 
     onUploadFile(file) {
-      if (this.status !== "ready") return;
+      if (this.status !== "ready") {
+        return;
+      }
       this.status = "processing";
 
       getClient().then(client => {
@@ -30,9 +32,9 @@ export default alt.createStore(
           const updateSpeed = () => {
             this.setState({
               speedUp: torrent.uploadSpeed,
-              peers: torrent.numPeers
+              peers: torrent.numPeers,
             });
-          };
+          }
 
           torrent.on("upload", updateSpeed);
           torrent.on("download", updateSpeed);
@@ -44,7 +46,7 @@ export default alt.createStore(
               fileName: file.name,
               fileSize: file.size,
               fileType: file.type,
-              infoHash: torrent.magnetURI
+              infoHash: torrent.magnetURI,
             },
             (res) => {
               this.setState({
@@ -54,11 +56,11 @@ export default alt.createStore(
                 fileName: file.name,
                 fileSize: file.size,
                 fileType: file.type,
-                infoHash: torrent.magnetURI
+                infoHash: torrent.magnetURI,
               });
-            }
+            },
           );
-        });
+        })
       });
     }
   },
