@@ -1,6 +1,6 @@
-import Arrow from '@app/components/Arrow';
-import React from 'react';
-import UploadActions from '@app/actions/UploadActions';
+import Arrow from '@app/components/Arrow'
+import React from 'react'
+import UploadActions from '@app/actions/UploadActions'
 
 export default class UploadPage extends React.Component {
   constructor() {
@@ -9,7 +9,7 @@ export default class UploadPage extends React.Component {
   }
 
   uploadFile(file) {
-    UploadActions.uploadFile(file);
+    UploadActions.uploadFile(file)
   }
 
   render() {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 export default class DropZone extends React.Component {
   constructor() {
@@ -24,7 +24,7 @@ export default class DropZone extends React.Component {
 
   onDragOver(e) {
     e.preventDefault()
-    e.dataTransfer.dropEffect = 'copy';
+    e.dataTransfer.dropEffect = 'copy'
   }
 
   onDrop(e) {

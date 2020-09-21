@@ -1,6 +1,6 @@
-import React from "react";
-import ErrorStore from "../stores/ErrorStore";
-import Spinner from './Spinner';
+import React from 'react'
+import ErrorStore from '../stores/ErrorStore'
+import Spinner from './Spinner'
 
 export default class ErrorPage extends React.Component {
   constructor() {
@@ -9,7 +9,7 @@ export default class ErrorPage extends React.Component {
 
     this._onChange = () => {
       this.setState(ErrorStore.getState())
-    };
+    }
   }
 
   componentDidMount() {

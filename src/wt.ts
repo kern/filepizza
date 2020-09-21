@@ -1,4 +1,4 @@
-import socket from 'filepizza-socket';
+import socket from 'filepizza-socket'
 
 export function getClient() {
   return new Promise((resolve, reject) => {
@@ -7,6 +7,6 @@ export function getClient() {
         tracker: trackerConfig,
       })
       resolve(client)
-    });
+    })
   })
 }

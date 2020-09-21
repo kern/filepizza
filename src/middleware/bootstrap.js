@@ -1,7 +1,9 @@
-const express = require("express");
-const db = require("../db");
-let routes = (module.exports = new express.Router())
-;function bootstrap(uploader, req, res, next) {
+const express = require('express')
+const db = require('../db')
+
+const routes = module.exports = new express.Router()
+
+function bootstrap(uploader, req, res, next) {
   if (uploader) {
     res.locals.data = {
       DownloadStore: {
@@ -17,7 +19,7 @@ let routes = (module.exports = new express.Router())
     next()
   } else {
     const err = new Error('Not Found')
-;err.status = 404
+    err.status = 404
     next(err)
   }
 }
@@ -25,8 +27,8 @@ let routes = (module.exports = new express.Router())
 routes.get(/^\/([a-z]+\/[a-z]+\/[a-z]+\/[a-z]+)$/, (req, res, next) => {
   const uploader = db.find(req.params[0])
   return bootstrap(uploader, req, res, next)
-});
+})
 routes.get(/^\/download\/(\w+)$/, (req, res, next) => {
   const uploader = db.findShort(req.params[0])
   return bootstrap(uploader, req, res, next)
-});
+})

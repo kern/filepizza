@@ -1,12 +1,12 @@
-import SupportActions from '../actions/SupportActions';
-import alt from '../alt';
+import SupportActions from '../actions/SupportActions'
+import alt from '../alt'
 
 export default alt.createStore(
   class SupportStore {
     constructor() {
       this.bindActions(SupportActions)
-      this.isSupported = true;
-      this.isChrome = false;
+      this.isSupported = true
+      this.isChrome = false
     }
 
     onNoSupport() {
@@ -17,5 +17,5 @@ export default alt.createStore(
       this.isChrome = true
     }
   },
-  'SupportStore'
+  'SupportStore',
 )

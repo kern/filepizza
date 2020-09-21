@@ -1,9 +1,9 @@
-import React from 'react';
-import { Route, DefaultRoute, NotFoundRoute, RouteHandler } from 'react-router';
-import App from './components/App';
-import DownloadPage from './components/DownloadPage';
-import UploadPage from './components/UploadPage';
-import ErrorPage from './components/ErrorPage';
+import React from 'react'
+import { Route, DefaultRoute, NotFoundRoute, RouteHandler } from 'react-router'
+import App from './components/App'
+import DownloadPage from './components/DownloadPage'
+import UploadPage from './components/UploadPage'
+import ErrorPage from './components/ErrorPage'
 
 export default (
   <Route handler={App}>

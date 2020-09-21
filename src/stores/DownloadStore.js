@@ -1,13 +1,13 @@
-import socket from "filepizza-socket";
-import DownloadActions from "../actions/DownloadActions";
-import alt from "../alt";
-import { getClient } from '../wt';
+import socket from 'filepizza-socket'
+import DownloadActions from '../actions/DownloadActions'
+import alt from '../alt'
+import { getClient } from '../wt'
 
 const SPEED_REFRESH_TIME = 2000
 
 function downloadBlobURL(name, blobURL) {
   const a = document.createElement('a')
-;document.body.appendChild(a)
+  document.body.appendChild(a)
   a.download = name
   a.href = blobURL
   a.click()
@@ -18,15 +18,15 @@ export default alt.createStore(
     constructor() {
       this.bindActions(DownloadActions)
 
-      this.fileName = "";
+      this.fileName = ''
       this.fileSize = 0
-      this.fileType = "";
+      this.fileType = ''
       this.infoHash = null
-      this.peers = 0;
-      this.progress = 0;
-      this.speedDown = 0;
-      this.speedUp = 0;
-      this.status = "uninitialized";
+      this.peers = 0
+      this.progress = 0
+      this.speedDown = 0
+      this.speedUp = 0
+      this.status = 'uninitialized'
       this.token = null
     }
 
@@ -34,7 +34,7 @@ export default alt.createStore(
       if (this.status !== 'ready') {
         return
       }
-      this.status = 'requesting';
+      this.status = 'requesting'
 
       getClient().then(client => {
         client.add(
@@ -51,12 +51,12 @@ export default alt.createStore(
               })
             }
             torrent.on('upload', updateSpeed)
-            torrent.on("download", updateSpeed);
-            setInterval(updateSpeed, SPEED_REFRESH_TIME);
+            torrent.on('download', updateSpeed)
+            setInterval(updateSpeed, SPEED_REFRESH_TIME)
 
-            const file = torrent.files[0];
-            const stream = file.createReadStream();
-            stream.on("data", (chunk) => {
+            const file = torrent.files[0]
+            const stream = file.createReadStream()
+            stream.on('data', (chunk) => {
               if (this.status !== 'downloading') {
                 return
               }
@@ -68,15 +68,15 @@ export default alt.createStore(
                     throw err
                   }
                   downloadBlobURL(this.fileName, blobURL)
-                });
+                })
               } else {
                 this.setState({ progress: torrent.progress })
               }
             })
           },
         )
-      });
+      })
     }
   },
-  'DownloadStore'
+  'DownloadStore',
 )

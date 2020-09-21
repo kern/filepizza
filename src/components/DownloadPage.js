@@ -1,12 +1,12 @@
-import React from "react";
-import DownloadActions from '../actions/DownloadActions';
-import DownloadStore from '../stores/DownloadStore';
-import { formatSize } from "../util";
-import ChromeNotice from './ChromeNotice';
-import DownloadButton from "./DownloadButton";
-import ErrorPage from './ErrorPage';
-import ProgressBar from './ProgressBar';
-import Spinner from "./Spinner";
+import React from 'react'
+import DownloadActions from '../actions/DownloadActions'
+import DownloadStore from '../stores/DownloadStore'
+import { formatSize } from '../util'
+import ChromeNotice from './ChromeNotice'
+import DownloadButton from './DownloadButton'
+import ErrorPage from './ErrorPage'
+import ProgressBar from './ProgressBar'
+import Spinner from './Spinner'
 
 export default class DownloadPage extends React.Component {
   constructor() {
@@ -15,7 +15,7 @@ export default class DownloadPage extends React.Component {
 
     this._onChange = () => {
       this.setState(DownloadStore.getState())
-    };
+    }
 
     this.downloadFile = this.downloadFile.bind(this)
   }

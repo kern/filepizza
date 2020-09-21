@@ -1,32 +1,32 @@
-import FrozenHead from "react-frozenhead";
-import React from "react";
-import { RouteHandler } from 'react-router';
-import ga from 'react-google-analytics';
-import SupportStore from '../stores/SupportStore';
-import ErrorPage from "./ErrorPage";
-import Bootstrap from './Bootstrap';
+import FrozenHead from 'react-frozenhead'
+import React from 'react'
+import { RouteHandler } from 'react-router'
+import ga from 'react-google-analytics'
+import SupportStore from '../stores/SupportStore'
+import ErrorPage from './ErrorPage'
+import Bootstrap from './Bootstrap'
 
 if (process.env.GA_ACCESS_TOKEN) {
-  ga("create", process.env.GA_ACCESS_TOKEN, "auto");
-  ;;ga('send', 'pageview')
+  ga('create', process.env.GA_ACCESS_TOKEN, 'auto')
+  ga('send', 'pageview')
 }
 
 export default class App extends React.Component {
   constructor() {
-    super();
-    this.state = SupportStore.getState();
+    super()
+    this.state = SupportStore.getState()
 
     this._onChange = () => {
-      this.setState(SupportStore.getState());
+      this.setState(SupportStore.getState())
     }
   }
 
   componentDidMount() {
-    SupportStore.listen(this._onChange);
+    SupportStore.listen(this._onChange)
   }
 
   componentWillUnmount() {
-    SupportStore.unlisten(this._onChange);
+    SupportStore.unlisten(this._onChange)
   }
 
   render() {
@@ -72,19 +72,19 @@ export default class App extends React.Component {
             </p>
 
             <p className="byline">
-              Cooked up by{" "}
+              Cooked up by{' '}
               <a href="http://kern.io" target="_blank">
                 Alex Kern
-              </a>{" "}
-              &amp;{" "}
+              </a>{' '}
+              &amp;{' '}
               <a href="http://neeraj.io" target="_blank">
                 Neeraj Baid
-              </a>{" "}
-              while eating <strong>Sliver</strong> @ UC Berkeley &middot;{" "}
+              </a>{' '}
+              while eating <strong>Sliver</strong> @ UC Berkeley &middot;{' '}
               <a href="https://github.com/kern/filepizza#faq" target="_blank">
                 FAQ
-              </a>{" "}
-              &middot;{" "}
+              </a>{' '}
+              &middot;{' '}
               <a href="https://github.com/kern/filepizza" target="_blank">
                 Fork us
               </a>
@@ -94,6 +94,6 @@ export default class App extends React.Component {
           {process.env.GA_ACCESS_TOKEN ? <ga.Initializer /> : <div></div>}
         </body>
       </html>
-    );
+    )
   }
 }
