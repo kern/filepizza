@@ -2,7 +2,6 @@
 
 beige = #F9F2E7
 dark-gray = #333
-gray = #777
 green = #3F6B29
 light-blue = #40C0CB
 light-gray = #EEE
@@ -12,6 +11,14 @@ light-yellow = #FFE476
 red = #B11C17
 yellow = #DEAC11
 
+:root {
+    --font-color: #777;
+}
+
+[data-theme="dark"] {
+    --font-color: #ccc;
+}
+
 @keyframes rotate {
     from { transform: rotate(0deg) }
     to { transform: rotate(360deg) }
@@ -19,7 +26,13 @@ yellow = #DEAC11
 
 global-reset()
 * { box-sizing: border-box }
-html, body { height: 100% }
+html, body {
+    height: 100%
+    background-color: white
+    [data-theme="dark"] {
+        background-color: #1E1014
+    }
+}
 
 h1 {
     color: red;
@@ -29,7 +42,13 @@ h1 {
 }
 
 a {
-  color: gray
+  color: var(--font-color)
+}
+
+pre {
+  color: var(--font-color)
+  font-family: monospace
+  margin: 1em auto
 }
 
 strong {
@@ -37,7 +56,7 @@ strong {
 }
 
 p {
-    color: gray;
+   color: var(--font-color)
     font: 18px/22px "Quicksand", sans-serif;
     text-align: center;
     margin: 0;
@@ -48,7 +67,7 @@ p {
 }
 
 small {
-    color: gray;
+   color: var(--font-color)
     font: 12px/22px "Quicksand", sans-serif;
     text-align: center;
     margin: 0;
@@ -61,13 +80,18 @@ small {
 .footer {
     width: 100%
     text-align: center
-    color: gray
+    color: var(--font-color)
     padding: 10px 0 10px
     position: fixed
     bottom: 0
     border-radius: 5px 5px 0 0
-    background white
+    background white;
     box-shadow 0 -2px 4px light-gray
+
+    [data-theme="dark"] & {
+        background: #1a1113;
+        box-shadow: 0 -2px 4px rgba(0,0,0,0.3)
+    }
 
     iframe {
       display: inline-block;
@@ -93,6 +117,8 @@ small {
     @media (max-width: 600px) {
         position: relative
     }
+
+
 }
 
 .page {
@@ -102,10 +128,13 @@ small {
     height: 100%;
     min-height: 640px;
     padding: 40px 0 80px;
+    background-color: white
+    [data-theme="dark"] & {
+        background-color: #1E1014
+    }
 }
 
 .drop-zone {
-
     .drop-zone-overlay {
         position: fixed
         top: 0
@@ -114,6 +143,7 @@ small {
         height: 100%
         background: rgba(0, 0, 0, 0.5)
         text-align: center
+        z-index: 10
 
         &:after {
             color: white
@@ -151,7 +181,7 @@ small {
         width: 300px
         height: 300px
         transition: transform 1s
-        z-index: -1
+        z-index: 1
 
         @media (max-width: 600px) {
             width: 150px
@@ -167,6 +197,7 @@ small {
     .spinner-image {
         display: block;
         width: 40%;
+        z-index: 2
     }
 
     .spinner-name {
@@ -178,6 +209,7 @@ small {
         white-space: nowrap
         margin-top: 10px
         text-shadow: 0 0 3px #333
+        z-index: 2
     }
 
     .spinner-size {
@@ -188,6 +220,7 @@ small {
         text-overflow: ellipsis
         white-space: nowrap
         text-shadow: 0 0 3px #333
+        z-index: 2
     }
 }
 
@@ -208,6 +241,10 @@ small {
         text-align: center
         width: 100%
         border-radius: 4px 4px 0 0
+        [data-theme="dark"] & {
+            background-color: #231717
+            color: white
+        }
     }
 
     .short-url {
@@ -219,6 +256,10 @@ small {
         width: 100%
         font: 14px/1 "Quicksand", sans-serif;
         border-radius: 0 0 4px 4px
+        [data-theme="dark"] & {
+            background-color: #2b1f22
+            color: var(--font-color)
+        }
 
         span {
             font: 14px/1 monospace
@@ -226,12 +267,15 @@ small {
     }
 
     .qr {
-      flex: none
-      padding-right: 40px
+        flex: none
+        padding-right: 40px
     }
 
     .urls {
-      flex: auto
+        flex: auto
+        [data-theme="dark"] & {
+            box-shadow: 0 1px 4px rgba(0,0,0,0.3)
+        }
     }
 
     img {
@@ -279,7 +323,7 @@ small {
 }
 
 .data {
-    color: gray
+    color: var(--font-color)
     font: 14px/20px "Quicksand", sans-serif
     text-align: center
     overflow: hidden
@@ -314,6 +358,16 @@ small {
     &:active {
         background: light-green
     }
+
+    [data-theme="dark"] & {
+        $shade = #cc4c00
+        background: #b62222
+        box-shadow: inset 0 1px 1px $shade
+        &:hover {
+            background: #d42828
+            box-shadow: inset 0 1px 1px lighten($shade, 10%)
+        }
+    }
 }
 
 .progress-bar {
@@ -343,8 +397,10 @@ small {
     }
 
     &.progress-bar-failed {
-        background: red
-        box-shadow: inset 0 1px 1px light-red
+        .progress-bar-inner {
+            background: red
+            box-shadow: inset 0 1px 1px light-red
+        }
 
         .progress-bar-text {
             text-align: center
@@ -375,17 +431,23 @@ small {
             line-height: 30px
         }
     }
+
+    [data-theme="dark"] & {
+        background: #1a0d11
+        box-shadow: inset 0 1px 4px rgba(0,0,0,0.6)
+    }
 }
 
 .select-file-label {
-    border: 2px solid gray
+    border: 2px solid #777
     border-radius: 4px
     padding: 2px 5px
     margin-top: 10px
-    background: light-gray
+    background: white
     display: inline-block
     cursor: pointer
     transition: all 0.25s ease
+
 
     &:hover, &:active {
         border-color: yellow
@@ -396,6 +458,15 @@ small {
     input[type="file"] {
         position: fixed
         top: -1000px
+    }
+
+    [data-theme="dark"] & {
+        background: #b62222
+        border-color: #701815
+        &:hover {
+            border-color: #c47732
+            color: white
+        }
     }
 }
 

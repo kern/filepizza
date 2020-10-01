@@ -4,7 +4,8 @@ export default alt.createActions(class SupportActions {
   constructor() {
     this.generateActions(
       'isChrome',
-      'noSupport'
+      'noSupport',
+      'themeChange',
     )
   }
 })
