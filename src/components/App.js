@@ -3,6 +3,7 @@ import ErrorPage from "./ErrorPage";
 import FrozenHead from "react-frozenhead";
 import React from "react";
 import SupportStore from "../stores/SupportStore";
+import SupportActions from "../actions/SupportActions";
 import { RouteHandler } from "react-router";
 import ga from "react-google-analytics";
 
@@ -19,6 +20,16 @@ export default class App extends React.Component {
     this._onChange = () => {
       this.setState(SupportStore.getState());
     };
+  }
+
+  toggleTheme(e) {
+    e.preventDefault()
+
+    if (this.state.theme == "dark") {
+      SupportActions.themeChange("light")
+    } else {
+      SupportActions.themeChange("dark")
+    }
   }
 
   componentDidMount() {
@@ -56,7 +67,7 @@ export default class App extends React.Component {
           <script src="/app.js" />
         </FrozenHead>
 
-        <body>
+        <body data-theme={this.state.theme}>
           <div className="container">
             {this.state.isSupported ? <RouteHandler /> : <ErrorPage />}
           </div>
@@ -81,6 +92,10 @@ export default class App extends React.Component {
               &middot;{" "}
               <a href="https://github.com/kern/filepizza" target="_blank">
                 Fork us
+              </a>{" "}
+              &middot;{" "}
+              <a href="#" onClick={this.toggleTheme.bind(this)}>
+                {this.state.theme == "dark" ? "Toggle light theme 🌝" : "Toggle dark theme 🌚"}
               </a>
             </p>
           </footer>

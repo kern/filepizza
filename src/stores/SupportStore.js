@@ -7,6 +7,7 @@ export default alt.createStore(class SupportStore {
     this.bindActions(SupportActions)
     this.isSupported = true
     this.isChrome = false
+    this.theme = "light"
   }
 
   onNoSupport() {
@@ -17,4 +18,8 @@ export default alt.createStore(class SupportStore {
     this.isChrome = true
   }
 
+  onThemeChange(theme) {
+    localStorage.setItem("theme", theme)
+    this.theme = theme
+  }
 }, 'SupportStore')
