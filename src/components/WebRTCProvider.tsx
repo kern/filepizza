@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react'
-import { EventDispatcher } from 'peer-data'
-import { PeerDataProvider } from 'react-peer-data'
+import React, { useState, useEffect, useRef, useContext } from 'react'
+import type { default as PeerType } from 'peerjs'
 
-const dispatcher = new EventDispatcher()
-const constraints = { ordered: true }
-const signaling = { dispatcher }
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Peer = process.browser ? require('peerjs').default : null
+
+export type WebRTCValue = PeerType | null
 
 const ICE_SERVERS: RTCConfiguration = {
   iceServers: [
@@ -19,28 +19,38 @@ interface Props {
   children?: React.ReactNode
 }
 
+const WebRTCContext = React.createContext<WebRTCValue>(null)
+
+export const useWebRTC = (): WebRTCValue => {
+  return useContext(WebRTCContext)
+}
+
 export const WebRTCProvider: React.FC<Props> = ({
   servers = ICE_SERVERS,
   children,
 }: Props) => {
   const [pageLoaded, setPageLoaded] = useState(false)
+  const peer = useRef<WebRTCValue>(null)
 
   useEffect(() => {
-    setPageLoaded(true)
+    const effect = async () => {
+      peer.current = new Peer(undefined, {
+        config: servers,
+      })
+      setPageLoaded(true)
+    }
+
+    effect()
   }, [])
 
-  if (!pageLoaded) {
+  if (!pageLoaded || !peer.current) {
     return null
   }
 
   return (
-    <PeerDataProvider
-      servers={servers}
-      constraints={constraints}
-      signaling={signaling}
-    >
+    <WebRTCContext.Provider value={peer.current}>
       {children}
-    </PeerDataProvider>
+    </WebRTCContext.Provider>
   )
 }
 

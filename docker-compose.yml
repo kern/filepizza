@@ -1,23 +1,11 @@
 version: '3'
 services:
-  filepizza:
-    image: kern/filepizza:latest
-    restart: always
-    build:
-      context: .
+  redis:
+    image: redis:latest
     ports:
-      - 3333:3333
-    environment:
-      - PORT=3333
-      - EXTRA_ICE_SERVERS=turn:localhost:3478
-      - WEBTORRENT_TRACKERS=ws://localhost:8000
-  coturn:
-    image: instrumentisto/coturn:latest
-    network_mode: host
-    ports:
-      - 3478:3478
-  bittorrent-tracker:
-    image: henkel/bittorrent-tracker:latest
-    command: ["npx", "bittorrent-tracker", "--http-hostname", "0.0.0.0", "--ws"]
-    ports:
-    - 8000:8000
+      - 6379:6379
+# coturn:
+#   image: instrumentisto/coturn:latest
+#   network_mode: host
+#   ports:
+#     - 3478:3478
