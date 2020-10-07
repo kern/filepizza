@@ -1,16 +1,18 @@
 'use strict';
 
 module.exports = {
-  parser: '@typescript-eslint/parser',
+  root: true,
+  parser: "@typescript-eslint/parser",
   parserOptions: {
     project: './tsconfig.json',
   },
   extends: [
-    '@strv/typescript',
-    '@strv/typescript/optional',
-    '@strv/typescript/style'
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
   ],
   plugins: [
+    "@typescript-eslint",
     "prettier"
   ],
   rules: {
@@ -25,7 +27,7 @@ module.exports = {
     "new-cap": "off",
     "no-inline-comments": "off",
     "no-shadow": "warn",
-    "no-use-before-define": ["error", { "variables": false }],
+    "no-use-before-define": "off",
     "prettier/prettier": "error",
   }
 };

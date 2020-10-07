@@ -1,22 +1,25 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { usePeerData } from 'react-peer-data'
-import { UploadedFile } from '../types'
 import { Room } from 'peer-data'
 
 interface Props {
   roomName: string
-  files: UploadedFile[]
 }
 
-const Uploader: React.FC<Props> = ({ roomName, files }: Props) => {
+const Downloader: React.FC<Props> = ({ roomName }: Props) => {
   const room = useRef<Room | null>(null)
   const peerData = usePeerData()
 
   useEffect(() => {
+    if (room.current) return
+
     room.current = peerData.connect(roomName)
+    console.log(room.current)
+    setInterval(() => console.log(room.current), 1000)
     room.current
       .on('participant', (participant) => {
         console.log(participant.getId() + ' joined')
+        participant.newDataChannel()
 
         participant
           .on('connected', () => {
@@ -35,7 +38,9 @@ const Uploader: React.FC<Props> = ({ roomName, files }: Props) => {
             console.error('peer', participant.id, event)
             participant.renegotiate()
           })
-        participant.send(`hello there, I'm the uploader`)
+
+        console.log(participant)
+        participant.send(`hello there, I'm the downloader`)
       })
       .on('error', (event) => {
         console.error('room', roomName, event)
@@ -47,8 +52,7 @@ const Uploader: React.FC<Props> = ({ roomName, files }: Props) => {
     }
   }, [peerData])
 
-  const items = files.map((f) => <li key={f.fullPath}>{f.fullPath}</li>)
-  return <ul>{items}</ul>
+  return null
 }
 
-export default Uploader
+export default Downloader

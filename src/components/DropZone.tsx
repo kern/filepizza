@@ -1,64 +1,66 @@
-import React from 'react'
+import React, { useState, useRef, useCallback } from 'react'
+import styled from 'styled-components'
+import { extractFileList } from '../fs'
 
-export default class DropZone extends React.Component {
-  constructor() {
-    super()
-    this.state = { focus: false }
+const Wrapper = styled.div`
+  display: block;
+`
 
-    this.onDragEnter = this.onDragEnter.bind(this)
-    this.onDragLeave = this.onDragLeave.bind(this)
-    this.onDragOver = this.onDragOver.bind(this)
-    this.onDrop = this.onDrop.bind(this)
-  }
+const Overlay = styled.div`
+  display: block;
+`
 
-  onDragEnter() {
-    this.setState({ focus: true })
-  }
+interface Props {
+  onDrop: (files: any) => void
+  children?: React.ReactNode
+}
 
-  onDragLeave(e) {
-    if (e.target !== this.refs.overlay.getDOMNode()) {
-      return
-    }
-    this.setState({ focus: false })
-  }
+const Dropzone: React.FC<Props> = ({ children, onDrop }: Props) => {
+  const overlay = useRef()
+  const [focus, setFocus] = useState(false)
 
-  onDragOver(e) {
+  const handleDragEnter = useCallback(() => {
+    setFocus(true)
+  }, [])
+
+  const handleDragLeave = useCallback(
+    (e: React.DragEvent) => {
+      if (e.target !== overlay.current) {
+        return
+      }
+
+      setFocus(false)
+    },
+    [overlay.current],
+  )
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     e.dataTransfer.dropEffect = 'copy'
-  }
+  }, [])
 
-  onDrop(e) {
-    e.preventDefault()
-    this.setState({ focus: false })
+  const handleDrop = useCallback(
+    async (e: React.DragEvent) => {
+      e.preventDefault()
+      setFocus(false)
 
-    const file = e.dataTransfer.files[0]
-    if (this.props.onDrop && file) {
-      this.props.onDrop(file)
-    }
-  }
+      const files = await extractFileList(e)
+      onDrop(files)
+    },
+    [onDrop],
+  )
 
-  render() {
-    return (
-      <div
-        className="drop-zone"
-        ref="root"
-        onDragEnter={this.onDragEnter}
-        onDragLeave={this.onDragLeave}
-        onDragOver={this.onDragOver}
-        onDrop={this.onDrop}
-      >
-        <div
-          className="drop-zone-overlay"
-          hidden={!this.state.focus}
-          ref="overlay"
-        />
-
-        {this.props.children}
-      </div>
-    )
-  }
+  return (
+    <Wrapper
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
+      <Overlay ref={overlay} hidden={!focus} />
+      {children}
+    </Wrapper>
+  )
 }
 
-DropZone.propTypes = {
-  onDrop: React.PropTypes.func.isRequired,
-}
+export default Dropzone
