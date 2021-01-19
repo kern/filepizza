@@ -48,9 +48,3 @@ export function find(token) {
 export function findShort(shortToken) {
   return shortTokens[shortToken.toLowerCase()]
 }
-
-export function remove(client) {
-  if (client == null) { return }
-  delete tokens[client.token]
-  delete shortTokens[client.shortToken]
-}

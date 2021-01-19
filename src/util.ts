@@ -1,6 +1,10 @@
-// Taken from StackOverflow
+import xkcdPassword from 'xkcd-password'
+import toppings from './toppings'
+import config from './config'
+
+// Borrowed from StackOverflow
 // http://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
-export function formatSize(bytes) {
+export const formatSize = (bytes: number): string => {
   if (bytes === 0) {
     return '0 Bytes'
   }

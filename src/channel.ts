@@ -1,5 +1,6 @@
 import config from './config'
 import Redis from 'ioredis'
+import { generateShortSlug, generateLongSlug } from './slugs'
 
 export type Channel = {
   uploaderPeerID: string
@@ -76,11 +77,27 @@ export class RedisChannelRepo implements ChannelRepo {
   }
 
   private async generateShortSlug(): Promise<string> {
-    return 'foo' // TODO
+    for (let i = 0; i < config.shortSlug.maxAttempts; i++) {
+      const slug = generateShortSlug()
+      const currVal = await this.client.get(this.getShortSlugKey(slug))
+      if (!currVal) {
+        return slug
+      }
+    }
+
+    throw new Error('max attempts reached generating short slug')
   }
 
   private async generateLongSlug(): Promise<string> {
-    return 'foo/bar/baz' // TODO
+    for (let i = 0; i < config.longSlug.maxAttempts; i++) {
+      const slug = await generateLongSlug()
+      const currVal = await this.client.get(this.getLongSlugKey(slug))
+      if (!currVal) {
+        return slug
+      }
+    }
+
+    throw new Error('max attempts reached generating long slug')
   }
 
   private getShortSlugKey(shortSlug: string): string {

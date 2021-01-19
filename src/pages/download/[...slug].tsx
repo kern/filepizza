@@ -1,25 +1,49 @@
 import React from 'react'
 import WebRTCProvider from '../../components/WebRTCProvider'
-import { useRouter } from 'next/router'
 import Downloader from '../../components/Downloader'
-import { NextPage } from 'next'
+import { NextPage, GetServerSideProps } from 'next'
+import { channelRepo } from '../../channel'
 
-const DownloadPage: NextPage = () => {
-  const router = useRouter()
-  const { slug } = router.query
+type Props = {
+  slug: string
+  uploaderPeerID: string
+  error?: string
+}
 
+const DownloadPage: NextPage<Props> = ({ slug, uploaderPeerID }) => {
   return (
     <WebRTCProvider>
       <>
-        <div>{JSON.stringify(slug)}</div>
-        <Downloader roomName="my-room" />
+        <div>{slug}</div>
+        <div>{uploaderPeerID}</div>
+        <Downloader uploaderPeerID={uploaderPeerID} />
       </>
     </WebRTCProvider>
   )
 }
 
-DownloadPage.getInitialProps = () => {
-  return {}
+export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
+  const slug = normalizeSlug(ctx.query.slug)
+  const channel = await channelRepo.fetch(slug)
+
+  if (!channel) {
+    ctx.res.statusCode = 404
+    return {
+      props: { slug, uploaderPeerID: '', error: 'not found' },
+    }
+  }
+
+  return {
+    props: { slug, uploaderPeerID: channel.uploaderPeerID },
+  }
+}
+
+const normalizeSlug = (rawSlug: string | string[]): string => {
+  if (typeof rawSlug === 'string') {
+    return rawSlug
+  } else {
+    return rawSlug.join('/')
+  }
 }
 
 export default DownloadPage

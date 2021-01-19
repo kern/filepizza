@@ -1,19 +1,10 @@
-import type { Request, Response } from 'express'
-import { channelRepo } from '../../channel'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { Channel, channelRepo } from '../../channel'
+import { routeHandler, getBodyKey } from '../../routes'
 
-export default (req: Request, res: Response): void => {
-  // TODO: validate method and uploaderPeerID
-
-  channelRepo
-    .create(req.body.uploaderPeerID)
-    .then((channel) => {
-      res.statusCode = 200
-      res.setHeader('Content-Type', 'application/json')
-      res.end(JSON.stringify(channel))
-    })
-    .catch((err) => {
-      res.statusCode = 500
-      res.setHeader('Content-Type', 'application/json')
-      res.end(JSON.stringify({ error: err.toString() }))
-    })
-}
+export default routeHandler<Channel>(
+  (req: NextApiRequest, _res: NextApiResponse): Promise<Channel> => {
+    const uploaderPeerID = getBodyKey(req, 'uploaderPeerID')
+    return channelRepo.create(uploaderPeerID)
+  },
+)

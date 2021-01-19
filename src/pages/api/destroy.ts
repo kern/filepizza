@@ -1,19 +1,10 @@
-import type { Request, Response } from 'express'
+import { NextApiRequest, NextApiResponse } from 'next'
 import { channelRepo } from '../../channel'
+import { routeHandler, getBodyKey } from '../../routes'
 
-export default (req: Request, res: Response): void => {
-  // TODO: validate method and slug
-
-  channelRepo
-    .destroy(req.body.slug)
-    .then((channel) => {
-      res.statusCode = 200
-      res.setHeader('Content-Type', 'application/json')
-      res.end(JSON.stringify(channel))
-    })
-    .catch((err) => {
-      res.statusCode = 500
-      res.setHeader('Content-Type', 'application/json')
-      res.end(JSON.stringify({ error: err.toString() }))
-    })
-}
+export default routeHandler<void>(
+  (req: NextApiRequest, _res: NextApiResponse): Promise<void> => {
+    const slug = getBodyKey(req, 'slug')
+    return channelRepo.destroy(slug)
+  },
+)
