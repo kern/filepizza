@@ -2,7 +2,6 @@
   "name": "filepizza",
   "version": "1.1.0",
   "description": "Free peer-to-peer file transfers in your browser.",
-  "bin": "./dist/index.js",
   "author": "Alex Kern <alex@kern.io> (http://kern.io)",
   "license": "BSD-3-Clause",
   "homepage": "https://github.com/kern/filepizza",
