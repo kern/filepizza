@@ -3749,6 +3749,11 @@ forwarded@~0.1.2:
   resolved "https://registry.yarnpkg.com/forwarded/-/forwarded-0.1.2.tgz#98c23dab1175657b8c0573e8ceccd91b0ff18c84"
   integrity sha1-mMI9qxF1ZXuMBXPozszZGw/xjIQ=
 
+fp-ts@^2.9.3:
+  version "2.9.3"
+  resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.9.3.tgz#419b9103018ddf7c785acf2b3fecb2662afab5af"
+  integrity sha512-NjzcHYgigcbPQ6yJ52zwgsVDwKz3vwy9sjbxyzcvfXQm+j1BGeOPRuzLKEwsLyE4Xut6gG1FXJtsU9/gUB7tXg==
+
 fragment-cache@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/fragment-cache/-/fragment-cache-0.2.1.tgz#4290fad27f13e89be7f33799c6bc5a0abfff0d19"
@@ -4201,6 +4206,11 @@ ignore@^5.1.4:
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-5.1.8.tgz#f150a8b50a34289b33e22f5889abd4d8016f0e57"
   integrity sha512-BMpfD7PpiETpBl/A6S498BaIJ6Y/ABT93ETbby2fP00v4EbvPBXWEoaR1UBPKs3iR53pJY7EtZk5KACI57i1Uw==
 
+immer@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/immer/-/immer-8.0.0.tgz#08763549ba9dd7d5e2eb4bec504a8315bd9440c2"
+  integrity sha512-jm87NNBAIG4fHwouilCHIecFXp5rMGkiFrAuhVO685UnMAlOneEAnOyzPt8OnP47TC11q/E7vpzZe0WvwepFTg==
+
 import-fresh@^3.0.0, import-fresh@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/import-fresh/-/import-fresh-3.2.1.tgz#633ff618506e793af5ac91bf48b72677e15cbe66"
@@ -4277,6 +4287,11 @@ invariant@^2.2.2, invariant@^2.2.4:
   integrity sha512-phJfQVBuaJM5raOpJjSfkiD6BpbCE4Ns//LaXl6wGYtUBY83nWS6Rf9tXm2e8VaK60JEjYldbPif/A2B1C2gNA==
   dependencies:
     loose-envify "^1.0.0"
+
+io-ts@^2.2.13:
+  version "2.2.13"
+  resolved "https://registry.yarnpkg.com/io-ts/-/io-ts-2.2.13.tgz#e04016685e863dd5cffb2b5262c5c9c74432dfda"
+  integrity sha512-BYJgE/BanovJKDvCnAkrr7f3gTucSyk+Sr5VtpouBO1/YfBKUyIn2z1ODG8LEF+1D4sjKZ3Bd/A5/v8JrJe5UQ==
 
 ioredis@^4.17.3:
   version "4.17.3"
@@ -6171,6 +6186,13 @@ rc@^1.0.1, rc@^1.1.6:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-device-detect@^1.15.0:
+  version "1.15.0"
+  resolved "https://registry.yarnpkg.com/react-device-detect/-/react-device-detect-1.15.0.tgz#5321f94ae3c4d51ef399b0502a6c739e32d0f315"
+  integrity sha512-ywjtWW04U7vaJK87IAFHhKozZhTPeDVWsfYx5CxQSQCjU5+fnMMxWZt9HnVWaNTqBEn6g8wCNWyqav7sXJrURg==
+  dependencies:
+    ua-parser-js "^0.7.23"
+
 react-dom@^16.13.1:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.13.1.tgz#c1bd37331a0486c078ee54c4740720993b2e0e7f"
@@ -7529,6 +7551,11 @@ typescript@^4.0.3:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.0.3.tgz#153bbd468ef07725c1df9c77e8b453f8d36abba5"
   integrity sha512-tEu6DGxGgRJPb/mVPIZ48e69xCn2yRmCgYmDugAVwmJ6o+0u1RI18eO7E7WBTLYLaEVVOhwQmcdhQHweux/WPg==
 
+ua-parser-js@^0.7.23:
+  version "0.7.23"
+  resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.23.tgz#704d67f951e13195fbcd3d78818577f5bc1d547b"
+  integrity sha512-m4hvMLxgGHXG3O3fQVAyyAQpZzDOvwnhOTjYz5Xmr7r/+LpkNy3vJXdVRWgd1TkAb7NGROZuSy96CrlNVjA7KA==
+
 undefsafe@^2.0.2:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/undefsafe/-/undefsafe-2.0.3.tgz#6b166e7094ad46313b2202da7ecc2cd7cc6e7aae"
@@ -7666,6 +7693,25 @@ url@^0.11.0:
     punycode "1.3.2"
     querystring "0.2.0"
 
+urs@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/urs/-/urs-0.0.7.tgz#2dbf320a68a54bbd67ab9c5ac103b0f2227ca6be"
+  integrity sha512-NDwuby5BP7D60RjHlow8Gch4yfglLdCpZagGeVDZNcL+jsA2v6RcBhPTJraqq1oQ1U3LT1bQfgmwgNUUIFht+g==
+
+use-http@^1.0.16:
+  version "1.0.16"
+  resolved "https://registry.yarnpkg.com/use-http/-/use-http-1.0.16.tgz#6d75f3e734abf990049c7a02b22d757c3abda883"
+  integrity sha512-t2/Q6Ic644Jn9z62sOVhfURXX58429NwgRDvJZikxhDjLG5FrZ0SLLxGgm4GYznOnKBqkXKVrhW/wdjwXkw1rA==
+  dependencies:
+    urs "^0.0.7"
+    use-ssr "^1.0.22"
+    utility-types "^3.10.0"
+
+use-ssr@^1.0.22:
+  version "1.0.23"
+  resolved "https://registry.yarnpkg.com/use-ssr/-/use-ssr-1.0.23.tgz#3bde1e10cd01b3b61ab6386d7cddb72e74828bf8"
+  integrity sha512-5bvlssgROgPgIrnILJe2mJch4e2Id0/bVm1SQzqvPvEAXmlsinCCVHWK3a2iHcPat7PkdJHBo0gmSmODIz6tNA==
+
 use-subscription@1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/use-subscription/-/use-subscription-1.4.1.tgz#edcbcc220f1adb2dd4fa0b2f61b6cc308e620069"
@@ -7696,6 +7742,11 @@ util@^0.11.0:
   integrity sha512-HShAsny+zS2TZfaXxD9tYj4HQGlBezXZMZuM/S5PKLLoZkShZiGk9o5CzukI1LVHZvjdvZ2Sj1aW/Ndn2NB/HQ==
   dependencies:
     inherits "2.0.3"
+
+utility-types@^3.10.0:
+  version "3.10.0"
+  resolved "https://registry.yarnpkg.com/utility-types/-/utility-types-3.10.0.tgz#ea4148f9a741015f05ed74fd615e1d20e6bed82b"
+  integrity sha512-O11mqxmi7wMKCo6HKFt5AhO4BwY3VV68YU07tgxfz8zJTIxr4BpsezN49Ffwy9j3ZpwwJp4fkRwjRzq3uWE6Rg==
 
 utils-merge@1.0.1:
   version "1.0.1"

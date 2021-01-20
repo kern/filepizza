@@ -15,10 +15,11 @@ export const generateShortSlug = (): string => {
 const longSlugGenerator = new xkcdPassword()
 longSlugGenerator.initWithWordList(config.longSlug.words)
 
-export const generateLongSlug = (): Promise<string> => {
-  return longSlugGenerator.generate({
+export const generateLongSlug = async (): Promise<string> => {
+  const parts = await longSlugGenerator.generate({
     numWords: config.longSlug.numWords,
     minLength: 1,
     maxLength: 256,
   })
+  return parts.join('/')
 }

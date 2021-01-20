@@ -14,36 +14,38 @@ const ICE_SERVERS: RTCConfiguration = {
   ],
 }
 
-interface Props {
-  servers?: RTCConfiguration
-  children?: React.ReactNode
-}
-
-const WebRTCContext = React.createContext<WebRTCValue>(null)
+const WebRTCContext = React.createContext<WebRTCValue | null>(null)
 
 export const useWebRTC = (): WebRTCValue => {
-  return useContext(WebRTCContext)
+  return useContext(WebRTCContext)!
 }
 
-export const WebRTCProvider: React.FC<Props> = ({
+export function WebRTCProvider({
   servers = ICE_SERVERS,
   children,
-}: Props) => {
-  const [pageLoaded, setPageLoaded] = useState(false)
-  const peer = useRef<WebRTCValue>(null)
+}: {
+  servers?: RTCConfiguration
+  children?: React.ReactNode
+}): JSX.Element {
+  const [loaded, setLoaded] = useState(false)
+  const peer = useRef<WebRTCValue | null>(null)
 
   useEffect(() => {
     const effect = async () => {
-      peer.current = new Peer(undefined, {
+      const peerObj = new Peer(undefined, {
         config: servers,
       })
-      setPageLoaded(true)
+
+      peerObj.on('open', () => {
+        peer.current = peerObj
+        setLoaded(true)
+      })
     }
 
     effect()
   }, [])
 
-  if (!pageLoaded || !peer.current) {
+  if (!loaded || !peer.current) {
     return null
   }
 

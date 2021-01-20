@@ -10,12 +10,13 @@ const Overlay = styled.div`
   display: block;
 `
 
-interface Props {
-  onDrop: (files: any) => void
+export default function DropZone({
+  children,
+  onDrop,
+}: {
+  onDrop: (files: File[]) => void
   children?: React.ReactNode
-}
-
-const Dropzone: React.FC<Props> = ({ children, onDrop }: Props) => {
+}): JSX.Element {
   const overlay = useRef()
   const [focus, setFocus] = useState(false)
 
@@ -62,5 +63,3 @@ const Dropzone: React.FC<Props> = ({ children, onDrop }: Props) => {
     </Wrapper>
   )
 }
-
-export default Dropzone

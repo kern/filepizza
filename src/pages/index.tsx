@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import WebRTCProvider from '../components/WebRTCProvider'
-import Dropzone from '../components/Dropzone'
+import DropZone from '../components/DropZone'
 import UploadFileList from '../components/UploadFileList'
 import Uploader from '../components/Uploader'
 import PasswordField from '../components/PasswordField'
@@ -15,7 +15,6 @@ export const IndexPage: NextPage = () => {
   const [uploading, setUploading] = useState(false)
 
   const handleDrop = useCallback((files: UploadedFile[]): void => {
-    console.log('Received files', files)
     setUploadedFiles(files)
   }, [])
 
@@ -34,7 +33,7 @@ export const IndexPage: NextPage = () => {
   if (!uploadedFiles.length) {
     return (
       <>
-        <Dropzone onDrop={handleDrop}>Drop a file to get started.</Dropzone>
+        <DropZone onDrop={handleDrop}>Drop a file to get started.</DropZone>
       </>
     )
   }
@@ -51,11 +50,9 @@ export const IndexPage: NextPage = () => {
 
   return (
     <WebRTCProvider>
-      <>
-        <UploadFileList files={uploadedFiles} />
-        <StopButton onClick={handleStop} />
-        <Uploader roomName={'my-room'} files={uploadedFiles} />
-      </>
+      <UploadFileList files={uploadedFiles} />
+      <StopButton onClick={handleStop} />
+      <Uploader files={uploadedFiles} password={password} />
     </WebRTCProvider>
   )
 }

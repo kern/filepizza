@@ -10,14 +10,10 @@ type Props = {
   error?: string
 }
 
-const DownloadPage: NextPage<Props> = ({ slug, uploaderPeerID }) => {
+const DownloadPage: NextPage<Props> = ({ uploaderPeerID }) => {
   return (
     <WebRTCProvider>
-      <>
-        <div>{slug}</div>
-        <div>{uploaderPeerID}</div>
-        <Downloader uploaderPeerID={uploaderPeerID} />
-      </>
+      <Downloader uploaderPeerID={uploaderPeerID} />
     </WebRTCProvider>
   )
 }
