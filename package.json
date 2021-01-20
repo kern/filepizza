@@ -32,9 +32,11 @@
     "react-device-detect": "^1.15.0",
     "react-dom": "^16.13.1",
     "react-qr": "0.0.2",
+    "streamsaver": "^2.0.5",
     "styled-components": "^5.2.0",
     "twilio": "^2.9.1",
     "use-http": "^1.0.16",
+    "web-streams-polyfill": "^3.0.1",
     "webrtcsupport": "^2.2.0",
     "xkcd-password": "^1.2.0"
   },
