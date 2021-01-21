@@ -1,4 +1,10 @@
 // Based on https://github.com/jimmywarting/StreamSaver.js/blob/master/examples/zip-stream.js
+//
+// Disabling typechecking for now since this was originally JavaScript, should
+// find some time to add types later.
+//
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 
 class Crc32 {
   crc: number
@@ -54,7 +60,9 @@ const pump = (zipObj) =>
     zipObj.ctrl.enqueue(outputData)
   })
 
-export function createZipStream(underlyingSource) {
+export function createZipStream(
+  underlyingSource: UnderlyingSource<any>,
+): ReadableStream {
   const files = Object.create(null)
   const filenames = []
   const encoder = new TextEncoder()

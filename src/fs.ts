@@ -1,6 +1,8 @@
+import { UploadedFile } from './types'
+
 const getAsFile = (entry: any): Promise<File> =>
   new Promise((resolve, reject) => {
-    entry.file((file: File) => {
+    entry.file((file: UploadedFile) => {
       file.fullPath = entry.fullPath
       resolve(file)
     }, reject)

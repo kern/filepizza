@@ -1,5 +1,8 @@
-on: push
-name: Build on push
+name: main
+on:
+  push:
+    branches:
+      - main
 jobs:
   build:
     name: Docker build, tag, and push
