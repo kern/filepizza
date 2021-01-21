@@ -97,6 +97,7 @@ export default function Downloader({
   const [shouldAttemptConnection, setShouldAttemptConnection] = useState(false)
   const [open, setOpen] = useState(false)
   const [downloading, setDownloading] = useState(false)
+  const [done, setDone] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   useEffect(() => {
@@ -177,32 +178,59 @@ export default function Downloader({
   const handleStartDownload = useCallback(() => {
     setDownloading(true)
 
-    const fileStreams = filesInfo.map((_info) => {
-      return new ReadableStream({
+    const fileStreamByPath: Record<
+      string,
+      {
+        stream: ReadableStream
+        enqueue: (chunk: any) => void
+        close: () => void
+      }
+    > = {}
+    const fileStreams = filesInfo.map((info) => {
+      let enqueue: ((chunk: any) => void) | null = null
+      let close: (() => void) | null = null
+      const stream = new ReadableStream({
         start(ctrl) {
-          console.log('START')
-          console.log(ctrl)
-        },
-        async pull(ctrl) {
-          console.log('PULL')
-          console.log(ctrl)
+          enqueue = (chunk: any) => ctrl.enqueue(chunk)
+          close = () => ctrl.close()
         },
       })
+      fileStreamByPath[info.fullPath] = {
+        stream,
+        enqueue,
+        close,
+      }
+      return stream
     })
 
-    const fileStreamByPath: Record<string, ReadableStream> = {}
-    fileStreams.forEach((stream, i) => {
-      fileStreamByPath[filesInfo[i].fullPath] = stream
-    })
+    let nextFileIndex = 0
+    const startNextFileOrFinish = (): void => {
+      if (nextFileIndex >= filesInfo.length) {
+        return
+      }
+
+      const request: t.TypeOf<typeof Message> = {
+        type: MessageType.Start,
+        fullPath: filesInfo[nextFileIndex].fullPath,
+        offset: 0,
+      }
+      dataConnection.send(request)
+      nextFileIndex++
+    }
 
     const processChunkFunc = (message: t.TypeOf<typeof ChunkMessage>): void => {
-      const stream = fileStreamByPath[message.fullPath]
-      if (!stream) {
+      const fileStream = fileStreamByPath[message.fullPath]
+      if (!fileStream) {
         console.error('no stream found for ' + message.fullPath)
         return
       }
 
-      console.log(stream)
+      const uInt8 = new Uint8Array(message.bytes as ArrayBuffer)
+      fileStream.enqueue(uInt8)
+      if (message.final) {
+        fileStream.close()
+        startNextFileOrFinish()
+      }
     }
     processChunk.current = processChunkFunc
 
@@ -223,19 +251,22 @@ export default function Downloader({
 
     downloadPromise
       .then(() => {
-        console.log('DONE')
+        const request: t.TypeOf<typeof Message> = {
+          type: MessageType.Done,
+        }
+        dataConnection.send(request)
+        setDone(true)
       })
       .catch((err) => {
         console.error(err)
       })
 
-    const request: t.TypeOf<typeof Message> = {
-      type: MessageType.Start,
-      fullPath: filesInfo[0].fullPath,
-      offset: 0,
-    }
-    dataConnection.send(request)
+    startNextFileOrFinish()
   }, [dataConnection, filesInfo])
+
+  if (done) {
+    return <div>Done!</div>
+  }
 
   if (downloading) {
     return <div>Downloading</div>

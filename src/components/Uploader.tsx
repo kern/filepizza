@@ -31,8 +31,7 @@ type UploaderConnection = {
 
 // TODO(@kern): Use better values
 const RENEW_INTERVAL = 5000 // 20 minutes
-// const MAX_CHUNK_SIZE = 1024 * 1024 // 1 Mi
-const MAX_CHUNK_SIZE = 1
+const MAX_CHUNK_SIZE = 10 * 1024 * 1024 // 10 Mi
 
 function useUploaderChannel(
   uploaderPeerID: string,
@@ -213,11 +212,13 @@ function useUploaderConnections(
               const sendNextChunk = () => {
                 const end = Math.min(file.size, offset + MAX_CHUNK_SIZE)
                 const chunkSize = end - offset
+                const final = chunkSize < MAX_CHUNK_SIZE
                 const request: t.TypeOf<typeof Message> = {
                   type: MessageType.Chunk,
                   fullPath,
                   offset,
                   bytes: file.slice(offset, end),
+                  final,
                 }
                 conn.send(request)
 
@@ -225,7 +226,7 @@ function useUploaderConnections(
                   offset = end
                   draft.uploadingOffset = end
 
-                  if (chunkSize < MAX_CHUNK_SIZE) {
+                  if (final) {
                     draft.status = UploaderConnectionStatus.Paused
                   } else {
                     sendChunkTimeout = setTimeout(() => {
@@ -251,6 +252,19 @@ function useUploaderConnections(
                   sendChunkTimeout = null
                 }
               })
+              break
+            }
+
+            case MessageType.Done: {
+              updateConnection((draft) => {
+                if (draft.status !== UploaderConnectionStatus.Paused) {
+                  return
+                }
+
+                draft.status = UploaderConnectionStatus.Done
+                conn.close()
+              })
+              break
             }
           }
         } catch (err) {
@@ -264,7 +278,12 @@ function useUploaderConnections(
         }
 
         updateConnection((draft) => {
-          if (draft.status === UploaderConnectionStatus.InvalidPassword) {
+          if (
+            [
+              UploaderConnectionStatus.InvalidPassword,
+              UploaderConnectionStatus.Done,
+            ].includes(draft.status)
+          ) {
             return
           }
 

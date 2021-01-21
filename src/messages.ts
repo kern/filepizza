@@ -45,6 +45,7 @@ export const ChunkMessage = t.type({
   fullPath: t.string,
   offset: t.number,
   bytes: t.unknown,
+  final: t.boolean,
 })
 
 export const PauseMessage = t.type({
