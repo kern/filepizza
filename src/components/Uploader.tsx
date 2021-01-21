@@ -9,11 +9,11 @@ import * as t from 'io-ts'
 
 enum UploaderConnectionStatus {
   Pending = 'PENDING',
+  Paused = 'PAUSED',
   Uploading = 'UPLOADING',
   Done = 'DONE',
   InvalidPassword = 'INVALID_PASSWORD',
   Closed = 'CLOSED',
-  Paused = 'PAUSED',
 }
 
 type UploaderConnection = {
@@ -25,9 +25,14 @@ type UploaderConnection = {
   osVersion?: string
   mobileVendor?: string
   mobileModel?: string
+  uploadingFullPath?: string
+  uploadingOffset?: number
 }
 
+// TODO(@kern): Use better values
 const RENEW_INTERVAL = 5000 // 20 minutes
+// const MAX_CHUNK_SIZE = 1024 * 1024 // 1 Mi
+const MAX_CHUNK_SIZE = 1
 
 function useUploaderChannel(
   uploaderPeerID: string,
@@ -86,6 +91,20 @@ function useUploaderChannelRenewal(shortSlug: string): void {
   }, [shortSlug])
 }
 
+function validateOffset(
+  files: UploadedFile[],
+  fullPath: string,
+  offset: number,
+): UploadedFile {
+  const validFile = files.find(
+    (file) => file.fullPath === fullPath && offset <= file.size,
+  )
+  if (!validFile) {
+    throw new Error('invalid file offset')
+  }
+  return validFile
+}
+
 function useUploaderConnections(
   peer: Peer,
   files: UploadedFile[],
@@ -95,6 +114,7 @@ function useUploaderConnections(
 
   useEffect(() => {
     peer.on('connection', (conn: DataConnection) => {
+      let sendChunkTimeout: number | null = null
       const newConn = {
         status: UploaderConnectionStatus.Pending,
         dataConnection: conn,
@@ -151,7 +171,7 @@ function useUploaderConnections(
                   return
                 }
 
-                draft.status = UploaderConnectionStatus.Uploading
+                draft.status = UploaderConnectionStatus.Paused
                 draft.browserName = message.browserName
                 draft.browserVersion = message.browserVersion
                 draft.osName = message.osName
@@ -163,6 +183,8 @@ function useUploaderConnections(
               const fileInfo = files.map((f) => {
                 return {
                   fullPath: f.fullPath,
+                  size: f.size,
+                  type: f.type,
                 }
               })
 
@@ -171,9 +193,64 @@ function useUploaderConnections(
                 files: fileInfo,
               }
               conn.send(request)
-
-              // TODO(@kern): Handle sending chunks
               break
+            }
+
+            case MessageType.Start: {
+              const fullPath = message.fullPath
+              let offset = message.offset
+              const file = validateOffset(files, fullPath, offset)
+              updateConnection((draft) => {
+                if (draft.status !== UploaderConnectionStatus.Paused) {
+                  return
+                }
+
+                draft.status = UploaderConnectionStatus.Uploading
+                draft.uploadingFullPath = fullPath
+                draft.uploadingOffset = offset
+              })
+
+              const sendNextChunk = () => {
+                const end = Math.min(file.size, offset + MAX_CHUNK_SIZE)
+                const chunkSize = end - offset
+                const request: t.TypeOf<typeof Message> = {
+                  type: MessageType.Chunk,
+                  fullPath,
+                  offset,
+                  bytes: file.slice(offset, end),
+                }
+                conn.send(request)
+
+                updateConnection((draft) => {
+                  offset = end
+                  draft.uploadingOffset = end
+
+                  if (chunkSize < MAX_CHUNK_SIZE) {
+                    draft.status = UploaderConnectionStatus.Paused
+                  } else {
+                    sendChunkTimeout = setTimeout(() => {
+                      sendNextChunk()
+                    }, 0)
+                  }
+                })
+              }
+              sendNextChunk()
+
+              break
+            }
+
+            case MessageType.Pause: {
+              updateConnection((draft) => {
+                if (draft.status !== UploaderConnectionStatus.Uploading) {
+                  return
+                }
+
+                draft.status = UploaderConnectionStatus.Paused
+                if (sendChunkTimeout) {
+                  clearTimeout(sendChunkTimeout)
+                  sendChunkTimeout = null
+                }
+              })
             }
           }
         } catch (err) {
@@ -182,6 +259,10 @@ function useUploaderConnections(
       })
 
       conn.on('close', (): void => {
+        if (sendChunkTimeout) {
+          clearTimeout(sendChunkTimeout)
+        }
+
         updateConnection((draft) => {
           if (draft.status === UploaderConnectionStatus.InvalidPassword) {
             return

@@ -5,13 +5,14 @@ import { fold } from 'fp-ts/Either'
 export enum MessageType {
   RequestInfo = 'REQUEST_INFO',
   Info = 'INFO',
+  Pause = 'PAUSE',
   Start = 'START',
   Chunk = 'CHUNK',
-  Pause = 'PAUSE',
+  Done = 'DONE',
   Error = 'ERROR',
 }
 
-const RequestInfoMessage = t.type({
+export const RequestInfoMessage = t.type({
   type: t.literal(MessageType.RequestInfo),
   browserName: t.string,
   browserVersion: t.string,
@@ -22,37 +23,39 @@ const RequestInfoMessage = t.type({
   password: t.string,
 })
 
-const InfoMessage = t.type({
+export const InfoMessage = t.type({
   type: t.literal(MessageType.Info),
   files: t.array(
     t.type({
       fullPath: t.string,
+      size: t.number,
+      type: t.string,
     }),
   ),
 })
 
-const StartMessage = t.type({
+export const StartMessage = t.type({
   type: t.literal(MessageType.Start),
-  browserName: t.string,
-  browserVersion: t.string,
-  osName: t.string,
-  osVersion: t.string,
-  mobileVendor: t.string,
-  mobileModel: t.string,
-  password: t.string,
+  fullPath: t.string,
+  offset: t.number,
 })
 
-const ChunkMessage = t.type({
+export const ChunkMessage = t.type({
   type: t.literal(MessageType.Chunk),
-  // TODO(@kern): Chunk
+  fullPath: t.string,
+  offset: t.number,
+  bytes: t.unknown,
 })
 
-const PauseMessage = t.type({
+export const PauseMessage = t.type({
   type: t.literal(MessageType.Pause),
-  // TODO(@kern): Pausing
 })
 
-const ErrorMessage = t.type({
+export const DoneMessage = t.type({
+  type: t.literal(MessageType.Done),
+})
+
+export const ErrorMessage = t.type({
   type: t.literal(MessageType.Error),
   error: t.string,
 })
@@ -60,9 +63,10 @@ const ErrorMessage = t.type({
 export const Message = t.union([
   RequestInfoMessage,
   InfoMessage,
+  PauseMessage,
   StartMessage,
   ChunkMessage,
-  PauseMessage,
+  DoneMessage,
   ErrorMessage,
 ])
 

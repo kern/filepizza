@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useWebRTC } from './WebRTCProvider'
 import {
   browserName,
@@ -9,8 +9,9 @@ import {
   mobileModel,
 } from 'react-device-detect'
 import * as t from 'io-ts'
-import { decodeMessage, Message, MessageType } from '../messages'
+import { ChunkMessage, decodeMessage, Message, MessageType } from '../messages'
 import { createZipStream } from '../zip-stream'
+import { DataConnection } from 'peerjs'
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
 
@@ -82,6 +83,17 @@ export default function Downloader({
   const peer = useWebRTC()
 
   const [password, setPassword] = useState('')
+  const [dataConnection, setDataConnection] = useState<DataConnection | null>(
+    null,
+  )
+  const [filesInfo, setFilesInfo] = useState<Array<{
+    fullPath: string
+    size: number
+    type: string
+  }> | null>(null)
+  const processChunk = useRef<
+    ((message: t.TypeOf<typeof ChunkMessage>) => void) | null
+  >(null)
   const [shouldAttemptConnection, setShouldAttemptConnection] = useState(false)
   const [open, setOpen] = useState(false)
   const [downloading, setDownloading] = useState(false)
@@ -95,6 +107,8 @@ export default function Downloader({
     const conn = peer.connect(uploaderPeerID, {
       reliable: true,
     })
+
+    setDataConnection(conn)
 
     conn.on('open', () => {
       setOpen(true)
@@ -118,7 +132,11 @@ export default function Downloader({
         const message = decodeMessage(data)
         switch (message.type) {
           case MessageType.Info:
-            console.log(message)
+            setFilesInfo(message.files)
+            break
+
+          case MessageType.Chunk:
+            if (processChunk.current) processChunk.current(message)
             break
 
           case MessageType.Error:
@@ -133,6 +151,7 @@ export default function Downloader({
     })
 
     conn.on('close', () => {
+      setDataConnection(null)
       setOpen(false)
       setDownloading(false)
       setShouldAttemptConnection(false)
@@ -158,16 +177,65 @@ export default function Downloader({
   const handleStartDownload = useCallback(() => {
     setDownloading(true)
 
-    // TODO(@kern): Download each file as a ReadableStream
-    // const blob = new Blob(['support blobs too'])
-    // const file = {
-    //   name: 'blob-example.txt',
-    //   size: 12,
-    //   stream: () => blob.stream(),
-    // }
-    // streamDownloadSingleFile(file)
-    // streamDownloadMultipleFiles([file])
-  }, [])
+    const fileStreams = filesInfo.map((_info) => {
+      return new ReadableStream({
+        start(ctrl) {
+          console.log('START')
+          console.log(ctrl)
+        },
+        async pull(ctrl) {
+          console.log('PULL')
+          console.log(ctrl)
+        },
+      })
+    })
+
+    const fileStreamByPath: Record<string, ReadableStream> = {}
+    fileStreams.forEach((stream, i) => {
+      fileStreamByPath[filesInfo[i].fullPath] = stream
+    })
+
+    const processChunkFunc = (message: t.TypeOf<typeof ChunkMessage>): void => {
+      const stream = fileStreamByPath[message.fullPath]
+      if (!stream) {
+        console.error('no stream found for ' + message.fullPath)
+        return
+      }
+
+      console.log(stream)
+    }
+    processChunk.current = processChunkFunc
+
+    const downloads = filesInfo.map((info, i) => ({
+      name: info.fullPath.replace(/^\//, ''),
+      size: info.size,
+      stream: () => fileStreams[i],
+    }))
+
+    let downloadPromise: Promise<void> | null = null
+    if (downloads.length > 1) {
+      downloadPromise = streamDownloadMultipleFiles(downloads)
+    } else if (downloads.length === 1) {
+      downloadPromise = streamDownloadSingleFile(downloads[0])
+    } else {
+      throw new Error('no files to download')
+    }
+
+    downloadPromise
+      .then(() => {
+        console.log('DONE')
+      })
+      .catch((err) => {
+        console.error(err)
+      })
+
+    const request: t.TypeOf<typeof Message> = {
+      type: MessageType.Start,
+      fullPath: filesInfo[0].fullPath,
+      offset: 0,
+    }
+    dataConnection.send(request)
+  }, [dataConnection, filesInfo])
 
   if (downloading) {
     return <div>Downloading</div>
