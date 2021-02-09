@@ -9,6 +9,7 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
+    "start:peerjs": "./bin/peerjs.js",
     "lint": "eslint 'src/**/*.ts[x]'"
   },
   "repository": {

@@ -34,6 +34,8 @@ export function WebRTCProvider({
   useEffect(() => {
     const effect = async () => {
       const peerObj = new Peer(undefined, {
+        host: '/',
+        port: '9000',
         config: servers,
       })
 
