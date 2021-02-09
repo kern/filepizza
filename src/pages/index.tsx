@@ -8,6 +8,10 @@ import StartButton from '../components/StartButton'
 import StopButton from '../components/StopButton'
 import { UploadedFile } from '../types'
 import { NextPage } from 'next'
+import Spinner from '../components/Spinner'
+import { ButtonGroup, Text, VStack } from '@chakra-ui/react'
+import Wordmark from '../components/Wordmark'
+import CancelButton from '../components/CancelButton'
 
 export const IndexPage: NextPage = () => {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
@@ -30,30 +34,60 @@ export const IndexPage: NextPage = () => {
     setUploading(false)
   }, [])
 
+  const handleCancel = useCallback(() => {
+    setUploadedFiles([])
+    setUploading(false)
+  }, [])
+
   if (!uploadedFiles.length) {
     return (
-      <>
+      <VStack spacing="20px" paddingY="40px">
+        <Spinner direction="up" />
+        <Wordmark />
+        <VStack spacing="4px">
+          <Text textStyle="description">
+            Peer-to-peer file transfers in your browser.
+          </Text>
+          <Text textStyle="descriptionSmall">
+            We never store anything. Files only served fresh.
+          </Text>
+        </VStack>
         <DropZone onDrop={handleDrop}>Drop a file to get started.</DropZone>
-      </>
+      </VStack>
     )
   }
 
   if (!uploading) {
     return (
-      <>
+      <VStack spacing="20px" paddingY="40px">
+        <Spinner direction="up" />
+        <Wordmark />
+        <Text textStyle="description">
+          You are about to start uploading {uploadedFiles.length} files.
+        </Text>
         <UploadFileList files={uploadedFiles} />
         <PasswordField value={password} onChange={handleChangePassword} />
-        <StartButton onClick={handleStart} />
-      </>
+        <ButtonGroup>
+          <CancelButton onClick={handleCancel} />
+          <StartButton onClick={handleStart} />
+        </ButtonGroup>
+      </VStack>
     )
   }
 
   return (
-    <WebRTCProvider>
+    <VStack spacing="20px" paddingY="40px">
+      <Spinner direction="up" isRotating />
+      <Wordmark />
+      <Text textStyle="description">
+        You are uploading {uploadedFiles.length} files.
+      </Text>
       <UploadFileList files={uploadedFiles} />
+      <WebRTCProvider>
+        <Uploader files={uploadedFiles} password={password} />
+      </WebRTCProvider>
       <StopButton onClick={handleStop} />
-      <Uploader files={uploadedFiles} password={password} />
-    </WebRTCProvider>
+    </VStack>
   )
 }
 

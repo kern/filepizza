@@ -4,8 +4,19 @@ import { useWebRTC } from './WebRTCProvider'
 import useFetch from 'use-http'
 import Peer, { DataConnection } from 'peerjs'
 import { decodeMessage, Message, MessageType } from '../messages'
+import {
+  Box,
+  Button,
+  Input,
+  HStack,
+  useClipboard,
+  VStack,
+} from '@chakra-ui/react'
+import QRCode from 'react-qr-code'
 import produce from 'immer'
 import * as t from 'io-ts'
+import Loading from './Loading'
+import ProgressBar from './ProgressBar'
 
 enum UploaderConnectionStatus {
   Pending = 'PENDING',
@@ -308,37 +319,62 @@ export default function Uploader({
   useUploaderChannelRenewal(shortSlug)
   const connections = useUploaderConnections(peer, files, password)
 
+  const hostPrefix =
+    window.location.protocol +
+    '//' +
+    window.location.hostname +
+    (['80', '443'].includes(window.location.port)
+      ? ''
+      : ':' + window.location.port)
+  const longURL = `${hostPrefix}/download/${longSlug}`
+  const shortURL = `${hostPrefix}/download/${shortSlug}`
+  const { hasCopied: hasCopiedLongURL, onCopy: onCopyLongURL } = useClipboard(
+    longURL,
+  )
+  const { hasCopied: hasCopiedShortURL, onCopy: onCopyShortURL } = useClipboard(
+    shortURL,
+  )
+
   if (!longSlug || !shortSlug) {
-    return null
+    return <Loading text="Creating channel" />
   }
 
-  const longURL = `/download/${longSlug}`
-  const shortURL = `/download/${shortSlug}`
-
-  const items = files.map((f) => <li key={f.fullPath}>{f.fullPath}</li>)
   return (
     <>
-      <div>
-        Long:
-        <a href={longURL} target="_blank">
-          {longURL}
-        </a>
-      </div>
-      <div>
-        Short:
-        <a href={shortURL} target="_blank">
-          {shortURL}
-        </a>
-      </div>
-      <ul>{items}</ul>
-      <h2>Connections</h2>
-      <ul>
-        {connections.map((conn) => (
-          <li>
-            {conn.status} {conn.browserName} {conn.browserVersion}
-          </li>
-        ))}
-      </ul>
+      <HStack w="100%">
+        <Box flex="none">
+          <QRCode value={shortURL} size={88} />
+        </Box>
+        <VStack flex="auto">
+          <HStack w="100%">
+            <Input value={longURL} isReadOnly fontSize="10px" />
+            <Button
+              onClick={onCopyLongURL}
+              variant="ghost"
+              colorScheme="blackAlpha"
+            >
+              {hasCopiedLongURL ? 'Copied' : 'Copy'}
+            </Button>
+          </HStack>
+          <HStack w="100%">
+            <Input value={shortURL} isReadOnly fontSize="10px" />
+            <Button
+              onClick={onCopyShortURL}
+              variant="ghost"
+              colorScheme="blackAlpha"
+            >
+              {hasCopiedShortURL ? 'Copied' : 'Copy'}
+            </Button>
+          </HStack>
+        </VStack>
+      </HStack>
+      {connections.map((conn, i) => (
+        <Box key={i} w="100%">
+          {/* TODO(@kern): Make this look nicer */}
+          {conn.status} {conn.browserName} {conn.browserVersion}
+          <ProgressBar value={50} max={100} />
+        </Box>
+      ))}
     </>
   )
 }

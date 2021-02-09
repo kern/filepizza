@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react'
 import type { default as PeerType } from 'peerjs'
+import Loading from './Loading'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Peer = process.browser ? require('peerjs').default : null
@@ -46,7 +47,7 @@ export function WebRTCProvider({
   }, [])
 
   if (!loaded || !peer.current) {
-    return null
+    return <Loading text="Initializing WebRTC" />
   }
 
   return (

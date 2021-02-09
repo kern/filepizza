@@ -5,12 +5,12 @@ type Props = {
   onClick: React.MouseEventHandler
 }
 
-const StartButton: React.FC<Props> = ({ onClick }: Props) => {
+const CancelButton: React.FC<Props> = ({ onClick }: Props) => {
   return (
-    <Button onClick={onClick} colorScheme="green">
-      Start
+    <Button onClick={onClick} variant="outline">
+      Cancel
     </Button>
   )
 }
 
-export default StartButton
+export default CancelButton

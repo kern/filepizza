@@ -37,6 +37,7 @@
     "react-device-detect": "^1.15.0",
     "react-dom": "^16.13.1",
     "react-qr": "0.0.2",
+    "react-qr-code": "^1.0.5",
     "streamsaver": "^2.0.5",
     "styled-components": "^5.2.0",
     "twilio": "^2.9.1",

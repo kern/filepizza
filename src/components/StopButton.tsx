@@ -1,16 +1,17 @@
 import React from 'react'
-import styled from 'styled-components'
-
-const StyledStopButton = styled.button`
-  background: blue;
-`
+import { Button } from '@chakra-ui/react'
 
 type Props = {
   onClick: React.MouseEventHandler
+  isDownloading?: boolean
 }
 
-const StopButton: React.FC<Props> = ({ onClick }: Props) => {
-  return <StyledStopButton onClick={onClick}>Stop</StyledStopButton>
+const StopButton: React.FC<Props> = ({ isDownloading, onClick }: Props) => {
+  return (
+    <Button size="xs" colorScheme="orange" variant="ghost" onClick={onClick}>
+      {isDownloading ? 'Stop Download' : 'Stop Upload'}
+    </Button>
+  )
 }
 
 export default StopButton

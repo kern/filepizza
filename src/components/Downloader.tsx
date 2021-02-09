@@ -12,6 +12,14 @@ import * as t from 'io-ts'
 import { ChunkMessage, decodeMessage, Message, MessageType } from '../messages'
 import { createZipStream } from '../zip-stream'
 import { DataConnection } from 'peerjs'
+import PasswordField from './PasswordField'
+import UnlockButton from './UnlockButton'
+import { chakra, Box, Text, VStack } from '@chakra-ui/react'
+import Loading from './Loading'
+import UploadFileList from './UploadFileList'
+import DownloadButton from './DownloadButton'
+import StopButton from './StopButton'
+import ProgressBar from './ProgressBar'
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
 
@@ -26,6 +34,14 @@ if (process.browser) {
 
 function getZipFilename(): string {
   return `filepizza-download-${Date.now()}.zip`
+}
+
+function cleanErrorMessage(errorMessage: string): string {
+  if (errorMessage.startsWith('Could not connect to peer')) {
+    return 'Could not connect to the uploader. Did they close their browser?'
+  } else {
+    return errorMessage
+  }
 }
 
 type DownloadFileStream = {
@@ -97,6 +113,7 @@ export default function Downloader({
   const [shouldAttemptConnection, setShouldAttemptConnection] = useState(false)
   const [open, setOpen] = useState(false)
   const [downloading, setDownloading] = useState(false)
+  const [bytesDownloaded, setBytesDownloaded] = useState(0)
   const [done, setDone] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -111,7 +128,7 @@ export default function Downloader({
 
     setDataConnection(conn)
 
-    conn.on('open', () => {
+    const handleOpen = () => {
       setOpen(true)
 
       const request: t.TypeOf<typeof Message> = {
@@ -126,13 +143,14 @@ export default function Downloader({
       }
 
       conn.send(request)
-    })
+    }
 
-    conn.on('data', (data) => {
+    const handleData = (data: unknown) => {
       try {
         const message = decodeMessage(data)
         switch (message.type) {
           case MessageType.Info:
+            console.log(message.files)
             setFilesInfo(message.files)
             break
 
@@ -149,26 +167,46 @@ export default function Downloader({
       } catch (err) {
         console.error(err)
       }
-    })
+    }
 
-    conn.on('close', () => {
+    const handleClose = () => {
       setDataConnection(null)
       setOpen(false)
       setDownloading(false)
       setShouldAttemptConnection(false)
-    })
+    }
+
+    const handlePeerError = (err: Error) => {
+      console.error(err)
+      setErrorMessage(cleanErrorMessage(err.message))
+      if (conn.open) {
+        conn.close()
+      } else {
+        handleClose()
+      }
+    }
+
+    const handleConnectionError = (err: Error) => {
+      console.error(err)
+      setErrorMessage(cleanErrorMessage(err.message))
+      if (conn.open) conn.close()
+    }
+
+    conn.on('open', handleOpen)
+    conn.on('data', handleData)
+    conn.on('error', handleConnectionError)
+    conn.on('close', handleClose)
+    peer.on('error', handlePeerError)
 
     return () => {
       if (conn.open) conn.close()
+      conn.off('open', handleOpen)
+      conn.off('data', handleData)
+      conn.off('error', handleConnectionError)
+      conn.off('close', handleClose)
+      peer.off('error', handlePeerError)
     }
   }, [peer, password, shouldAttemptConnection])
-
-  const handleChangePassword = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setPassword(e.target.value)
-    },
-    [],
-  )
 
   const handleSubmitPassword = useCallback((ev) => {
     ev.preventDefault()
@@ -225,6 +263,7 @@ export default function Downloader({
         return
       }
 
+      setBytesDownloaded((bd) => bd + (message.bytes as ArrayBuffer).byteLength)
       const uInt8 = new Uint8Array(message.bytes as ArrayBuffer)
       fileStream.enqueue(uInt8)
       if (message.final) {
@@ -264,31 +303,87 @@ export default function Downloader({
     startNextFileOrFinish()
   }, [dataConnection, filesInfo])
 
-  if (done) {
-    return <div>Done!</div>
-  }
+  const handleStopDownload = useCallback(() => {
+    // TODO(@kern): Implement me
+  }, [])
 
-  if (downloading) {
-    return <div>Downloading</div>
-  }
+  const totalSize = filesInfo
+    ? filesInfo.reduce((acc, info) => acc + info.size, 0)
+    : 0
 
-  if (open) {
+  if (done && filesInfo) {
     return (
-      <div>
-        <button onClick={handleStartDownload}>Download</button>
-      </div>
+      <VStack spacing="20px" w="100%">
+        <Text textStyle="description">
+          You downloaded {filesInfo.length} files.
+        </Text>
+        <UploadFileList files={filesInfo} />
+        <Box w="100%">
+          <ProgressBar value={bytesDownloaded} max={totalSize} />
+        </Box>
+      </VStack>
     )
   }
 
+  if (downloading && filesInfo) {
+    return (
+      <VStack spacing="20px" w="100%">
+        <Text textStyle="description">
+          You are about to start downloading {filesInfo.length} files.
+        </Text>
+        <UploadFileList files={filesInfo} />
+        <Box w="100%">
+          <ProgressBar value={bytesDownloaded} max={totalSize} />
+        </Box>
+        <StopButton onClick={handleStopDownload} isDownloading />
+      </VStack>
+    )
+  }
+
+  if (open && filesInfo) {
+    return (
+      <VStack spacing="20px" w="100%">
+        <Text textStyle="description">
+          You are about to start downloading {filesInfo.length} files.
+        </Text>
+        <UploadFileList files={filesInfo} />
+        <DownloadButton onClick={handleStartDownload} />
+      </VStack>
+    )
+  }
+
+  if (open) {
+    return <Loading text="Listing uploaded files" />
+  }
+
+  // TODO(@kern): Connect immediately, then have server respond if password is needed.
   if (shouldAttemptConnection) {
-    return <div>Loading...</div>
+    return <Loading text="Connecting to uploader" />
   }
 
   return (
-    <form action="#" method="post" onSubmit={handleSubmitPassword}>
-      {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
-      <input type="password" value={password} onChange={handleChangePassword} />
-      <button>Unlock</button>
-    </form>
+    <chakra.form
+      action="#"
+      method="post"
+      onSubmit={handleSubmitPassword}
+      w="100%"
+    >
+      <VStack spacing="20px" w="100%">
+        {errorMessage ? (
+          <Text textStyle="descriptionError">{errorMessage}</Text>
+        ) : (
+          <Text textStyle="description">
+            This download requires a password.
+          </Text>
+        )}
+        <PasswordField
+          value={password}
+          onChange={setPassword}
+          isRequired
+          isInvalid={Boolean(errorMessage)}
+        />
+        <UnlockButton onClick={handleSubmitPassword} />
+      </VStack>
+    </chakra.form>
   )
 }

@@ -2,15 +2,15 @@ import React from 'react'
 import { Button } from '@chakra-ui/react'
 
 type Props = {
-  onClick: React.MouseEventHandler
+  onClick?: React.MouseEventHandler
 }
 
-const StartButton: React.FC<Props> = ({ onClick }: Props) => {
+const UnlockButton: React.FC<Props> = ({ onClick }: Props) => {
   return (
     <Button onClick={onClick} colorScheme="green">
-      Start
+      Unlock
     </Button>
   )
 }
 
-export default StartButton
+export default UnlockButton
