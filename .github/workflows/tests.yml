@@ -1,0 +1,15 @@
+name: tests
+on: [push]
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js 14
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14
+    - run: npm i -g yarn@1
+    - run: yarn
+    - run: yarn lint
+    - run: yarn build

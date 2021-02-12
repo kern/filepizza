@@ -1,0 +1,11 @@
+version: '3'
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+# coturn:
+#   image: instrumentisto/coturn:latest
+#   network_mode: host
+#   ports:
+#     - 3478:3478
