@@ -31,6 +31,7 @@ If you want to use [Google Analytics](https://marketingplatform.google.com/about
 ## Development
 
     $ git clone https://github.com/kern/filepizza.git
+    $ cd filepizza/
     $ npm install
     $ npm run-script build
     $ npm start
