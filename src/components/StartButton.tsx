@@ -1,15 +1,17 @@
 import React from 'react'
-import { Button } from '@chakra-ui/react'
 
-type Props = {
+export function StartButton({
+  onClick,
+}: {
   onClick: React.MouseEventHandler
-}
-
-const StartButton: React.FC<Props> = ({ onClick }: Props) => {
+}): JSX.Element {
   return (
-    <Button onClick={onClick} colorScheme="green">
+    <button
+      onClick={onClick}
+      className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors duration-200"
+    >
       Start
-    </Button>
+    </button>
   )
 }
 

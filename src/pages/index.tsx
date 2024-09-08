@@ -9,7 +9,6 @@ import StopButton from '../components/StopButton'
 import { UploadedFile } from '../types'
 import { NextPage } from 'next'
 import Spinner from '../components/Spinner'
-import { ButtonGroup, Text, VStack } from '@chakra-ui/react'
 import Wordmark from '../components/Wordmark'
 import CancelButton from '../components/CancelButton'
 
@@ -39,55 +38,59 @@ export const IndexPage: NextPage = () => {
     setUploading(false)
   }, [])
 
+  const handleFileListChange = useCallback((updatedFiles: UploadedFile[]) => {
+    setUploadedFiles(updatedFiles)
+  }, [])
+
   if (!uploadedFiles.length) {
     return (
-      <VStack spacing="20px" paddingY="40px">
+      <div className="flex flex-col items-center space-y-5 py-10">
         <Spinner direction="up" />
         <Wordmark />
-        <VStack spacing="4px">
-          <Text textStyle="description">
+        <div className="flex flex-col items-center space-y-1">
+          <p className="text-lg text-center text-stone-800">
             Peer-to-peer file transfers in your browser.
-          </Text>
-          <Text textStyle="descriptionSmall">
+          </p>
+          <p className="text-sm text-center text-stone-600">
             We never store anything. Files only served fresh.
-          </Text>
-        </VStack>
-        <DropZone onDrop={handleDrop}>Drop a file to get started.</DropZone>
-      </VStack>
+          </p>
+        </div>
+        <DropZone onDrop={handleDrop} />
+      </div>
     )
   }
 
   if (!uploading) {
     return (
-      <VStack spacing="20px" paddingY="40px">
+      <div className="flex flex-col items-center space-y-5 py-10">
         <Spinner direction="up" />
         <Wordmark />
-        <Text textStyle="description">
+        <p className="text-lg text-center text-stone-800">
           You are about to start uploading {uploadedFiles.length} files.
-        </Text>
-        <UploadFileList files={uploadedFiles} />
+        </p>
+        <UploadFileList files={uploadedFiles} onChange={handleFileListChange} />
         <PasswordField value={password} onChange={handleChangePassword} />
-        <ButtonGroup>
+        <div className="flex space-x-4">
           <CancelButton onClick={handleCancel} />
           <StartButton onClick={handleStart} />
-        </ButtonGroup>
-      </VStack>
+        </div>
+      </div>
     )
   }
 
   return (
-    <VStack spacing="20px" paddingY="40px">
+    <div className="flex flex-col items-center space-y-5 py-10">
       <Spinner direction="up" isRotating />
       <Wordmark />
-      <Text textStyle="description">
+      <p className="text-lg text-center text-stone-800">
         You are uploading {uploadedFiles.length} files.
-      </Text>
+      </p>
       <UploadFileList files={uploadedFiles} />
       <WebRTCProvider>
         <Uploader files={uploadedFiles} password={password} />
       </WebRTCProvider>
       <StopButton onClick={handleStop} />
-    </VStack>
+    </div>
   )
 }
 

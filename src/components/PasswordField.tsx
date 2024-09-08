@@ -1,33 +1,35 @@
 import React, { useCallback } from 'react'
-import { Input } from '@chakra-ui/react'
 
-interface Props {
-  value: string
-  onChange: (value: string) => void
-  isRequired?: boolean
-  isInvalid?: boolean
-}
-
-export const PasswordField: React.FC<Props> = ({
+export function PasswordField({
   value,
   onChange,
   isRequired,
   isInvalid,
-}: Props) => {
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e.target.value)
-  }, [])
+}: {
+  value: string
+  onChange: (v: string) => void
+  isRequired?: boolean
+  isInvalid?: boolean
+}): JSX.Element {
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      onChange(e.target.value)
+    },
+    [onChange],
+  )
 
   return (
-    <Input
+    <input
       autoFocus
       type="password"
+      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+        isInvalid ? 'border-red-500' : 'border-gray-300'
+      }`}
       placeholder={
         isRequired ? 'Enter password...' : 'Add password (optional)...'
       }
       value={value}
       onChange={handleChange}
-      isInvalid={isInvalid}
     />
   )
 }

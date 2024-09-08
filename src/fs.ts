@@ -37,28 +37,33 @@ const scanDirectoryEntry = async (entry: any): Promise<File[]> => {
   }
 }
 
-export const extractFileList = async (e: React.DragEvent): Promise<File[]> => {
-  if (!e.dataTransfer.items.length) {
+export const extractFileList = async (
+  e: React.DragEvent | DragEvent,
+): Promise<File[]> => {
+  if (!e.dataTransfer || !e.dataTransfer.items.length) {
     return []
   }
 
   const items = e.dataTransfer.items
-  const scans = []
-  const files = []
+  const scans: Promise<File[]>[] = []
+  const files: Promise<File>[] = []
 
-  for (const item of items) {
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i]
     const entry = item.webkitGetAsEntry()
-    if (entry.isDirectory) {
-      scans.push(scanDirectoryEntry(entry))
-    } else {
-      files.push(getAsFile(entry))
+    if (entry) {
+      if (entry.isDirectory) {
+        scans.push(scanDirectoryEntry(entry))
+      } else {
+        files.push(getAsFile(entry))
+      }
     }
   }
 
   const scanResults = await Promise.all(scans)
   const fileResults = await Promise.all(files)
 
-  return [scanResults, fileResults].flat(2)
+  return scanResults.flat().concat(fileResults)
 }
 
 // Borrowed from StackOverflow

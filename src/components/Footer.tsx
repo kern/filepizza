@@ -1,54 +1,56 @@
-import { chakra, Text, Link, Button, VStack, HStack } from '@chakra-ui/react'
 import React, { useCallback } from 'react'
 
 const DONATE_HREF =
   'https://commerce.coinbase.com/checkout/247b6ffe-fb4e-47a8-9a76-e6b7ef83ea22'
 
-export const Footer: React.FC = () => {
+const FooterLink: React.FC<{ href: string; children: React.ReactNode }> = ({
+  href,
+  children,
+}) => (
+  <a
+    className="text-stone-600 underline hover:text-stone-800"
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    {children}
+  </a>
+)
+
+export function Footer(): JSX.Element {
   const handleDonate = useCallback(() => {
     window.location.href = DONATE_HREF
   }, [])
 
   return (
-    <chakra.footer textAlign="center" textStyle="footer" paddingY="10px">
-      <VStack spacing="4px">
-        <HStack>
-          <Text>
+    <footer className="text-center py-2.5 pb-4 text-xs border-t border-stone-200 shadow-[0_-1px_2px_rgba(0,0,0,0.04)]">
+      <div className="flex flex-col items-center space-y-1 px-4 sm:px-6 md:px-8">
+        <div className="flex items-center space-x-2">
+          <p className="text-stone-600">
             <strong>Like FilePizza?</strong> Support its development!{' '}
-          </Text>
-          <Button size="xs" onClick={handleDonate}>
-            donate
-          </Button>
-        </HStack>
+          </p>
+          <button
+            className="px-1.5 py-0.5 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors duration-200 font-medium text-[10px]"
+            onClick={handleDonate}
+          >
+            Donate
+          </button>
+        </div>
 
-        <Text>
-          Cooked up by{' '}
-          <Link textStyle="footerLink" href="http://kern.io" isExternal>
-            Alex Kern
-          </Link>{' '}
-          &amp;{' '}
-          <Link textStyle="footerLink" href="http://neeraj.io" isExternal>
-            Neeraj Baid
-          </Link>{' '}
+        <p className="text-stone-600">
+          Cooked up by <FooterLink href="http://kern.io">Alex Kern</FooterLink>{' '}
+          &amp; <FooterLink href="http://neeraj.io">Neeraj Baid</FooterLink>{' '}
           while eating <strong>Sliver</strong> @ UC Berkeley &middot;{' '}
-          <Link
-            textStyle="footerLink"
-            href="https://github.com/kern/filepizza#faq"
-            isExternal
-          >
+          <FooterLink href="https://github.com/kern/filepizza#faq">
             FAQ
-          </Link>{' '}
+          </FooterLink>{' '}
           &middot;{' '}
-          <Link
-            textStyle="footerLink"
-            href="https://github.com/kern/filepizza"
-            isExternal
-          >
+          <FooterLink href="https://github.com/kern/filepizza">
             Fork us
-          </Link>
-        </Text>
-      </VStack>
-    </chakra.footer>
+          </FooterLink>
+        </p>
+      </div>
+    </footer>
   )
 }
 

@@ -17,9 +17,11 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "downlevelIteration": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "incremental": true
   },
   "include": [
+    "tailwind.config.js",
     "next-env.d.ts",
     "src/**/*.js",
     "src/**/*.ts",

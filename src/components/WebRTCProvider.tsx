@@ -3,7 +3,7 @@ import type { default as PeerType } from 'peerjs'
 import Loading from './Loading'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const Peer = process.browser ? require('peerjs').default : null
+const Peer = typeof window !== 'undefined' ? require('peerjs').default : null
 
 export type WebRTCValue = PeerType | null
 
@@ -18,7 +18,12 @@ const ICE_SERVERS: RTCConfiguration = {
 const WebRTCContext = React.createContext<WebRTCValue | null>(null)
 
 export const useWebRTC = (): WebRTCValue => {
-  return useContext(WebRTCContext)!
+  const value = useContext(WebRTCContext)
+  if (value === null) {
+    throw new Error('useWebRTC must be used within a WebRTCProvider')
+  }
+
+  return value
 }
 
 export function WebRTCProvider({
@@ -33,11 +38,22 @@ export function WebRTCProvider({
 
   useEffect(() => {
     const effect = async () => {
-      const peerObj = new Peer(undefined, {
-        host: '/',
-        port: '9000',
+      const peerConfig: {
+        host?: string
+        port?: string
+        path?: string
+        config: RTCConfiguration
+      } = {
         config: servers,
-      })
+      }
+
+      if (process.env.NEXT_PUBLIC_PEERJS_HOST) {
+        peerConfig.host = process.env.NEXT_PUBLIC_PEERJS_HOST
+        peerConfig.port = process.env.NEXT_PUBLIC_PEERJS_PORT || '9000'
+        peerConfig.path = process.env.NEXT_PUBLIC_PEERJS_PATH || '/'
+      }
+
+      const peerObj = new Peer(undefined, peerConfig)
 
       peerObj.on('open', () => {
         peer.current = peerObj
@@ -46,7 +62,7 @@ export function WebRTCProvider({
     }
 
     effect()
-  }, [])
+  }, [servers])
 
   if (!loaded || !peer.current) {
     return <Loading text="Initializing WebRTC" />

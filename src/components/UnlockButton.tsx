@@ -1,5 +1,4 @@
 import React from 'react'
-import { Button } from '@chakra-ui/react'
 
 type Props = {
   onClick?: React.MouseEventHandler
@@ -7,9 +6,12 @@ type Props = {
 
 const UnlockButton: React.FC<Props> = ({ onClick }: Props) => {
   return (
-    <Button onClick={onClick} colorScheme="green">
+    <button
+      onClick={onClick}
+      className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors duration-200"
+    >
       Unlock
-    </Button>
+    </button>
   )
 }
 

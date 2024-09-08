@@ -1,6 +1,14 @@
 import React from 'react'
-import { Img } from '@chakra-ui/react'
+import Image from 'next/image'
 
 export default function Wordmark(): JSX.Element {
-  return <Img src="/images/wordmark.png" maxH="48px" />
+  return (
+    <Image
+      src="/images/wordmark.png"
+      className="max-h-12"
+      alt="FilePizza Wordmark"
+      width={200}
+      height={45}
+    />
+  )
 }

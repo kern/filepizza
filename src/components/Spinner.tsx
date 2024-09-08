@@ -1,11 +1,5 @@
 import React from 'react'
-import { Box, Center, Img } from '@chakra-ui/react'
-import { keyframes } from '@emotion/react'
-
-const rotate = keyframes`
-  from { transform: rotate(0deg) }
-  to { transform: rotate(360deg) }
-`
+import Image from 'next/image'
 
 export default function Spinner({
   direction,
@@ -16,14 +10,22 @@ export default function Spinner({
 }): JSX.Element {
   const src = `/images/${direction}.png`
   return (
-    <Box pos="relative" w="300px" h="300px">
-      <Img
+    <div className="relative w-[300px] h-[300px]">
+      <Image
         src="/images/pizza.png"
-        animation={isRotating ? `${rotate} 5s infinite linear` : 'none'}
+        alt="Pizza"
+        width={300}
+        height={300}
+        className={isRotating ? 'animate-spin-slow' : ''}
       />
-      <Center pos="absolute" top="0" left="0" w="100%" h="100%">
-        <Img src={src} w="120px" />
-      </Center>
-    </Box>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <Image
+          src={src}
+          alt={`Arrow pointing ${direction}`}
+          width={120}
+          height={120}
+        />
+      </div>
+    </div>
   )
 }

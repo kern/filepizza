@@ -1,16 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 html {
-  height: -webkit-fill-available;
+  height: 100dvh;
 }
 
 body {
-  min-height: 100vh;
-
-  /* mobile viewport bug fix */
-  min-height: -webkit-fill-available;
+  min-height: 100dvh;
 }
 
 #__next {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100dvh;
 }

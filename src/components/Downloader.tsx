@@ -14,7 +14,6 @@ import { createZipStream } from '../zip-stream'
 import { DataConnection } from 'peerjs'
 import PasswordField from './PasswordField'
 import UnlockButton from './UnlockButton'
-import { chakra, Box, Text, VStack } from '@chakra-ui/react'
 import Loading from './Loading'
 import UploadFileList from './UploadFileList'
 import DownloadButton from './DownloadButton'
@@ -313,42 +312,42 @@ export default function Downloader({
 
   if (done && filesInfo) {
     return (
-      <VStack spacing="20px" w="100%">
-        <Text textStyle="description">
+      <div className="flex flex-col space-y-5 w-full">
+        <p className="text-description">
           You downloaded {filesInfo.length} files.
-        </Text>
+        </p>
         <UploadFileList files={filesInfo} />
-        <Box w="100%">
+        <div className="w-full">
           <ProgressBar value={bytesDownloaded} max={totalSize} />
-        </Box>
-      </VStack>
+        </div>
+      </div>
     )
   }
 
   if (downloading && filesInfo) {
     return (
-      <VStack spacing="20px" w="100%">
-        <Text textStyle="description">
+      <div className="flex flex-col space-y-5 w-full">
+        <p className="text-description">
           You are about to start downloading {filesInfo.length} files.
-        </Text>
+        </p>
         <UploadFileList files={filesInfo} />
-        <Box w="100%">
+        <div className="w-full">
           <ProgressBar value={bytesDownloaded} max={totalSize} />
-        </Box>
+        </div>
         <StopButton onClick={handleStopDownload} isDownloading />
-      </VStack>
+      </div>
     )
   }
 
   if (open && filesInfo) {
     return (
-      <VStack spacing="20px" w="100%">
-        <Text textStyle="description">
+      <div className="flex flex-col space-y-5 w-full">
+        <p className="text-description">
           You are about to start downloading {filesInfo.length} files.
-        </Text>
+        </p>
         <UploadFileList files={filesInfo} />
         <DownloadButton onClick={handleStartDownload} />
-      </VStack>
+      </div>
     )
   }
 
@@ -362,19 +361,17 @@ export default function Downloader({
   }
 
   return (
-    <chakra.form
+    <form
       action="#"
       method="post"
       onSubmit={handleSubmitPassword}
-      w="100%"
+      className="w-full"
     >
-      <VStack spacing="20px" w="100%">
+      <div className="flex flex-col space-y-5 w-full">
         {errorMessage ? (
-          <Text textStyle="descriptionError">{errorMessage}</Text>
+          <p className="text-description-error">{errorMessage}</p>
         ) : (
-          <Text textStyle="description">
-            This download requires a password.
-          </Text>
+          <p className="text-description">This download requires a password.</p>
         )}
         <PasswordField
           value={password}
@@ -383,7 +380,7 @@ export default function Downloader({
           isInvalid={Boolean(errorMessage)}
         />
         <UnlockButton onClick={handleSubmitPassword} />
-      </VStack>
-    </chakra.form>
+      </div>
+    </form>
   )
 }

@@ -3,7 +3,6 @@ import WebRTCProvider from '../../components/WebRTCProvider'
 import Downloader from '../../components/Downloader'
 import { NextPage, GetServerSideProps } from 'next'
 import { channelRepo } from '../../channel'
-import { VStack } from '@chakra-ui/react'
 import Spinner from '../../components/Spinner'
 import Wordmark from '../../components/Wordmark'
 
@@ -15,13 +14,13 @@ type Props = {
 
 const DownloadPage: NextPage<Props> = ({ uploaderPeerID }) => {
   return (
-    <VStack spacing="20px" paddingY="40px" w="100%">
+    <div className="flex flex-col items-center space-y-5 py-10 w-full">
       <Spinner direction="down" />
       <Wordmark />
       <WebRTCProvider>
         <Downloader uploaderPeerID={uploaderPeerID} />
       </WebRTCProvider>
-    </VStack>
+    </div>
   )
 }
 

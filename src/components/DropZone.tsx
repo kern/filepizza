@@ -1,65 +1,109 @@
-import React, { useState, useRef, useCallback } from 'react'
-import styled from 'styled-components'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { extractFileList } from '../fs'
 
-const Wrapper = styled.div`
-  display: block;
-`
-
-const Overlay = styled.div`
-  display: block;
-`
-
 export default function DropZone({
-  children,
   onDrop,
 }: {
   onDrop: (files: File[]) => void
-  children?: React.ReactNode
 }): JSX.Element {
-  const overlay = useRef()
-  const [focus, setFocus] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const [fileCount, setFileCount] = useState(0)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleDragEnter = useCallback(() => {
-    setFocus(true)
+  const handleDragEnter = useCallback((e: DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+    setFileCount(e.dataTransfer?.items.length || 0)
   }, [])
 
-  const handleDragLeave = useCallback(
-    (e: React.DragEvent) => {
-      if (e.target !== overlay.current) {
-        return
-      }
-
-      setFocus(false)
-    },
-    [overlay.current],
-  )
-
-  const handleDragOver = useCallback((e: React.DragEvent) => {
+  const handleDragLeave = useCallback((e: DragEvent) => {
     e.preventDefault()
-    e.dataTransfer.dropEffect = 'copy'
+
+    const currentTarget =
+      e.currentTarget === window ? window.document : e.currentTarget
+    if (
+      e.relatedTarget &&
+      currentTarget instanceof Node &&
+      currentTarget.contains(e.relatedTarget as Node)
+    ) {
+      return
+    }
+
+    setIsDragging(false)
+  }, [])
+
+  const handleDragOver = useCallback((e: DragEvent) => {
+    e.preventDefault()
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = 'copy'
+    }
   }, [])
 
   const handleDrop = useCallback(
-    async (e: React.DragEvent) => {
+    async (e: DragEvent) => {
       e.preventDefault()
-      setFocus(false)
+      setIsDragging(false)
 
-      const files = await extractFileList(e)
-      onDrop(files)
+      if (e.dataTransfer) {
+        const files = await extractFileList(e)
+        onDrop(files)
+      }
     },
     [onDrop],
   )
 
+  const handleClick = useCallback(() => {
+    fileInputRef.current?.click()
+  }, [])
+
+  const handleFileInputChange = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files) {
+        const files = Array.from(e.target.files)
+        onDrop(files)
+      }
+    },
+    [onDrop],
+  )
+
+  useEffect(() => {
+    window.addEventListener('dragenter', handleDragEnter)
+    window.addEventListener('dragleave', handleDragLeave)
+    window.addEventListener('dragover', handleDragOver)
+    window.addEventListener('drop', handleDrop)
+
+    return () => {
+      window.removeEventListener('dragenter', handleDragEnter)
+      window.removeEventListener('dragleave', handleDragLeave)
+      window.removeEventListener('dragover', handleDragOver)
+      window.removeEventListener('drop', handleDrop)
+    }
+  }, [handleDragEnter, handleDragLeave, handleDragOver, handleDrop])
+
   return (
-    <Wrapper
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-    >
-      <Overlay ref={overlay} hidden={!focus} />
-      {children}
-    </Wrapper>
+    <>
+      <div
+        className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center text-2xl text-white transition-opacity duration-300 backdrop-blur-sm z-50 ${
+          isDragging ? 'opacity-100 visible' : 'opacity-0 invisible'
+        }`}
+      >
+        Drop to select {fileCount} file{fileCount !== 1 ? 's' : ''}
+      </div>
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        onChange={handleFileInputChange}
+        multiple
+      />
+      <button
+        className="inline-block cursor-pointer relative py-3 px-6 text-base font-bold text-gray-700 bg-white border-2 border-gray-700 rounded-lg transition-all duration-300 ease-in-out outline-none hover:shadow-md active:shadow-inner focus:shadow-outline"
+        onClick={handleClick}
+      >
+        <span className="text-center text-stone-700">
+          Drop a file to get started
+        </span>
+      </button>
+    </>
   )
 }

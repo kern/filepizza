@@ -1,4 +1,4 @@
-import { Progress } from '@chakra-ui/react'
+import React from 'react'
 
 export default function ProgressBar({
   value,
@@ -7,13 +7,17 @@ export default function ProgressBar({
   value: number
   max: number
 }): JSX.Element {
+  const percentage = (value / max) * 100
+  const isComplete = value === max
+
   return (
-    <Progress
-      height="48px"
-      colorScheme={value === max ? 'green' : 'blue'}
-      value={value}
-      max={max}
-      borderRadius="md"
-    />
+    <div className="w-full h-12 bg-gray-200 rounded-md overflow-hidden">
+      <div
+        className={`h-full ${
+          isComplete ? 'bg-green-500' : 'bg-blue-500'
+        } transition-all duration-300 ease-in-out`}
+        style={{ width: `${percentage}%` }}
+      ></div>
+    </div>
   )
 }

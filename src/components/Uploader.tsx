@@ -4,19 +4,12 @@ import { useWebRTC } from './WebRTCProvider'
 import useFetch from 'use-http'
 import Peer, { DataConnection } from 'peerjs'
 import { decodeMessage, Message, MessageType } from '../messages'
-import {
-  Box,
-  Button,
-  Input,
-  HStack,
-  useClipboard,
-  VStack,
-} from '@chakra-ui/react'
 import QRCode from 'react-qr-code'
 import produce from 'immer'
 import * as t from 'io-ts'
 import Loading from './Loading'
 import ProgressBar from './ProgressBar'
+import useClipboard from '../hooks/useClipboard'
 
 enum UploaderConnectionStatus {
   Pending = 'PENDING',
@@ -44,9 +37,7 @@ type UploaderConnection = {
 const RENEW_INTERVAL = 5000 // 20 minutes
 const MAX_CHUNK_SIZE = 10 * 1024 * 1024 // 10 Mi
 
-function useUploaderChannel(
-  uploaderPeerID: string,
-): {
+function useUploaderChannel(uploaderPeerID: string): {
   loading: boolean
   error: Error | null
   longSlug: string
@@ -141,7 +132,7 @@ function useUploaderConnections(
               return
             }
 
-            fn(updatedConn)
+            fn(updatedConn as UploaderConnection)
           }),
         )
       }
@@ -240,7 +231,7 @@ function useUploaderConnections(
                   if (final) {
                     draft.status = UploaderConnectionStatus.Paused
                   } else {
-                    sendChunkTimeout = setTimeout(() => {
+                    sendChunkTimeout = window.setTimeout(() => {
                       sendNextChunk()
                     }, 0)
                   }
@@ -328,12 +319,10 @@ export default function Uploader({
       : ':' + window.location.port)
   const longURL = `${hostPrefix}/download/${longSlug}`
   const shortURL = `${hostPrefix}/download/${shortSlug}`
-  const { hasCopied: hasCopiedLongURL, onCopy: onCopyLongURL } = useClipboard(
-    longURL,
-  )
-  const { hasCopied: hasCopiedShortURL, onCopy: onCopyShortURL } = useClipboard(
-    shortURL,
-  )
+  const { hasCopied: hasCopiedLongURL, onCopy: onCopyLongURL } =
+    useClipboard(longURL)
+  const { hasCopied: hasCopiedShortURL, onCopy: onCopyShortURL } =
+    useClipboard(shortURL)
 
   if (!longSlug || !shortSlug) {
     return <Loading text="Creating channel" />
@@ -341,39 +330,47 @@ export default function Uploader({
 
   return (
     <>
-      <HStack w="100%">
-        <Box flex="none">
+      <div className="flex w-full">
+        <div className="flex-none">
           <QRCode value={shortURL} size={88} />
-        </Box>
-        <VStack flex="auto">
-          <HStack w="100%">
-            <Input value={longURL} isReadOnly fontSize="10px" />
-            <Button
+        </div>
+        <div className="flex-auto flex flex-col">
+          <div className="flex w-full">
+            <input
+              className="flex-grow px-2 py-1 text-xs border rounded-l"
+              value={longURL}
+              readOnly
+            />
+            <button
+              className="px-4 py-1 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-r"
               onClick={onCopyLongURL}
-              variant="ghost"
-              colorScheme="blackAlpha"
             >
               {hasCopiedLongURL ? 'Copied' : 'Copy'}
-            </Button>
-          </HStack>
-          <HStack w="100%">
-            <Input value={shortURL} isReadOnly fontSize="10px" />
-            <Button
+            </button>
+          </div>
+          <div className="flex w-full mt-2">
+            <input
+              className="flex-grow px-2 py-1 text-xs border rounded-l"
+              value={shortURL}
+              readOnly
+            />
+            <button
+              className="px-4 py-1 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-r"
               onClick={onCopyShortURL}
-              variant="ghost"
-              colorScheme="blackAlpha"
             >
               {hasCopiedShortURL ? 'Copied' : 'Copy'}
-            </Button>
-          </HStack>
-        </VStack>
-      </HStack>
+            </button>
+          </div>
+        </div>
+      </div>
       {connections.map((conn, i) => (
-        <Box key={i} w="100%">
+        <div key={i} className="w-full mt-4">
           {/* TODO(@kern): Make this look nicer */}
-          {conn.status} {conn.browserName} {conn.browserVersion}
+          <div className="text-sm">
+            {conn.status} {conn.browserName} {conn.browserVersion}
+          </div>
           <ProgressBar value={50} max={100} />
-        </Box>
+        </div>
       ))}
     </>
   )
