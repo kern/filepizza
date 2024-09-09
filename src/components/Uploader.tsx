@@ -325,6 +325,46 @@ function CopyableInput({ label, value }: { label: string; value: string }) {
   )
 }
 
+function ConnectionListItem({ conn }: { conn: UploaderConnection }) {
+  const getStatusColor = (status: UploaderConnectionStatus) => {
+    switch (status) {
+      case UploaderConnectionStatus.Uploading:
+        return 'bg-green-500'
+      case UploaderConnectionStatus.Paused:
+        return 'bg-yellow-500'
+      case UploaderConnectionStatus.Done:
+        return 'bg-blue-500'
+      case UploaderConnectionStatus.Closed:
+        return 'bg-red-500'
+      default:
+        return 'bg-gray-500'
+    }
+  }
+
+  return (
+    <div className="w-full mt-4">
+      <div className="flex items-center space-x-2 mb-2">
+        <span className="text-sm font-medium">
+          {conn.browserName} {conn.browserVersion}
+        </span>
+        <span
+          className={`px-1.5 py-0.5 text-white rounded-md transition-colors duration-200 font-medium text-[10px] ${getStatusColor(
+            conn.status,
+          )}`}
+        >
+          {conn.status}
+        </span>
+      </div>
+      <ProgressBar
+        value={
+          (conn.completedFiles + conn.currentFileProgress) / conn.totalFiles
+        }
+        max={1}
+      />
+    </div>
+  )
+}
+
 export default function Uploader({
   files,
   password,
@@ -355,18 +395,7 @@ export default function Uploader({
         </div>
       </div>
       {connections.map((conn, i) => (
-        <div key={i} className="w-full mt-4">
-          {/* TODO(@kern): Make this look nicer */}
-          <div className="text-sm">
-            {conn.status} {conn.browserName} {conn.browserVersion}
-          </div>
-          <ProgressBar
-            value={
-              (conn.completedFiles + conn.currentFileProgress) / conn.totalFiles
-            }
-            max={1}
-          />
-        </div>
+        <ConnectionListItem key={i} conn={conn} />
       ))}
     </>
   )

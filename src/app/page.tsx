@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useCallback, useState } from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import WebRTCProvider from '../components/WebRTCProvider'
 import DropZone from '../components/DropZone'
 import UploadFileList from '../components/UploadFileList'
@@ -13,6 +14,8 @@ import Spinner from '../components/Spinner'
 import Wordmark from '../components/Wordmark'
 import CancelButton from '../components/CancelButton'
 
+const queryClient = new QueryClient()
+
 function PageWrapper({
   children,
   isRotating = false,
@@ -21,11 +24,13 @@ function PageWrapper({
   isRotating?: boolean
 }): JSX.Element {
   return (
-    <div className="flex flex-col items-center space-y-5 py-10 max-w-2xl mx-auto">
-      <Spinner direction="up" isRotating={isRotating} />
-      <Wordmark />
-      {children}
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <div className="flex flex-col items-center space-y-5 py-10 max-w-2xl mx-auto">
+        <Spinner direction="up" isRotating={isRotating} />
+        <Wordmark />
+        {children}
+      </div>
+    </QueryClientProvider>
   )
 }
 
