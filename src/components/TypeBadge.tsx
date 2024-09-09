@@ -5,7 +5,7 @@ function getTypeColor(fileType: string): string {
   if (fileType.startsWith('text/')) return 'bg-green-100 text-green-800'
   if (fileType.startsWith('audio/')) return 'bg-purple-100 text-purple-800'
   if (fileType.startsWith('video/')) return 'bg-red-100 text-red-800'
-  return 'bg-gray-100 text-gray-800'
+  return 'bg-stone-100 text-stone-800'
 }
 
 export default function TypeBadge({ type }: { type: string }): JSX.Element {

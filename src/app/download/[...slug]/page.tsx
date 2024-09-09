@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation'
 import { channelRepo } from '../../../channel'
 import Spinner from '../../../components/Spinner'
 import Wordmark from '../../../components/Wordmark'
@@ -21,13 +22,7 @@ export default async function DownloadPage({
   const channel = await channelRepo.fetch(slug)
 
   if (!channel) {
-    return (
-      <div className="flex flex-col items-center space-y-5 py-10 max-w-2xl mx-auto">
-        <Spinner direction="down" />
-        <Wordmark />
-        <p>Not found</p>
-      </div>
-    )
+    notFound()
   }
 
   return (

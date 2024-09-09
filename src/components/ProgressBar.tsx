@@ -11,7 +11,7 @@ export default function ProgressBar({
   const isComplete = value === max
 
   return (
-    <div className="w-full h-12 bg-gray-200 rounded-md overflow-hidden">
+    <div className="w-full h-12 bg-stone-200 rounded-md overflow-hidden">
       <div
         className={`h-full ${
           isComplete ? 'bg-green-500' : 'bg-blue-500'

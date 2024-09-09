@@ -10,6 +10,7 @@ import * as t from 'io-ts'
 import Loading from './Loading'
 import ProgressBar from './ProgressBar'
 import useClipboard from '../hooks/useClipboard'
+import InputLabel from './InputLabel'
 
 enum UploaderConnectionStatus {
   Pending = 'PENDING',
@@ -337,9 +338,7 @@ export default function Uploader({
         </div>
         <div className="flex-auto flex flex-col justify-center space-y-2">
           <div className="flex flex-col w-full">
-            <label className="text-[10px] text-gray-400 mb-0.5 font-bold">
-              Long URL
-            </label>
+            <InputLabel>Long URL</InputLabel>
             <div className="flex w-full">
               <input
                 className="flex-grow px-3 py-2 text-xs border border-r-0 rounded-l"
@@ -347,7 +346,7 @@ export default function Uploader({
                 readOnly
               />
               <button
-                className="px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-r border-t border-r border-b"
+                className="px-4 py-2 text-sm text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-r border-t border-r border-b"
                 onClick={onCopyLongURL}
               >
                 {hasCopiedLongURL ? 'Copied' : 'Copy'}
@@ -355,9 +354,7 @@ export default function Uploader({
             </div>
           </div>
           <div className="flex flex-col w-full mt-2">
-            <label className="text-[10px] text-gray-400 mb-0.5 font-bold">
-              Short URL
-            </label>
+            <InputLabel>Short URL</InputLabel>
             <div className="flex w-full">
               <input
                 className="flex-grow px-3 py-2 text-xs border border-r-0 rounded-l"
@@ -365,7 +362,7 @@ export default function Uploader({
                 readOnly
               />
               <button
-                className="px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-r border-t border-r border-b"
+                className="px-4 py-2 text-sm text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-r border-t border-r border-b"
                 onClick={onCopyShortURL}
               >
                 {hasCopiedShortURL ? 'Copied' : 'Copy'}

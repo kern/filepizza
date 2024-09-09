@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react'
+import InputLabel from './InputLabel'
 
 export default function PasswordField(props: {
   value: string
@@ -14,17 +15,20 @@ export default function PasswordField(props: {
   )
 
   return (
-    <input
-      autoFocus
-      type="password"
-      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-        props.isInvalid ? 'border-red-500' : 'border-gray-300'
-      }`}
-      placeholder={
-        props.isRequired ? 'Enter password...' : 'Add password (optional)...'
-      }
-      value={props.value}
-      onChange={handleChange}
-    />
+    <div className="flex flex-col w-full">
+      <InputLabel>
+        {props.isRequired ? 'Password' : 'Password (optional)'}
+      </InputLabel>
+      <input
+        autoFocus
+        type="password"
+        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+          props.isInvalid ? 'border-red-500' : 'border-stone-300'
+        }`}
+        placeholder="Enter a secret password for this FilePizza..."
+        value={props.value}
+        onChange={handleChange}
+      />
+    </div>
   )
 }

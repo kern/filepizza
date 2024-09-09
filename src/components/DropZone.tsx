@@ -97,7 +97,7 @@ export default function DropZone({
         multiple
       />
       <button
-        className="inline-block cursor-pointer relative py-3 px-6 text-base font-bold text-gray-700 bg-white border-2 border-gray-700 rounded-lg transition-all duration-300 ease-in-out outline-none hover:shadow-md active:shadow-inner focus:shadow-outline"
+        className="inline-block cursor-pointer relative py-3 px-6 text-base font-bold text-stone-700 bg-white border-2 border-stone-700 rounded-lg transition-all duration-300 ease-in-out outline-none hover:shadow-md active:shadow-inner focus:shadow-outline"
         onClick={handleClick}
       >
         <span className="text-center text-stone-700">
