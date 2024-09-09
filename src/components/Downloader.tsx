@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useWebRTC } from './WebRTCProvider'
 import {
@@ -23,11 +25,12 @@ import ProgressBar from './ProgressBar'
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-if (process.browser) require('web-streams-polyfill/ponyfill')
+if (typeof window !== 'undefined') require('web-streams-polyfill/ponyfill')
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const streamSaver = process.browser ? require('streamsaver') : null
-if (process.browser) {
+const streamSaver =
+  typeof window !== 'undefined' ? require('streamsaver') : null
+if (typeof window !== 'undefined') {
   streamSaver.mitm = baseURL + '/stream.html'
 }
 

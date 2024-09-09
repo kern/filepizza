@@ -36,6 +36,7 @@ type UploaderConnection = {
 // TODO(@kern): Use better values
 const RENEW_INTERVAL = 5000 // 20 minutes
 const MAX_CHUNK_SIZE = 10 * 1024 * 1024 // 10 Mi
+const QR_CODE_SIZE = 128
 
 function useUploaderChannel(uploaderPeerID: string): {
   loading: boolean
@@ -330,36 +331,46 @@ export default function Uploader({
 
   return (
     <>
-      <div className="flex w-full">
-        <div className="flex-none">
-          <QRCode value={shortURL} size={88} />
+      <div className="flex w-full items-center">
+        <div className="flex-none mr-4">
+          <QRCode value={shortURL} size={QR_CODE_SIZE} />
         </div>
-        <div className="flex-auto flex flex-col">
-          <div className="flex w-full">
-            <input
-              className="flex-grow px-2 py-1 text-xs border rounded-l"
-              value={longURL}
-              readOnly
-            />
-            <button
-              className="px-4 py-1 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-r"
-              onClick={onCopyLongURL}
-            >
-              {hasCopiedLongURL ? 'Copied' : 'Copy'}
-            </button>
+        <div className="flex-auto flex flex-col justify-center space-y-2">
+          <div className="flex flex-col w-full">
+            <label className="text-[10px] text-gray-400 mb-0.5 font-bold">
+              Long URL
+            </label>
+            <div className="flex w-full">
+              <input
+                className="flex-grow px-3 py-2 text-xs border border-r-0 rounded-l"
+                value={longURL}
+                readOnly
+              />
+              <button
+                className="px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-r border-t border-r border-b"
+                onClick={onCopyLongURL}
+              >
+                {hasCopiedLongURL ? 'Copied' : 'Copy'}
+              </button>
+            </div>
           </div>
-          <div className="flex w-full mt-2">
-            <input
-              className="flex-grow px-2 py-1 text-xs border rounded-l"
-              value={shortURL}
-              readOnly
-            />
-            <button
-              className="px-4 py-1 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-r"
-              onClick={onCopyShortURL}
-            >
-              {hasCopiedShortURL ? 'Copied' : 'Copy'}
-            </button>
+          <div className="flex flex-col w-full mt-2">
+            <label className="text-[10px] text-gray-400 mb-0.5 font-bold">
+              Short URL
+            </label>
+            <div className="flex w-full">
+              <input
+                className="flex-grow px-3 py-2 text-xs border border-r-0 rounded-l"
+                value={shortURL}
+                readOnly
+              />
+              <button
+                className="px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-r border-t border-r border-b"
+                onClick={onCopyShortURL}
+              >
+                {hasCopiedShortURL ? 'Copied' : 'Copy'}
+              </button>
+            </div>
           </div>
         </div>
       </div>

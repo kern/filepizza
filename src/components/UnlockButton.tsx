@@ -1,10 +1,10 @@
 import React from 'react'
 
-type Props = {
-  onClick?: React.MouseEventHandler
-}
-
-const UnlockButton: React.FC<Props> = ({ onClick }: Props) => {
+export default function UnlockButton({
+  onClick,
+}: {
+  onClick?: React.MouseEventHandler<HTMLButtonElement>
+}): React.ReactElement {
   return (
     <button
       onClick={onClick}
@@ -14,5 +14,3 @@ const UnlockButton: React.FC<Props> = ({ onClick }: Props) => {
     </button>
   )
 }
-
-export default UnlockButton

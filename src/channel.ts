@@ -1,3 +1,4 @@
+import 'server-only'
 import config from './config'
 import Redis from 'ioredis'
 import { generateShortSlug, generateLongSlug } from './slugs'

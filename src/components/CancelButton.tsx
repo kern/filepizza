@@ -1,10 +1,10 @@
 import React from 'react'
 
-type Props = {
+export default function CancelButton({
+  onClick,
+}: {
   onClick: React.MouseEventHandler
-}
-
-const CancelButton: React.FC<Props> = ({ onClick }: Props) => {
+}): JSX.Element {
   return (
     <button
       onClick={onClick}
@@ -14,5 +14,3 @@ const CancelButton: React.FC<Props> = ({ onClick }: Props) => {
     </button>
   )
 }
-
-export default CancelButton

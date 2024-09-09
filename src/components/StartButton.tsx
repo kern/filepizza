@@ -1,10 +1,10 @@
 import React from 'react'
 
-export function StartButton({
+export default function StartButton({
   onClick,
 }: {
-  onClick: React.MouseEventHandler
-}): JSX.Element {
+  onClick: React.MouseEventHandler<HTMLButtonElement>
+}): React.ReactElement {
   return (
     <button
       onClick={onClick}
@@ -14,5 +14,3 @@ export function StartButton({
     </button>
   )
 }
-
-export default StartButton

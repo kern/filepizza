@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useCallback, useState } from 'react'
 import WebRTCProvider from '../components/WebRTCProvider'
 import DropZone from '../components/DropZone'
@@ -7,12 +9,11 @@ import PasswordField from '../components/PasswordField'
 import StartButton from '../components/StartButton'
 import StopButton from '../components/StopButton'
 import { UploadedFile } from '../types'
-import { NextPage } from 'next'
 import Spinner from '../components/Spinner'
 import Wordmark from '../components/Wordmark'
 import CancelButton from '../components/CancelButton'
 
-export const IndexPage: NextPage = () => {
+export default function IndexPage(): JSX.Element {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
   const [password, setPassword] = useState('')
   const [uploading, setUploading] = useState(false)
@@ -44,10 +45,10 @@ export const IndexPage: NextPage = () => {
 
   if (!uploadedFiles.length) {
     return (
-      <div className="flex flex-col items-center space-y-5 py-10">
+      <div className="flex flex-col items-center space-y-5 py-10 max-w-2xl mx-auto">
         <Spinner direction="up" />
         <Wordmark />
-        <div className="flex flex-col items-center space-y-1">
+        <div className="flex flex-col items-center space-y-1 max-w-md">
           <p className="text-lg text-center text-stone-800">
             Peer-to-peer file transfers in your browser.
           </p>
@@ -62,11 +63,12 @@ export const IndexPage: NextPage = () => {
 
   if (!uploading) {
     return (
-      <div className="flex flex-col items-center space-y-5 py-10">
+      <div className="flex flex-col items-center space-y-5 py-10 max-w-2xl mx-auto">
         <Spinner direction="up" />
         <Wordmark />
-        <p className="text-lg text-center text-stone-800">
-          You are about to start uploading {uploadedFiles.length} files.
+        <p className="text-lg text-center text-stone-800 max-w-md">
+          You are about to start uploading {uploadedFiles.length}{' '}
+          {uploadedFiles.length === 1 ? 'file' : 'files'}.
         </p>
         <UploadFileList files={uploadedFiles} onChange={handleFileListChange} />
         <PasswordField value={password} onChange={handleChangePassword} />
@@ -79,11 +81,12 @@ export const IndexPage: NextPage = () => {
   }
 
   return (
-    <div className="flex flex-col items-center space-y-5 py-10">
+    <div className="flex flex-col items-center space-y-5 py-10 max-w-2xl mx-auto">
       <Spinner direction="up" isRotating />
       <Wordmark />
-      <p className="text-lg text-center text-stone-800">
-        You are uploading {uploadedFiles.length} files.
+      <p className="text-lg text-center text-stone-800 max-w-md">
+        You are uploading {uploadedFiles.length}{' '}
+        {uploadedFiles.length === 1 ? 'file' : 'files'}.
       </p>
       <UploadFileList files={uploadedFiles} />
       <WebRTCProvider>
@@ -93,9 +96,3 @@ export const IndexPage: NextPage = () => {
     </div>
   )
 }
-
-IndexPage.getInitialProps = () => {
-  return {}
-}
-
-export default IndexPage

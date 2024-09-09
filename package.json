@@ -28,14 +28,14 @@
     "immer": "^8.0.4",
     "io-ts": "^2.2.21",
     "ioredis": "^4.28.5",
-    "next": "^14.2.7",
+    "next": "^14.2.8",
     "nodemon": "^1.19.4",
     "peer": "^0.5.3",
     "peerjs": "^1.5.4",
     "postcss": "^8.4.44",
-    "react": "^18.3.1",
+    "react": "^18.2.0",
     "react-device-detect": "^1.17.0",
-    "react-dom": "^18.3.1",
+    "react-dom": "^18.2.0",
     "react-qr": "0.0.2",
     "react-qr-code": "^1.1.1",
     "streamsaver": "^2.0.6",
@@ -43,8 +43,7 @@
     "twilio": "^2.11.1",
     "use-http": "^1.0.28",
     "web-streams-polyfill": "^3.3.3",
-    "webrtcsupport": "^2.2.0",
-    "xkcd-password": "^1.2.0"
+    "webrtcsupport": "^2.2.0"
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",

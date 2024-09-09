@@ -17,7 +17,7 @@ export default function ProgressBar({
           isComplete ? 'bg-green-500' : 'bg-blue-500'
         } transition-all duration-300 ease-in-out`}
         style={{ width: `${percentage}%` }}
-      ></div>
+      />
     </div>
   )
 }

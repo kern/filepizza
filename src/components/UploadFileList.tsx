@@ -1,4 +1,5 @@
 import React from 'react'
+import TypeBadge from './TypeBadge'
 
 type UploadedFileLike = {
   fullPath?: string
@@ -6,40 +7,21 @@ type UploadedFileLike = {
   type: string
 }
 
-interface Props {
-  files: UploadedFileLike[]
-  onChange?: (updatedFiles: UploadedFileLike[]) => void
-}
-
-const getFileName = (file: UploadedFileLike): string => {
+function getFileName(file: UploadedFileLike): string {
   if (file.fullPath) {
     return file.fullPath.slice(1)
   }
   return file.name || 'Unknown'
 }
 
-export function TypeBadge({ type }: { type: string }): JSX.Element {
-  const getTypeColor = (fileType: string): string => {
-    if (fileType.startsWith('image/')) return 'bg-blue-100 text-blue-800'
-    if (fileType.startsWith('text/')) return 'bg-green-100 text-green-800'
-    if (fileType.startsWith('audio/')) return 'bg-purple-100 text-purple-800'
-    if (fileType.startsWith('video/')) return 'bg-red-100 text-red-800'
-    return 'bg-gray-100 text-gray-800'
-  }
-
-  return (
-    <span
-      className={`px-2 py-1 text-xs font-semibold rounded-full ${getTypeColor(
-        type,
-      )} transition-all duration-300 mr-2`}
-    >
-      {type}
-    </span>
-  )
-}
-
-export function UploadFileList({ files, onChange }: Props): JSX.Element {
-  const handleRemove = (index: number) => {
+export default function UploadFileList({
+  files,
+  onChange,
+}: {
+  files: UploadedFileLike[]
+  onChange?: (updatedFiles: UploadedFileLike[]) => void
+}): JSX.Element {
+  function handleRemove(index: number): void {
     if (onChange) {
       const updatedFiles = files.filter((_, i) => i !== index)
       onChange(updatedFiles)
@@ -70,5 +52,3 @@ export function UploadFileList({ files, onChange }: Props): JSX.Element {
 
   return <div className="w-full">{items}</div>
 }
-
-export default UploadFileList

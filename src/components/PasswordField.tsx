@@ -1,21 +1,16 @@
 import React, { useCallback } from 'react'
 
-export function PasswordField({
-  value,
-  onChange,
-  isRequired,
-  isInvalid,
-}: {
+export default function PasswordField(props: {
   value: string
   onChange: (v: string) => void
   isRequired?: boolean
   isInvalid?: boolean
 }): JSX.Element {
   const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      onChange(e.target.value)
+    function (e: React.ChangeEvent<HTMLInputElement>): void {
+      props.onChange(e.target.value)
     },
-    [onChange],
+    [props.onChange],
   )
 
   return (
@@ -23,15 +18,13 @@ export function PasswordField({
       autoFocus
       type="password"
       className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-        isInvalid ? 'border-red-500' : 'border-gray-300'
+        props.isInvalid ? 'border-red-500' : 'border-gray-300'
       }`}
       placeholder={
-        isRequired ? 'Enter password...' : 'Add password (optional)...'
+        props.isRequired ? 'Enter password...' : 'Add password (optional)...'
       }
-      value={value}
+      value={props.value}
       onChange={handleChange}
     />
   )
 }
-
-export default PasswordField

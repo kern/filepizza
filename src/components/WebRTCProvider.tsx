@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect, useRef, useContext } from 'react'
 import type { default as PeerType } from 'peerjs'
 import Loading from './Loading'
