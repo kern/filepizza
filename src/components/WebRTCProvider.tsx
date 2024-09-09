@@ -7,7 +7,7 @@ import Loading from './Loading'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Peer = typeof window !== 'undefined' ? require('peerjs').default : null
 
-export type WebRTCValue = PeerType | null
+export type WebRTCValue = PeerType
 
 const ICE_SERVERS: RTCConfiguration = {
   iceServers: [

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { UploadedFile } from '../types'
 import { useWebRTC } from './WebRTCProvider'
-import useFetch from 'use-http'
+import { useQuery } from '@tanstack/react-query'
 import Peer, { DataConnection } from 'peerjs'
 import { decodeMessage, Message, MessageType } from '../messages'
 import QRCode from 'react-qr-code'
@@ -11,6 +11,7 @@ import Loading from './Loading'
 import ProgressBar from './ProgressBar'
 import useClipboard from '../hooks/useClipboard'
 import InputLabel from './InputLabel'
+import { useUploaderChannelRenewal } from '../hooks/useUploaderChannelRenewal'
 
 enum UploaderConnectionStatus {
   Pending = 'PENDING',
@@ -32,66 +33,60 @@ type UploaderConnection = {
   mobileModel?: string
   uploadingFullPath?: string
   uploadingOffset?: number
+  completedFiles: number
+  totalFiles: number
+  currentFileProgress: number
 }
 
 // TODO(@kern): Use better values
-const RENEW_INTERVAL = 5000 // 20 minutes
 const MAX_CHUNK_SIZE = 10 * 1024 * 1024 // 10 Mi
 const QR_CODE_SIZE = 128
+
+function generateURL(slug: string): string {
+  const hostPrefix =
+    window.location.protocol +
+    '//' +
+    window.location.hostname +
+    (['80', '443'].includes(window.location.port)
+      ? ''
+      : ':' + window.location.port)
+  return `${hostPrefix}/download/${slug}`
+}
 
 function useUploaderChannel(uploaderPeerID: string): {
   loading: boolean
   error: Error | null
-  longSlug: string
-  shortSlug: string
+  longSlug: string | undefined
+  shortSlug: string | undefined
+  longURL: string | undefined
+  shortURL: string | undefined
 } {
-  const { loading, error, data } = useFetch(
-    '/api/create',
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ uploaderPeerID }),
+  const { isLoading, error, data } = useQuery({
+    queryKey: ['uploaderChannel', uploaderPeerID],
+    queryFn: async () => {
+      const response = await fetch('/api/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uploaderPeerID }),
+      })
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+      return response.json()
     },
-    [uploaderPeerID],
-  )
+  })
 
-  if (!data) {
-    return { loading, error, longSlug: null, shortSlug: null }
-  }
+  const longURL = data?.longSlug ? generateURL(data.longSlug) : undefined
+  const shortURL = data?.shortSlug ? generateURL(data.shortSlug) : undefined
 
   return {
-    loading: false,
-    error: null,
-    longSlug: data.longSlug,
-    shortSlug: data.shortSlug,
+    loading: isLoading,
+    error: error as Error | null,
+    longSlug: data?.longSlug,
+    shortSlug: data?.shortSlug,
+    longURL,
+    shortURL,
   }
-}
-
-function useUploaderChannelRenewal(shortSlug: string): void {
-  const { post } = useFetch('/api/renew')
-
-  useEffect(() => {
-    let timeout = null
-
-    const run = (): void => {
-      timeout = setTimeout(() => {
-        post({ slug: shortSlug })
-          .then(() => {
-            run()
-          })
-          .catch((err) => {
-            console.error(err)
-            run()
-          })
-      }, RENEW_INTERVAL)
-    }
-
-    run()
-
-    return () => {
-      clearTimeout(timeout)
-    }
-  }, [shortSlug])
 }
 
 function validateOffset(
@@ -117,10 +112,13 @@ function useUploaderConnections(
 
   useEffect(() => {
     peer.on('connection', (conn: DataConnection) => {
-      let sendChunkTimeout: number | null = null
+      let sendChunkTimeout: NodeJS.Timeout | null = null
       const newConn = {
         status: UploaderConnectionStatus.Pending,
         dataConnection: conn,
+        completedFiles: 0,
+        totalFiles: files.length,
+        currentFileProgress: 0,
       }
 
       setConnections((conns) => [...conns, newConn])
@@ -211,6 +209,7 @@ function useUploaderConnections(
                 draft.status = UploaderConnectionStatus.Uploading
                 draft.uploadingFullPath = fullPath
                 draft.uploadingOffset = offset
+                draft.currentFileProgress = offset / file.size
               })
 
               const sendNextChunk = () => {
@@ -229,11 +228,14 @@ function useUploaderConnections(
                 updateConnection((draft) => {
                   offset = end
                   draft.uploadingOffset = end
+                  draft.currentFileProgress = end / file.size
 
                   if (final) {
                     draft.status = UploaderConnectionStatus.Paused
+                    draft.completedFiles += 1
+                    draft.currentFileProgress = 0
                   } else {
-                    sendChunkTimeout = window.setTimeout(() => {
+                    sendChunkTimeout = setTimeout(() => {
                       sendNextChunk()
                     }, 0)
                   }
@@ -300,31 +302,42 @@ function useUploaderConnections(
   return connections
 }
 
+function CopyableInput({ label, value }: { label: string; value: string }) {
+  const { hasCopied, onCopy } = useClipboard(value)
+
+  return (
+    <div className="flex flex-col w-full">
+      <InputLabel>{label}</InputLabel>
+      <div className="flex w-full">
+        <input
+          className="flex-grow px-3 py-2 text-xs border border-r-0 rounded-l"
+          value={value}
+          readOnly
+        />
+        <button
+          className="px-4 py-2 text-sm text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-r border-t border-r border-b"
+          onClick={onCopy}
+        >
+          {hasCopied ? 'Copied' : 'Copy'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function Uploader({
   files,
   password,
+  renewInterval = 5000,
 }: {
   files: UploadedFile[]
   password: string
+  renewInterval?: number
 }): JSX.Element {
   const peer = useWebRTC()
-  const { longSlug, shortSlug } = useUploaderChannel(peer.id)
-  useUploaderChannelRenewal(shortSlug)
+  const { longSlug, shortSlug, longURL, shortURL } = useUploaderChannel(peer.id)
+  useUploaderChannelRenewal(shortSlug, renewInterval)
   const connections = useUploaderConnections(peer, files, password)
-
-  const hostPrefix =
-    window.location.protocol +
-    '//' +
-    window.location.hostname +
-    (['80', '443'].includes(window.location.port)
-      ? ''
-      : ':' + window.location.port)
-  const longURL = `${hostPrefix}/download/${longSlug}`
-  const shortURL = `${hostPrefix}/download/${shortSlug}`
-  const { hasCopied: hasCopiedLongURL, onCopy: onCopyLongURL } =
-    useClipboard(longURL)
-  const { hasCopied: hasCopiedShortURL, onCopy: onCopyShortURL } =
-    useClipboard(shortURL)
 
   if (!longSlug || !shortSlug) {
     return <Loading text="Creating channel" />
@@ -334,41 +347,11 @@ export default function Uploader({
     <>
       <div className="flex w-full items-center">
         <div className="flex-none mr-4">
-          <QRCode value={shortURL} size={QR_CODE_SIZE} />
+          <QRCode value={shortURL ?? ''} size={QR_CODE_SIZE} />
         </div>
         <div className="flex-auto flex flex-col justify-center space-y-2">
-          <div className="flex flex-col w-full">
-            <InputLabel>Long URL</InputLabel>
-            <div className="flex w-full">
-              <input
-                className="flex-grow px-3 py-2 text-xs border border-r-0 rounded-l"
-                value={longURL}
-                readOnly
-              />
-              <button
-                className="px-4 py-2 text-sm text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-r border-t border-r border-b"
-                onClick={onCopyLongURL}
-              >
-                {hasCopiedLongURL ? 'Copied' : 'Copy'}
-              </button>
-            </div>
-          </div>
-          <div className="flex flex-col w-full mt-2">
-            <InputLabel>Short URL</InputLabel>
-            <div className="flex w-full">
-              <input
-                className="flex-grow px-3 py-2 text-xs border border-r-0 rounded-l"
-                value={shortURL}
-                readOnly
-              />
-              <button
-                className="px-4 py-2 text-sm text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-r border-t border-r border-b"
-                onClick={onCopyShortURL}
-              >
-                {hasCopiedShortURL ? 'Copied' : 'Copy'}
-              </button>
-            </div>
-          </div>
+          <CopyableInput label="Long URL" value={longURL ?? ''} />
+          <CopyableInput label="Short URL" value={shortURL ?? ''} />
         </div>
       </div>
       {connections.map((conn, i) => (
@@ -377,7 +360,12 @@ export default function Uploader({
           <div className="text-sm">
             {conn.status} {conn.browserName} {conn.browserVersion}
           </div>
-          <ProgressBar value={50} max={100} />
+          <ProgressBar
+            value={
+              (conn.completedFiles + conn.currentFileProgress) / conn.totalFiles
+            }
+            max={1}
+          />
         </div>
       ))}
     </>
