@@ -6,11 +6,26 @@ import {
   UploaderConnectionStatus,
 } from '../types'
 import { decodeMessage, Message, MessageType } from '../messages'
-import { validateOffset } from '../utils/fs'
 import * as t from 'io-ts'
 
 // TODO(@kern): Test for better values
 const MAX_CHUNK_SIZE = 10 * 1024 * 1024 // 10 Mi
+
+function validateOffset(
+  files: UploadedFile[],
+  fullPath: string,
+  offset: number,
+): UploadedFile {
+  const validFile = files.find(
+    (file) =>
+      (file.fullPath === fullPath || file.name === fullPath) &&
+      offset <= file.size,
+  )
+  if (!validFile) {
+    throw new Error('invalid file offset')
+  }
+  return validFile
+}
 
 export function useUploaderConnections(
   peer: Peer,
