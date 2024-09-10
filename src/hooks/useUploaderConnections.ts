@@ -6,7 +6,6 @@ import {
   UploaderConnectionStatus,
 } from '../types'
 import { decodeMessage, Message, MessageType } from '../messages'
-import * as t from 'io-ts'
 import { getFileName } from '../fs'
 
 // TODO(@kern): Test for better values
@@ -59,7 +58,7 @@ export function useUploaderConnections(
           switch (message.type) {
             case MessageType.RequestInfo: {
               if (message.password !== password) {
-                const request: t.TypeOf<typeof Message> = {
+                const request: Message = {
                   type: MessageType.Error,
                   error: 'Invalid password',
                 }
@@ -105,13 +104,13 @@ export function useUploaderConnections(
 
               const fileInfo = files.map((f) => {
                 return {
-                  fileName: f.fileName ?? f.name ?? '',
+                  fileName: getFileName(f),
                   size: f.size,
                   type: f.type,
                 }
               })
 
-              const request: t.TypeOf<typeof Message> = {
+              const request: Message = {
                 type: MessageType.Info,
                 files: fileInfo,
               }
@@ -142,7 +141,7 @@ export function useUploaderConnections(
                 const end = Math.min(file.size, offset + MAX_CHUNK_SIZE)
                 const chunkSize = end - offset
                 const final = chunkSize < MAX_CHUNK_SIZE
-                const request: t.TypeOf<typeof Message> = {
+                const request: Message = {
                   type: MessageType.Chunk,
                   fileName,
                   offset,

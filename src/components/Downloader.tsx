@@ -10,7 +10,7 @@ import {
   mobileVendor,
   mobileModel,
 } from 'react-device-detect'
-import * as t from 'io-ts'
+import { z } from 'zod' // Add this import
 import { ChunkMessage, decodeMessage, Message, MessageType } from '../messages'
 import { createZipStream } from '../zip-stream'
 import { DataConnection } from 'peerjs'
@@ -110,7 +110,7 @@ export default function Downloader({
     type: string
   }> | null>(null)
   const processChunk = useRef<
-    ((message: t.TypeOf<typeof ChunkMessage>) => void) | null
+    ((message: z.infer<typeof ChunkMessage>) => void) | null
   >(null)
   const [shouldAttemptConnection, setShouldAttemptConnection] = useState(false)
   const [open, setOpen] = useState(false)
@@ -133,7 +133,7 @@ export default function Downloader({
     const handleOpen = () => {
       setOpen(true)
 
-      const request: t.TypeOf<typeof Message> = {
+      const request: z.infer<typeof Message> = {
         type: MessageType.RequestInfo,
         browserName: browserName,
         browserVersion: browserVersion,
@@ -149,7 +149,7 @@ export default function Downloader({
 
     const handleData = (data: unknown) => {
       try {
-        const message = decodeMessage(data)
+        const message = Message.parse(data) // Use Zod's parse method
         switch (message.type) {
           case MessageType.Info:
             setFilesInfo(message.files)
@@ -248,7 +248,7 @@ export default function Downloader({
         return
       }
 
-      const request: t.TypeOf<typeof Message> = {
+      const request: z.infer<typeof Message> = {
         type: MessageType.Start,
         fileName: filesInfo[nextFileIndex].fileName,
         offset: 0,
@@ -257,7 +257,7 @@ export default function Downloader({
       nextFileIndex++
     }
 
-    const processChunkFunc = (message: t.TypeOf<typeof ChunkMessage>): void => {
+    const processChunkFunc = (message: z.infer<typeof ChunkMessage>): void => {
       const fileStream = fileStreamByPath[message.fileName]
       if (!fileStream) {
         console.error('no stream found for ' + message.fileName)
@@ -291,7 +291,7 @@ export default function Downloader({
 
     downloadPromise
       .then(() => {
-        const request: t.TypeOf<typeof Message> = {
+        const request: z.infer<typeof Message> = {
           type: MessageType.Done,
         }
         dataConnection.send(request)

@@ -24,8 +24,6 @@
     "autoprefixer": "^10.4.20",
     "debug": "^4.3.6",
     "express": "^4.19.2",
-    "fp-ts": "^2.16.9",
-    "io-ts": "^2.2.21",
     "ioredis": "^4.28.5",
     "next": "^14.2.8",
     "nodemon": "^1.19.4",
@@ -42,7 +40,8 @@
     "twilio": "^2.11.1",
     "use-http": "^1.0.28",
     "web-streams-polyfill": "^3.3.3",
-    "webrtcsupport": "^2.2.0"
+    "webrtcsupport": "^2.2.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",

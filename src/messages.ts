@@ -1,82 +1,70 @@
-import * as t from 'io-ts'
-import { pipe } from 'fp-ts/function'
-import { fold } from 'fp-ts/Either'
+import { z } from 'zod'
 
 export enum MessageType {
-  RequestInfo = 'REQUEST_INFO',
-  Info = 'INFO',
-  Pause = 'PAUSE',
-  Start = 'START',
-  Chunk = 'CHUNK',
-  Done = 'DONE',
-  Error = 'ERROR',
+  RequestInfo = 'RequestInfo',
+  Info = 'Info',
+  Start = 'Start',
+  Chunk = 'Chunk',
+  Done = 'Done',
+  Error = 'Error',
 }
 
-export const RequestInfoMessage = t.type({
-  type: t.literal(MessageType.RequestInfo),
-  browserName: t.string,
-  browserVersion: t.string,
-  osName: t.string,
-  osVersion: t.string,
-  mobileVendor: t.string,
-  mobileModel: t.string,
-  password: t.string,
+export const RequestInfoMessage = z.object({
+  type: z.literal(MessageType.RequestInfo),
+  browserName: z.string(),
+  browserVersion: z.string(),
+  osName: z.string(),
+  osVersion: z.string(),
+  mobileVendor: z.string(),
+  mobileModel: z.string(),
+  password: z.string(),
 })
 
-export const InfoMessage = t.type({
-  type: t.literal(MessageType.Info),
-  files: t.array(
-    t.type({
-      fileName: t.string,
-      size: t.number,
-      type: t.string,
+export const InfoMessage = z.object({
+  type: z.literal(MessageType.Info),
+  files: z.array(
+    z.object({
+      fileName: z.string(),
+      size: z.number(),
+      type: z.string(),
     }),
   ),
 })
 
-export const StartMessage = t.type({
-  type: t.literal(MessageType.Start),
-  fileName: t.string,
-  offset: t.number,
+export const StartMessage = z.object({
+  type: z.literal(MessageType.Start),
+  fileName: z.string(),
+  offset: z.number(),
 })
 
-export const ChunkMessage = t.type({
-  type: t.literal(MessageType.Chunk),
-  fileName: t.string,
-  offset: t.number,
-  bytes: t.unknown,
-  final: t.boolean,
+export const ChunkMessage = z.object({
+  type: z.literal(MessageType.Chunk),
+  fileName: z.string(),
+  offset: z.number(),
+  bytes: z.unknown(),
+  final: z.boolean(),
 })
 
-export const PauseMessage = t.type({
-  type: t.literal(MessageType.Pause),
+export const DoneMessage = z.object({
+  type: z.literal(MessageType.Done),
 })
 
-export const DoneMessage = t.type({
-  type: t.literal(MessageType.Done),
+export const ErrorMessage = z.object({
+  type: z.literal(MessageType.Error),
+  error: z.string(),
 })
 
-export const ErrorMessage = t.type({
-  type: t.literal(MessageType.Error),
-  error: t.string,
-})
-
-export const Message = t.union([
+export const Message = z.discriminatedUnion('type', [
   RequestInfoMessage,
   InfoMessage,
-  PauseMessage,
   StartMessage,
   ChunkMessage,
   DoneMessage,
   ErrorMessage,
 ])
 
-export function decodeMessage(data: any): t.TypeOf<typeof Message> {
-  const onFailure = (errors: t.Errors): t.TypeOf<typeof Message> => {
-    throw new Error(`${errors.length} error(s) found`)
-  }
+export type Message = z.infer<typeof Message>
 
-  const onSuccess = (mesg: t.TypeOf<typeof Message>) => mesg
-
-  return pipe(Message.decode(data), fold(onFailure, onSuccess))
+export function decodeMessage(data: unknown): Message {
+  return Message.parse(data)
 }
