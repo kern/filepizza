@@ -33,12 +33,10 @@
     "react": "^18.2.0",
     "react-device-detect": "^1.17.0",
     "react-dom": "^18.2.0",
-    "react-qr": "0.0.2",
     "react-qr-code": "^1.1.1",
     "streamsaver": "^2.0.6",
     "tailwindcss": "^3.4.10",
     "twilio": "^2.11.1",
-    "use-http": "^1.0.28",
     "web-streams-polyfill": "^3.3.3",
     "webrtcsupport": "^2.2.0",
     "zod": "^3.23.8"
