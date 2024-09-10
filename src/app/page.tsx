@@ -8,7 +8,6 @@ import UploadFileList from '../components/UploadFileList'
 import Uploader from '../components/Uploader'
 import PasswordField from '../components/PasswordField'
 import StartButton from '../components/StartButton'
-import StopButton from '../components/StopButton'
 import { UploadedFile } from '../types'
 import Spinner from '../components/Spinner'
 import Wordmark from '../components/Wordmark'
@@ -102,9 +101,8 @@ function UploadingState({
       </p>
       <UploadFileList files={uploadedFiles} />
       <WebRTCProvider>
-        <Uploader files={uploadedFiles} password={password} />
+        <Uploader files={uploadedFiles} password={password} onStop={onStop} />
       </WebRTCProvider>
-      <StopButton onClick={onStop} />
     </PageWrapper>
   )
 }

@@ -12,6 +12,7 @@ export default function Spinner({
   return (
     <div className="relative w-[300px] h-[300px]">
       <Image
+        priority
         src="/images/pizza.png"
         alt="Pizza"
         width={300}
@@ -20,10 +21,11 @@ export default function Spinner({
       />
       <div className="absolute inset-0 flex items-center justify-center">
         <Image
+          priority
           src={src}
           alt={`Arrow pointing ${direction}`}
           width={120}
-          height={120}
+          height={173}
         />
       </div>
     </div>
