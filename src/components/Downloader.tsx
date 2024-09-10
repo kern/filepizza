@@ -149,7 +149,7 @@ export default function Downloader({
 
     const handleData = (data: unknown) => {
       try {
-        const message = Message.parse(data) // Use Zod's parse method
+        const message = decodeMessage(data)
         switch (message.type) {
           case MessageType.Info:
             setFilesInfo(message.files)

@@ -7,7 +7,7 @@ export const metadata = {
   description: 'Oops! This slice of FilePizza seems to be missing.',
 }
 
-export default function NotFound(): JSX.Element {
+export default async function NotFound(): Promise<JSX.Element> {
   return (
     <div className="flex flex-col items-center space-y-5 py-10 max-w-2xl mx-auto">
       <Spinner direction="down" />

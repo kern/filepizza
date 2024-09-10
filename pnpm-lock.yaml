@@ -44,9 +44,6 @@ dependencies:
   react-dom:
     specifier: ^18.2.0
     version: 18.3.1(react@18.3.1)
-  react-qr:
-    specifier: 0.0.2
-    version: 0.0.2(react@18.3.1)
   react-qr-code:
     specifier: ^1.1.1
     version: 1.1.1(react-native@0.75.2)(react@18.3.1)
@@ -59,9 +56,6 @@ dependencies:
   twilio:
     specifier: ^2.11.1
     version: 2.11.1
-  use-http:
-    specifier: ^1.0.28
-    version: 1.0.28(react-dom@18.3.1)(react@18.3.1)
   web-streams-polyfill:
     specifier: ^3.3.3
     version: 3.3.3
@@ -7436,10 +7430,6 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     dev: false
 
-  /qr-image@3.2.0:
-    resolution: {integrity: sha512-rXKDS5Sx3YipVsqmlMJsJsk6jXylEpiHRC2+nJy66fxA5ExYyGa4PqwteW69SaVmAb2OQ18HbYriT7cGQMbduw==}
-    dev: false
-
   /qr.js@0.0.0:
     resolution: {integrity: sha512-c4iYnWb+k2E+vYpRimHqSu575b1/wKl4XFeJGpFmrJQz5I88v9aY2czh7s0w36srfCM1sXgC/xpoJz5dJfq+OQ==}
     dev: false
@@ -7610,15 +7600,6 @@ packages:
       react: 18.3.1
     transitivePeerDependencies:
       - react-native
-    dev: false
-
-  /react-qr@0.0.2(react@18.3.1):
-    resolution: {integrity: sha512-7FNhidqSLN/MRVU+vA+Rx7lNxtrq/wR1ZhxVSd62ioxet4GeS6QFtU46qEq/rditziaDUiHVVRjzriA4VftsYA==}
-    peerDependencies:
-      react: '*'
-    dependencies:
-      qr-image: 3.2.0
-      react: 18.3.1
     dev: false
 
   /react-refresh@0.14.2:
@@ -9032,39 +9013,6 @@ packages:
       prepend-http: 1.0.4
     dev: false
 
-  /urs@0.0.8(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-LaSSPpr91XrVA3vW2zPupw4K6DSQEDKdL4yQZX1mO2fpljIMpB5zctrjRvxLurelWSgKsHsCmfHNCImscryirQ==}
-    peerDependencies:
-      react: ^16.13.1 || ^17.0.0
-      react-dom: ^16.13.1 || ^17.0.0
-    dependencies:
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-    dev: false
-
-  /use-http@1.0.28(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-MWux13mGDBj+bzuTZJczDIjFu5r7D9eYrrKyKaCo+KFvoGRE9mpNHLK21pAJb2Sbdh/J85y5E4b2xR+IH2WOkg==}
-    peerDependencies:
-      react: ^16.13.1 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.13.1 || ^17.0.0 || ^18.0.0
-    dependencies:
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      urs: 0.0.8(react-dom@18.3.1)(react@18.3.1)
-      use-ssr: 1.0.25(react-dom@18.3.1)(react@18.3.1)
-      utility-types: 3.11.0
-    dev: false
-
-  /use-ssr@1.0.25(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-VYF8kJKI+X7+U4XgGoUER2BUl0vIr+8OhlIhyldgSGE0KHMoDRXPvWeHUUeUktq7ACEOVLzXGq1+QRxcvtwvyQ==}
-    peerDependencies:
-      react: ^16.13.1 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.13.1 || ^17.0.0 || ^18.0.0
-    dependencies:
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-    dev: false
-
   /use@3.1.1:
     resolution: {integrity: sha512-cwESVXlO3url9YWlFW/TA9cshCEhtu7IKJ/p5soJ/gGpj7vbvFrAY/eIioQ6Dw23KjZhYgiIo8HOs1nQ2vr/oQ==}
     engines: {node: '>=0.10.0'}
@@ -9072,11 +9020,6 @@ packages:
 
   /util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
-    dev: false
-
-  /utility-types@3.11.0:
-    resolution: {integrity: sha512-6Z7Ma2aVEWisaL6TvBCy7P8rm2LQoPv6dJ7ecIaIixHcwfbJ0x7mWdbcwlIM5IGQxPZSFYeqRCqlOOeKoJYMkw==}
-    engines: {node: '>= 4'}
     dev: false
 
   /utils-merge@1.0.1:

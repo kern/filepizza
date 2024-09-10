@@ -32,6 +32,10 @@ export function useUploaderChannel(uploaderPeerID: string): {
       }
       return response.json()
     },
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    staleTime: Infinity,
   })
 
   const longURL = data?.longSlug ? generateURL(data.longSlug) : undefined
