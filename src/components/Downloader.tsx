@@ -152,7 +152,6 @@ export default function Downloader({
         const message = decodeMessage(data)
         switch (message.type) {
           case MessageType.Info:
-            console.log(message.files)
             setFilesInfo(message.files)
             break
 

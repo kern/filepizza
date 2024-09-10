@@ -42,11 +42,9 @@ export function useUploaderConnections(
       conn.on('data', (data): void => {
         try {
           const message = decodeMessage(data)
-          console.log('message', message)
           switch (message.type) {
             case MessageType.RequestInfo: {
               if (message.password !== password) {
-                console.log('invalid password')
                 const request: t.TypeOf<typeof Message> = {
                   type: MessageType.Error,
                   error: 'Invalid password',
@@ -73,8 +71,6 @@ export function useUploaderConnections(
 
                 return
               }
-
-              console.log('valid password')
 
               updateConnection((draft) => {
                 if (draft.status !== UploaderConnectionStatus.Pending) {
@@ -106,7 +102,6 @@ export function useUploaderConnections(
                 files: fileInfo,
               }
 
-              console.log('sending info', request)
               conn.send(request)
               break
             }

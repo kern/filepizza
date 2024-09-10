@@ -10,7 +10,6 @@ export function validateOffset(
       (file.fullPath === fullPath || file.name === fullPath) &&
       offset <= file.size,
   )
-  debugger
   if (!validFile) {
     throw new Error('invalid file offset')
   }
