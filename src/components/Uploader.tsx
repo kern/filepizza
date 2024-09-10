@@ -1,5 +1,7 @@
+'use client'
+
 import React from 'react'
-import { UploadedFile } from '../types'
+import { UploadedFile, UploaderConnectionStatus } from '../types'
 import { useWebRTC } from './WebRTCProvider'
 import QRCode from 'react-qr-code'
 import Loading from './Loading'
@@ -32,6 +34,10 @@ export default function Uploader({
     return <Loading text="Creating channel" />
   }
 
+  const activeDownloaders = connections.filter(
+    (conn) => conn.status === UploaderConnectionStatus.Uploading,
+  ).length
+
   return (
     <>
       <div className="flex w-full items-center">
@@ -46,8 +52,7 @@ export default function Uploader({
       <div className="mt-6 pt-4 border-t border-gray-200 w-full">
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-lg font-semibold text-stone-400">
-            {connections.length}{' '}
-            {connections.length === 1 ? 'Downloader' : 'Downloaders'}
+            {activeDownloaders} Downloading, {connections.length} Total
           </h2>
           <StopButton onClick={onStop} />
         </div>

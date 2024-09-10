@@ -1,6 +1,6 @@
 import type { DataConnection } from 'peerjs'
 
-export type UploadedFile = File & { fullPath?: string; name?: string }
+export type UploadedFile = File & { entryFullPath?: string }
 
 export enum UploaderConnectionStatus {
   Pending = 'PENDING',
@@ -20,7 +20,7 @@ export type UploaderConnection = {
   osVersion?: string
   mobileVendor?: string
   mobileModel?: string
-  uploadingFullPath?: string
+  uploadingFileName?: string
   uploadingOffset?: number
   completedFiles: number
   totalFiles: number

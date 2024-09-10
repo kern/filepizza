@@ -12,6 +12,8 @@ import { UploadedFile } from '../types'
 import Spinner from '../components/Spinner'
 import Wordmark from '../components/Wordmark'
 import CancelButton from '../components/CancelButton'
+import { useMemo } from 'react'
+import { getFileName } from '../fs'
 
 const queryClient = new QueryClient()
 
@@ -53,6 +55,15 @@ function InitialState({
   )
 }
 
+function useUploaderFileListData(uploadedFiles: UploadedFile[]) {
+  return useMemo(() => {
+    return uploadedFiles.map((item) => ({
+      fileName: getFileName(item),
+      type: item.type,
+    }))
+  }, [uploadedFiles])
+}
+
 function ConfirmUploadState({
   uploadedFiles,
   password,
@@ -68,13 +79,14 @@ function ConfirmUploadState({
   onStart: () => void
   onFileListChange: (updatedFiles: UploadedFile[]) => void
 }): JSX.Element {
+  const fileListData = useUploaderFileListData(uploadedFiles)
   return (
     <PageWrapper>
       <p className="text-lg text-center text-stone-800 max-w-md">
         You are about to start uploading {uploadedFiles.length}{' '}
         {uploadedFiles.length === 1 ? 'file' : 'files'}.
       </p>
-      <UploadFileList files={uploadedFiles} onChange={onFileListChange} />
+      <UploadFileList files={fileListData} onChange={onFileListChange} />
       <PasswordField value={password} onChange={onChangePassword} />
       <div className="flex space-x-4">
         <CancelButton onClick={onCancel} />
@@ -93,13 +105,14 @@ function UploadingState({
   password: string
   onStop: () => void
 }): JSX.Element {
+  const fileListData = useUploaderFileListData(uploadedFiles)
   return (
     <PageWrapper isRotating={true}>
       <p className="text-lg text-center text-stone-800 max-w-md">
         You are uploading {uploadedFiles.length}{' '}
         {uploadedFiles.length === 1 ? 'file' : 'files'}.
       </p>
-      <UploadFileList files={uploadedFiles} />
+      <UploadFileList files={fileListData} />
       <WebRTCProvider>
         <Uploader files={uploadedFiles} password={password} onStop={onStop} />
       </WebRTCProvider>

@@ -7,19 +7,18 @@ import {
 } from '../types'
 import { decodeMessage, Message, MessageType } from '../messages'
 import * as t from 'io-ts'
+import { getFileName } from '../fs'
 
 // TODO(@kern): Test for better values
 const MAX_CHUNK_SIZE = 10 * 1024 * 1024 // 10 Mi
 
 function validateOffset(
   files: UploadedFile[],
-  fullPath: string,
+  fileName: string,
   offset: number,
 ): UploadedFile {
   const validFile = files.find(
-    (file) =>
-      (file.fullPath === fullPath || file.name === fullPath) &&
-      offset <= file.size,
+    (file) => getFileName(file) === fileName && offset <= file.size,
   )
   if (!validFile) {
     throw new Error('invalid file offset')
@@ -106,7 +105,7 @@ export function useUploaderConnections(
 
               const fileInfo = files.map((f) => {
                 return {
-                  fullPath: f.fullPath ?? f.name ?? '',
+                  fileName: f.fileName ?? f.name ?? '',
                   size: f.size,
                   type: f.type,
                 }
@@ -122,9 +121,9 @@ export function useUploaderConnections(
             }
 
             case MessageType.Start: {
-              const fullPath = message.fullPath
+              const fileName = message.fileName
               let offset = message.offset
-              const file = validateOffset(files, fullPath, offset)
+              const file = validateOffset(files, fileName, offset)
               updateConnection((draft) => {
                 if (draft.status !== UploaderConnectionStatus.Paused) {
                   return draft
@@ -133,7 +132,7 @@ export function useUploaderConnections(
                 return {
                   ...draft,
                   status: UploaderConnectionStatus.Uploading,
-                  uploadingFullPath: fullPath,
+                  uploadingFileName: fileName,
                   uploadingOffset: offset,
                   currentFileProgress: offset / file.size,
                 }
@@ -145,7 +144,7 @@ export function useUploaderConnections(
                 const final = chunkSize < MAX_CHUNK_SIZE
                 const request: t.TypeOf<typeof Message> = {
                   type: MessageType.Chunk,
-                  fullPath,
+                  fileName,
                   offset,
                   bytes: file.slice(offset, end),
                   final,

@@ -10,11 +10,11 @@ export function ConnectionListItem({
   const getStatusColor = (status: UploaderConnectionStatus) => {
     switch (status) {
       case UploaderConnectionStatus.Uploading:
-        return 'bg-green-500'
+        return 'bg-blue-500'
       case UploaderConnectionStatus.Paused:
         return 'bg-yellow-500'
       case UploaderConnectionStatus.Done:
-        return 'bg-blue-500'
+        return 'bg-green-500'
       case UploaderConnectionStatus.Closed:
         return 'bg-red-500'
       default:

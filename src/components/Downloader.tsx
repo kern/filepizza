@@ -105,7 +105,7 @@ export default function Downloader({
     null,
   )
   const [filesInfo, setFilesInfo] = useState<Array<{
-    fullPath: string
+    fileName: string
     size: number
     type: string
   }> | null>(null)
@@ -234,7 +234,7 @@ export default function Downloader({
           close = () => ctrl.close()
         },
       })
-      fileStreamByPath[info.fullPath] = {
+      fileStreamByPath[info.fileName] = {
         stream,
         enqueue,
         close,
@@ -250,7 +250,7 @@ export default function Downloader({
 
       const request: t.TypeOf<typeof Message> = {
         type: MessageType.Start,
-        fullPath: filesInfo[nextFileIndex].fullPath,
+        fileName: filesInfo[nextFileIndex].fileName,
         offset: 0,
       }
       dataConnection.send(request)
@@ -258,9 +258,9 @@ export default function Downloader({
     }
 
     const processChunkFunc = (message: t.TypeOf<typeof ChunkMessage>): void => {
-      const fileStream = fileStreamByPath[message.fullPath]
+      const fileStream = fileStreamByPath[message.fileName]
       if (!fileStream) {
-        console.error('no stream found for ' + message.fullPath)
+        console.error('no stream found for ' + message.fileName)
         return
       }
 
@@ -275,7 +275,7 @@ export default function Downloader({
     processChunk.current = processChunkFunc
 
     const downloads = filesInfo.map((info, i) => ({
-      name: info.fullPath.replace(/^\//, ''),
+      name: info.fileName.replace(/^\//, ''),
       size: info.size,
       stream: () => fileStreams[i],
     }))

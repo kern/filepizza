@@ -3,7 +3,7 @@ import { UploadedFile } from './types'
 const getAsFile = (entry: any): Promise<File> =>
   new Promise((resolve, reject) => {
     entry.file((file: UploadedFile) => {
-      file.fullPath = entry.fullPath
+      file.entryFullPath = entry.fullPath
       resolve(file)
     }, reject)
   })
@@ -76,4 +76,8 @@ export const formatSize = (bytes: number): string => {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return `${(bytes / Math.pow(k, i)).toPrecision(3)} ${sizes[i]}`
+}
+
+export const getFileName = (file: UploadedFile): string => {
+  return file.name ?? file.entryFullPath ?? ''
 }

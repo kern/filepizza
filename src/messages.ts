@@ -27,7 +27,7 @@ export const InfoMessage = t.type({
   type: t.literal(MessageType.Info),
   files: t.array(
     t.type({
-      fullPath: t.string,
+      fileName: t.string,
       size: t.number,
       type: t.string,
     }),
@@ -36,13 +36,13 @@ export const InfoMessage = t.type({
 
 export const StartMessage = t.type({
   type: t.literal(MessageType.Start),
-  fullPath: t.string,
+  fileName: t.string,
   offset: t.number,
 })
 
 export const ChunkMessage = t.type({
   type: t.literal(MessageType.Chunk),
-  fullPath: t.string,
+  fileName: t.string,
   offset: t.number,
   bytes: t.unknown,
   final: t.boolean,
