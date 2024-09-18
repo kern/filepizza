@@ -50,7 +50,7 @@ function cleanErrorMessage(errorMessage: string): string {
 type DownloadFileStream = {
   name: string
   size: number
-  stream: () => ReadableStream
+  stream: () => ReadableStream<Uint8Array>
 }
 
 export async function streamDownloadSingleFile(
@@ -82,7 +82,7 @@ export function streamDownloadMultipleFiles(
   const readableZipStream = createZipStream({
     start(ctrl) {
       for (const file of files) {
-        ctrl.enqueue(file)
+        ctrl.enqueue(file as unknown as ArrayBufferView)
       }
       ctrl.close()
     },
@@ -216,25 +216,30 @@ export default function Downloader({
   }, [])
 
   const handleStartDownload = useCallback(() => {
+    if (!filesInfo || !dataConnection) return
+
     setDownloading(true)
 
     const fileStreamByPath: Record<
       string,
       {
-        stream: ReadableStream
-        enqueue: (chunk: any) => void
+        stream: ReadableStream<Uint8Array>
+        enqueue: (chunk: Uint8Array) => void
         close: () => void
       }
     > = {}
     const fileStreams = filesInfo.map((info) => {
-      let enqueue: ((chunk: any) => void) | null = null
+      let enqueue: ((chunk: Uint8Array) => void) | null = null
       let close: (() => void) | null = null
-      const stream = new ReadableStream({
+      const stream = new ReadableStream<Uint8Array>({
         start(ctrl) {
-          enqueue = (chunk: any) => ctrl.enqueue(chunk)
+          enqueue = (chunk: Uint8Array) => ctrl.enqueue(chunk)
           close = () => ctrl.close()
         },
       })
+      if (!enqueue || !close) {
+        throw new Error('Failed to initialize stream controllers')
+      }
       fileStreamByPath[info.fileName] = {
         stream,
         enqueue,
