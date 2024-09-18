@@ -10,9 +10,12 @@ import {
   mobileVendor,
   mobileModel,
 } from 'react-device-detect'
-import { z } from 'zod' // Add this import
+import { z } from 'zod'
 import { ChunkMessage, decodeMessage, Message, MessageType } from '../messages'
-import { createZipStream } from '../zip-stream'
+import {
+  streamDownloadSingleFile,
+  streamDownloadMultipleFiles,
+} from '../utils/download'
 import { DataConnection } from 'peerjs'
 import PasswordField from './PasswordField'
 import UnlockButton from './UnlockButton'
@@ -23,22 +26,6 @@ import StopButton from './StopButton'
 import ProgressBar from './ProgressBar'
 import TitleText from './TitleText'
 
-const baseURL = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-if (typeof window !== 'undefined') require('web-streams-polyfill/ponyfill')
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const streamSaver =
-  typeof window !== 'undefined' ? require('streamsaver') : null
-if (typeof window !== 'undefined') {
-  streamSaver.mitm = baseURL + '/stream.html'
-}
-
-function getZipFilename(): string {
-  return `filepizza-download-${Date.now()}.zip`
-}
-
 function cleanErrorMessage(errorMessage: string): string {
   if (errorMessage.startsWith('Could not connect to peer')) {
     return 'Could not connect to the uploader. Did they close their browser?'
@@ -47,51 +34,8 @@ function cleanErrorMessage(errorMessage: string): string {
   }
 }
 
-type DownloadFileStream = {
-  name: string
-  size: number
-  stream: () => ReadableStream<Uint8Array>
-}
-
-export async function streamDownloadSingleFile(
-  file: DownloadFileStream,
-): Promise<void> {
-  const fileStream = streamSaver.createWriteStream(file.name, {
-    size: file.size,
-  })
-
-  const writer = fileStream.getWriter()
-  const reader = file.stream().getReader()
-
-  const pump = async () => {
-    const res = await reader.read()
-    return res.done ? writer.close() : writer.write(res.value).then(pump)
-  }
-  await pump()
-}
-
-export function streamDownloadMultipleFiles(
-  files: Array<DownloadFileStream>,
-): Promise<void> {
-  const filename = getZipFilename()
-  const totalSize = files.reduce((acc, file) => acc + file.size, 0)
-  const fileStream = streamSaver.createWriteStream(filename, {
-    size: totalSize,
-  })
-
-  const readableZipStream = createZipStream({
-    start(ctrl) {
-      for (const file of files) {
-        ctrl.enqueue(file as unknown as ArrayBufferView)
-      }
-      ctrl.close()
-    },
-    async pull(_ctrl) {
-      // Gets executed everytime zip-stream asks for more data
-    },
-  })
-
-  return readableZipStream.pipeTo(fileStream)
+function getZipFilename(): string {
+  return `filepizza-download-${Date.now()}.zip`
 }
 
 export default function Downloader({
@@ -288,9 +232,13 @@ export default function Downloader({
 
     let downloadPromise: Promise<void> | null = null
     if (downloads.length > 1) {
-      downloadPromise = streamDownloadMultipleFiles(downloads)
+      const zipFilename = getZipFilename()
+      downloadPromise = streamDownloadMultipleFiles(downloads, zipFilename)
     } else if (downloads.length === 1) {
-      downloadPromise = streamDownloadSingleFile(downloads[0])
+      downloadPromise = streamDownloadSingleFile(
+        downloads[0],
+        downloads[0].name,
+      )
     } else {
       throw new Error('no files to download')
     }
@@ -320,40 +268,46 @@ export default function Downloader({
 
   if (done && filesInfo) {
     return (
-      <div className="flex flex-col space-y-5 w-full">
+      <>
         <TitleText>You downloaded {filesInfo.length} files.</TitleText>
-        <UploadFileList files={filesInfo} />
-        <div className="w-full">
-          <ProgressBar value={bytesDownloaded} max={totalSize} />
+        <div className="flex flex-col space-y-5 w-full">
+          <UploadFileList files={filesInfo} />
+          <div className="w-full">
+            <ProgressBar value={bytesDownloaded} max={totalSize} />
+          </div>
         </div>
-      </div>
+      </>
     )
   }
 
   if (downloading && filesInfo) {
     return (
-      <div className="flex flex-col space-y-5 w-full">
+      <>
         <TitleText>
           You are about to start downloading {filesInfo.length} files.
         </TitleText>
-        <UploadFileList files={filesInfo} />
-        <div className="w-full">
-          <ProgressBar value={bytesDownloaded} max={totalSize} />
+        <div className="flex flex-col space-y-5 w-full">
+          <UploadFileList files={filesInfo} />
+          <div className="w-full">
+            <ProgressBar value={bytesDownloaded} max={totalSize} />
+          </div>
+          <StopButton onClick={handleStopDownload} isDownloading />
         </div>
-        <StopButton onClick={handleStopDownload} isDownloading />
-      </div>
+      </>
     )
   }
 
   if (open && filesInfo) {
     return (
-      <div className="flex flex-col space-y-5 w-full">
+      <>
         <TitleText>
           You are about to start downloading {filesInfo.length} files.
         </TitleText>
-        <UploadFileList files={filesInfo} />
-        <DownloadButton onClick={handleStartDownload} />
-      </div>
+        <div className="flex flex-col space-y-5 w-full">
+          <UploadFileList files={filesInfo} />
+          <DownloadButton onClick={handleStartDownload} />
+        </div>
+      </>
     )
   }
 
