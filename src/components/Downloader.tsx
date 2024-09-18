@@ -21,6 +21,7 @@ import UploadFileList from './UploadFileList'
 import DownloadButton from './DownloadButton'
 import StopButton from './StopButton'
 import ProgressBar from './ProgressBar'
+import TitleText from './TitleText'
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
 
@@ -315,9 +316,7 @@ export default function Downloader({
   if (done && filesInfo) {
     return (
       <div className="flex flex-col space-y-5 w-full">
-        <p className="text-description">
-          You downloaded {filesInfo.length} files.
-        </p>
+        <TitleText>You downloaded {filesInfo.length} files.</TitleText>
         <UploadFileList files={filesInfo} />
         <div className="w-full">
           <ProgressBar value={bytesDownloaded} max={totalSize} />
@@ -329,9 +328,9 @@ export default function Downloader({
   if (downloading && filesInfo) {
     return (
       <div className="flex flex-col space-y-5 w-full">
-        <p className="text-description">
+        <TitleText>
           You are about to start downloading {filesInfo.length} files.
-        </p>
+        </TitleText>
         <UploadFileList files={filesInfo} />
         <div className="w-full">
           <ProgressBar value={bytesDownloaded} max={totalSize} />
@@ -344,9 +343,9 @@ export default function Downloader({
   if (open && filesInfo) {
     return (
       <div className="flex flex-col space-y-5 w-full">
-        <p className="text-description">
+        <TitleText>
           You are about to start downloading {filesInfo.length} files.
-        </p>
+        </TitleText>
         <UploadFileList files={filesInfo} />
         <DownloadButton onClick={handleStartDownload} />
       </div>
@@ -371,9 +370,9 @@ export default function Downloader({
     >
       <div className="flex flex-col space-y-5 w-full">
         {errorMessage ? (
-          <p className="text-description-error">{errorMessage}</p>
+          <TitleText>{errorMessage}</TitleText>
         ) : (
-          <p className="text-description">This download requires a password.</p>
+          <TitleText>This download requires a password.</TitleText>
         )}
         <PasswordField
           value={password}

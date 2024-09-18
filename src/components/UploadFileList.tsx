@@ -8,30 +8,23 @@ type UploadedFileLike = {
 
 export default function UploadFileList({
   files,
-  onChange,
+  onRemove,
 }: {
   files: UploadedFileLike[]
-  onChange?: (updatedFiles: UploadedFileLike[]) => void
+  onRemove?: (index: number) => void
 }): JSX.Element {
-  function handleRemove(index: number): void {
-    if (onChange) {
-      const updatedFiles = files.filter((_, i) => i !== index)
-      onChange(updatedFiles)
-    }
-  }
-
   const items = files.map((f: UploadedFileLike, i: number) => (
     <div
       key={f.fileName}
-      className="w-full border border-stone-300 rounded-md mb-2 group"
+      className={`w-full border-b border-stone-300 last:border-0`}
     >
       <div className="flex justify-between items-center py-2 px-2.5">
         <p className="truncate text-sm font-medium">{f.fileName}</p>
         <div className="flex items-center">
           <TypeBadge type={f.type} />
-          {onChange && (
+          {onRemove && (
             <button
-              onClick={() => handleRemove(i)}
+              onClick={() => onRemove?.(i)}
               className="text-stone-500 hover:text-stone-700 focus:outline-none"
             >
               ✕
@@ -42,5 +35,9 @@ export default function UploadFileList({
     </div>
   ))
 
-  return <div className="w-full">{items}</div>
+  return (
+    <div className="w-full border border-stone-300 rounded-md shadow-sm">
+      {items}
+    </div>
+  )
 }

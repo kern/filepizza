@@ -14,6 +14,8 @@ import Wordmark from '../components/Wordmark'
 import CancelButton from '../components/CancelButton'
 import { useMemo } from 'react'
 import { getFileName } from '../fs'
+import TitleText from '../components/TitleText'
+import SubtitleText from '../components/SubtitleText'
 
 const queryClient = new QueryClient()
 
@@ -26,7 +28,7 @@ function PageWrapper({
 }): JSX.Element {
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex flex-col items-center space-y-5 py-10 max-w-2xl mx-auto">
+      <div className="flex flex-col items-center space-y-5 py-10 max-w-2xl mx-auto px-4">
         <Spinner direction="up" isRotating={isRotating} />
         <Wordmark />
         {children}
@@ -43,12 +45,10 @@ function InitialState({
   return (
     <PageWrapper>
       <div className="flex flex-col items-center space-y-1 max-w-md">
-        <p className="text-lg text-center text-stone-800">
-          Peer-to-peer file transfers in your browser.
-        </p>
-        <p className="text-sm text-center text-stone-600">
+        <TitleText>Peer-to-peer file transfers in your browser.</TitleText>
+        <SubtitleText>
           We never store anything. Files only served fresh.
-        </p>
+        </SubtitleText>
       </div>
       <DropZone onDrop={onDrop} />
     </PageWrapper>
@@ -70,23 +70,23 @@ function ConfirmUploadState({
   onChangePassword,
   onCancel,
   onStart,
-  onFileListChange,
+  onRemoveFile,
 }: {
   uploadedFiles: UploadedFile[]
   password: string
   onChangePassword: (pw: string) => void
   onCancel: () => void
   onStart: () => void
-  onFileListChange: (updatedFiles: UploadedFile[]) => void
+  onRemoveFile: (index: number) => void
 }): JSX.Element {
   const fileListData = useUploaderFileListData(uploadedFiles)
   return (
     <PageWrapper>
-      <p className="text-lg text-center text-stone-800 max-w-md">
+      <TitleText>
         You are about to start uploading {uploadedFiles.length}{' '}
         {uploadedFiles.length === 1 ? 'file' : 'files'}.
-      </p>
-      <UploadFileList files={fileListData} onChange={onFileListChange} />
+      </TitleText>
+      <UploadFileList files={fileListData} onRemove={onRemoveFile} />
       <PasswordField value={password} onChange={onChangePassword} />
       <div className="flex space-x-4">
         <CancelButton onClick={onCancel} />
@@ -108,10 +108,10 @@ function UploadingState({
   const fileListData = useUploaderFileListData(uploadedFiles)
   return (
     <PageWrapper isRotating={true}>
-      <p className="text-lg text-center text-stone-800 max-w-md">
+      <TitleText>
         You are uploading {uploadedFiles.length}{' '}
         {uploadedFiles.length === 1 ? 'file' : 'files'}.
-      </p>
+      </TitleText>
       <UploadFileList files={fileListData} />
       <WebRTCProvider>
         <Uploader files={uploadedFiles} password={password} onStop={onStop} />
@@ -146,8 +146,8 @@ export default function UploadPage(): JSX.Element {
     setUploading(false)
   }, [])
 
-  const handleFileListChange = useCallback((updatedFiles: UploadedFile[]) => {
-    setUploadedFiles(updatedFiles)
+  const handleRemoveFile = useCallback((index: number) => {
+    setUploadedFiles((fs) => fs.filter((_, i) => i !== index))
   }, [])
 
   if (!uploadedFiles.length) {
@@ -162,7 +162,7 @@ export default function UploadPage(): JSX.Element {
         onChangePassword={handleChangePassword}
         onCancel={handleCancel}
         onStart={handleStart}
-        onFileListChange={handleFileListChange}
+        onRemoveFile={handleRemoveFile}
       />
     )
   }
