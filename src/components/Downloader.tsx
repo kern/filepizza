@@ -362,26 +362,30 @@ export default function Downloader({
   }
 
   return (
-    <form
-      action="#"
-      method="post"
-      onSubmit={handleSubmitPassword}
-      className="w-full"
-    >
+    <>
+      {errorMessage ? (
+        <TitleText>{errorMessage}</TitleText>
+      ) : (
+        <TitleText>This download requires a password.</TitleText>
+      )}
       <div className="flex flex-col space-y-5 w-full">
-        {errorMessage ? (
-          <TitleText>{errorMessage}</TitleText>
-        ) : (
-          <TitleText>This download requires a password.</TitleText>
-        )}
-        <PasswordField
-          value={password}
-          onChange={setPassword}
-          isRequired
-          isInvalid={Boolean(errorMessage)}
-        />
-        <UnlockButton onClick={handleSubmitPassword} />
+        <form
+          action="#"
+          method="post"
+          onSubmit={handleSubmitPassword}
+          className="w-full"
+        >
+          <div className="flex flex-col space-y-5 w-full">
+            <PasswordField
+              value={password}
+              onChange={setPassword}
+              isRequired
+              isInvalid={Boolean(errorMessage)}
+            />
+            <UnlockButton onClick={handleSubmitPassword} />
+          </div>
+        </form>
       </div>
-    </form>
+    </>
   )
 }
