@@ -18,14 +18,14 @@ export default function UploadFileList({
       key={f.fileName}
       className={`w-full border-b border-stone-300 last:border-0`}
     >
-      <div className="flex justify-between items-center py-2 px-2.5">
+      <div className="flex justify-between items-center py-2 pl-3 pr-2">
         <p className="truncate text-sm font-medium">{f.fileName}</p>
-        <div className="flex items-center">
+        <div className="flex items-end">
           <TypeBadge type={f.type} />
           {onRemove && (
             <button
               onClick={() => onRemove?.(i)}
-              className="text-stone-500 hover:text-stone-700 focus:outline-none"
+              className="text-stone-500 hover:text-stone-700 focus:outline-none pl-3 pr-1"
             >
               ✕
             </button>

@@ -16,6 +16,7 @@ import { useMemo } from 'react'
 import { getFileName } from '../fs'
 import TitleText from '../components/TitleText'
 import SubtitleText from '../components/SubtitleText'
+import { pluralize } from '../utils/pluralize'
 
 const queryClient = new QueryClient()
 
@@ -83,8 +84,8 @@ function ConfirmUploadState({
   return (
     <PageWrapper>
       <TitleText>
-        You are about to start uploading {uploadedFiles.length}{' '}
-        {uploadedFiles.length === 1 ? 'file' : 'files'}.
+        You are about to start uploading{' '}
+        {pluralize(uploadedFiles.length, 'file', 'files')}.
       </TitleText>
       <UploadFileList files={fileListData} onRemove={onRemoveFile} />
       <PasswordField value={password} onChange={onChangePassword} />
@@ -109,8 +110,7 @@ function UploadingState({
   return (
     <PageWrapper isRotating={true}>
       <TitleText>
-        You are uploading {uploadedFiles.length}{' '}
-        {uploadedFiles.length === 1 ? 'file' : 'files'}.
+        You are uploading {pluralize(uploadedFiles.length, 'file', 'files')}.
       </TitleText>
       <UploadFileList files={fileListData} />
       <WebRTCProvider>

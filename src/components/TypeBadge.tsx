@@ -11,9 +11,9 @@ function getTypeColor(fileType: string): string {
 export default function TypeBadge({ type }: { type: string }): JSX.Element {
   return (
     <span
-      className={`px-2 py-1 text-xs font-semibold rounded-full ${getTypeColor(
+      className={`px-2 py-1 text-[10px] font-semibold rounded ${getTypeColor(
         type,
-      )} transition-all duration-300 mr-2`}
+      )} transition-all duration-300`}
     >
       {type}
     </span>
