@@ -7,6 +7,7 @@ export enum UploaderConnectionStatus {
   Paused = 'PAUSED',
   Uploading = 'UPLOADING',
   Done = 'DONE',
+  Authenticating = 'AUTHENTICATING',
   InvalidPassword = 'INVALID_PASSWORD',
   Closed = 'CLOSED',
 }

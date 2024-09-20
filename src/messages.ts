@@ -57,6 +57,7 @@ export const ErrorMessage = z.object({
 
 export const PasswordRequiredMessage = z.object({
   type: z.literal(MessageType.PasswordRequired),
+  errorMessage: z.string().optional(),
 })
 
 export const UsePasswordMessage = z.object({

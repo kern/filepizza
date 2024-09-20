@@ -11,6 +11,7 @@ import StopButton from './StopButton'
 import ProgressBar from './ProgressBar'
 import TitleText from './TitleText'
 import ReturnHome from './ReturnHome'
+import { pluralize } from '../utils/pluralize'
 
 interface FileInfo {
   fileName: string
@@ -29,7 +30,9 @@ export function DownloadComplete({
 }): JSX.Element {
   return (
     <>
-      <TitleText>You downloaded {filesInfo.length} files.</TitleText>
+      <TitleText>
+        You downloaded {pluralize(filesInfo.length, 'file', 'files')}.
+      </TitleText>
       <div className="flex flex-col space-y-5 w-full">
         <UploadFileList files={filesInfo} />
         <div className="w-full">
@@ -55,14 +58,16 @@ export function DownloadInProgress({
   return (
     <>
       <TitleText>
-        You are about to start downloading {filesInfo.length} files.
+        You are downloading {pluralize(filesInfo.length, 'file', 'files')}.
       </TitleText>
       <div className="flex flex-col space-y-5 w-full">
         <UploadFileList files={filesInfo} />
         <div className="w-full">
           <ProgressBar value={bytesDownloaded} max={totalSize} />
         </div>
-        <StopButton onClick={onStop} isDownloading />
+        <div className="flex justify-center w-full">
+          <StopButton onClick={onStop} isDownloading />
+        </div>
       </div>
     </>
   )
@@ -78,7 +83,8 @@ export function ReadyToDownload({
   return (
     <>
       <TitleText>
-        You are about to start downloading {filesInfo.length} files.
+        You are about to start downloading{' '}
+        {pluralize(filesInfo.length, 'file', 'files')}.
       </TitleText>
       <div className="flex flex-col space-y-5 w-full">
         <UploadFileList files={filesInfo} />
@@ -106,9 +112,7 @@ export function PasswordEntry({
 
   return (
     <>
-      <TitleText>
-        {errorMessage || 'This download requires a password.'}
-      </TitleText>
+      <TitleText>This download requires a password.</TitleText>
       <div className="flex flex-col space-y-5 w-full">
         <form
           action="#"
@@ -127,6 +131,14 @@ export function PasswordEntry({
           </div>
         </form>
       </div>
+      {errorMessage && (
+        <div
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+          role="alert"
+        >
+          <span className="block sm:inline">{errorMessage}</span>
+        </div>
+      )}
     </>
   )
 }

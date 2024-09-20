@@ -37,7 +37,6 @@ export function useDownloader(uploaderPeerID: string): {
   bytesDownloaded: number
 } {
   const peer = useWebRTC()
-  const [password, setPassword] = useState('')
   const [dataConnection, setDataConnection] = useState<DataConnection | null>(
     null,
   )
@@ -50,11 +49,11 @@ export function useDownloader(uploaderPeerID: string): {
     ((message: z.infer<typeof ChunkMessage>) => void) | null
   >(null)
   const [isConnected, setIsConnected] = useState(false)
-  const [isDownloading, setDownloading] = useState(false)
+  const [isPasswordRequired, setIsPasswordRequired] = useState(false)
+  const [isDownloading, setIsDownloading] = useState(false)
   const [isDone, setDone] = useState(false)
   const [bytesDownloaded, setBytesDownloaded] = useState(0)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [isPasswordRequired, setIsPasswordRequired] = useState(false)
 
   useEffect(() => {
     const conn = peer.connect(uploaderPeerID, { reliable: true })
@@ -79,6 +78,7 @@ export function useDownloader(uploaderPeerID: string): {
         switch (message.type) {
           case MessageType.PasswordRequired:
             setIsPasswordRequired(true)
+            if (message.errorMessage) setErrorMessage(message.errorMessage)
             break
           case MessageType.Info:
             setFilesInfo(message.files)
@@ -100,7 +100,7 @@ export function useDownloader(uploaderPeerID: string): {
     const handleClose = () => {
       setDataConnection(null)
       setIsConnected(false)
-      setDownloading(false)
+      setIsDownloading(false)
     }
 
     const handleError = (err: Error) => {
@@ -124,7 +124,7 @@ export function useDownloader(uploaderPeerID: string): {
       conn.off('close', handleClose)
       peer.off('error', handleError)
     }
-  }, [peer, password, uploaderPeerID])
+  }, [peer, uploaderPeerID])
 
   const submitPassword = useCallback(
     (pass: string) => {
@@ -134,12 +134,12 @@ export function useDownloader(uploaderPeerID: string): {
         password: pass,
       } as z.infer<typeof Message>)
     },
-    [dataConnection, password],
+    [dataConnection],
   )
 
   const startDownload = useCallback(() => {
     if (!filesInfo || !dataConnection) return
-    setDownloading(true)
+    setIsDownloading(true)
 
     const fileStreamByPath: Record<
       string,
@@ -213,8 +213,23 @@ export function useDownloader(uploaderPeerID: string): {
   }, [dataConnection, filesInfo])
 
   const stopDownload = useCallback(() => {
-    // TODO(@kern): Implement me
-  }, [])
+    // TODO(@kern): Continue here with stop / pause logic
+    if (dataConnection) {
+      dataConnection.send({ type: MessageType.Pause } as z.infer<
+        typeof Message
+      >)
+      dataConnection.close()
+    }
+    setIsDownloading(false)
+    setDone(false)
+    setBytesDownloaded(0)
+    setErrorMessage(null)
+    // fileStreams.forEach((stream) => stream.cancel())
+    // fileStreams.length = 0
+    // Object.values(fileStreamByPath).forEach((stream) => stream.cancel())
+    // Object.keys(fileStreamByPath).forEach((key) => delete fileStreamByPath[key])
+    //   }, [dataConnection, fileStreams, fileStreamByPath])
+  }, [dataConnection])
 
   return {
     filesInfo,

@@ -57,13 +57,19 @@ export function useUploaderConnections(
           const message = decodeMessage(data)
           switch (message.type) {
             case MessageType.RequestInfo: {
-              if (password) {
-                // TODO(@kern): Check password
-                const request: Message = {
-                  type: MessageType.Error,
-                  error: 'Invalid password',
-                }
+              const newConnectionState = {
+                browserName: message.browserName,
+                browserVersion: message.browserVersion,
+                osName: message.osName,
+                osVersion: message.osVersion,
+                mobileVendor: message.mobileVendor,
+                mobileModel: message.mobileModel,
+              }
 
+              if (password) {
+                const request: Message = {
+                  type: MessageType.PasswordRequired,
+                }
                 conn.send(request)
 
                 updateConnection((draft) => {
@@ -73,13 +79,8 @@ export function useUploaderConnections(
 
                   return {
                     ...draft,
-                    status: UploaderConnectionStatus.InvalidPassword,
-                    browserName: message.browserName,
-                    browserVersion: message.browserVersion,
-                    osName: message.osName,
-                    osVersion: message.osVersion,
-                    mobileVendor: message.mobileVendor,
-                    mobileModel: message.mobileModel,
+                    ...newConnectionState,
+                    status: UploaderConnectionStatus.Authenticating,
                   }
                 })
 
@@ -93,13 +94,8 @@ export function useUploaderConnections(
 
                 return {
                   ...draft,
+                  ...newConnectionState,
                   status: UploaderConnectionStatus.Paused,
-                  browserName: message.browserName,
-                  browserVersion: message.browserVersion,
-                  osName: message.osName,
-                  osVersion: message.osVersion,
-                  mobileVendor: message.mobileVendor,
-                  mobileModel: message.mobileModel,
                 }
               })
 
@@ -117,6 +113,57 @@ export function useUploaderConnections(
               }
 
               conn.send(request)
+              break
+            }
+
+            case MessageType.UsePassword: {
+              const { password: submittedPassword } = message
+              if (submittedPassword === password) {
+                updateConnection((draft) => {
+                  if (
+                    draft.status !== UploaderConnectionStatus.Authenticating
+                  ) {
+                    return draft
+                  }
+
+                  return {
+                    ...draft,
+                    status: UploaderConnectionStatus.Paused,
+                  }
+                })
+
+                const fileInfo = files.map((f) => ({
+                  fileName: getFileName(f),
+                  size: f.size,
+                  type: f.type,
+                }))
+
+                const request: Message = {
+                  type: MessageType.Info,
+                  files: fileInfo,
+                }
+
+                conn.send(request)
+              } else {
+                updateConnection((draft) => {
+                  if (
+                    draft.status !== UploaderConnectionStatus.Authenticating
+                  ) {
+                    return draft
+                  }
+
+                  return {
+                    ...draft,
+                    status: UploaderConnectionStatus.InvalidPassword,
+                  }
+                })
+
+                const request: Message = {
+                  type: MessageType.PasswordRequired,
+                  errorMessage: 'Invalid password',
+                }
+                conn.send(request)
+              }
               break
             }
 
