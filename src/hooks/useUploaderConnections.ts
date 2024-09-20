@@ -57,7 +57,8 @@ export function useUploaderConnections(
           const message = decodeMessage(data)
           switch (message.type) {
             case MessageType.RequestInfo: {
-              if (message.password !== password) {
+              if (password) {
+                // TODO(@kern): Check password
                 const request: Message = {
                   type: MessageType.Error,
                   error: 'Invalid password',

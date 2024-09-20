@@ -7,6 +7,8 @@ export enum MessageType {
   Chunk = 'Chunk',
   Done = 'Done',
   Error = 'Error',
+  PasswordRequired = 'PasswordRequired',
+  UsePassword = 'UsePassword',
 }
 
 export const RequestInfoMessage = z.object({
@@ -17,7 +19,6 @@ export const RequestInfoMessage = z.object({
   osVersion: z.string(),
   mobileVendor: z.string(),
   mobileModel: z.string(),
-  password: z.string(),
 })
 
 export const InfoMessage = z.object({
@@ -54,6 +55,15 @@ export const ErrorMessage = z.object({
   error: z.string(),
 })
 
+export const PasswordRequiredMessage = z.object({
+  type: z.literal(MessageType.PasswordRequired),
+})
+
+export const UsePasswordMessage = z.object({
+  type: z.literal(MessageType.UsePassword),
+  password: z.string(),
+})
+
 export const Message = z.discriminatedUnion('type', [
   RequestInfoMessage,
   InfoMessage,
@@ -61,6 +71,8 @@ export const Message = z.discriminatedUnion('type', [
   ChunkMessage,
   DoneMessage,
   ErrorMessage,
+  PasswordRequiredMessage,
+  UsePasswordMessage,
 ])
 
 export type Message = z.infer<typeof Message>
