@@ -1,6 +1,8 @@
 import React from 'react'
 import Footer from '../components/Footer'
 import '../styles.css'
+import { ThemeProvider } from '../components/ThemeProvider'
+import { ModeToggle } from '../components/ModeToggle'
 
 export const metadata = {
   title: 'FilePizza • Your files, delivered.',
@@ -21,13 +23,16 @@ export default function RootLayout({
   children: React.ReactNode
 }): React.ReactElement {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="monetization" content="$twitter.xrptipbot.com/kernio" />
       </head>
       <body>
-        <main>{children}</main>
-        <Footer />
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <main>{children}</main>
+          <Footer />
+          <ModeToggle />
+        </ThemeProvider>
       </body>
     </html>
   )

@@ -5,7 +5,11 @@ interface SubtitleTextProps {
 }
 
 const SubtitleText: React.FC<SubtitleTextProps> = ({ children }) => {
-  return <p className="text-sm text-center text-stone-600">{children}</p>
+  return (
+    <p className="text-sm text-center text-stone-600 dark:text-stone-400">
+      {children}
+    </p>
+  )
 }
 
 export default SubtitleText

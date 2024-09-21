@@ -49,9 +49,9 @@ export default function Uploader({
           <CopyableInput label="Short URL" value={shortURL ?? ''} />
         </div>
       </div>
-      <div className="mt-6 pt-4 border-t border-gray-200 w-full">
+      <div className="mt-6 pt-4 border-t border-stone-200 dark:border-stone-700 w-full">
         <div className="flex justify-between items-center mb-2">
-          <h2 className="text-lg font-semibold text-stone-400">
+          <h2 className="text-lg font-semibold text-stone-400 dark:text-stone-200">
             {activeDownloaders} Downloading, {connections.length} Total
           </h2>
           <StopButton onClick={onStop} />

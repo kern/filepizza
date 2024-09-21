@@ -67,7 +67,7 @@ export function WebRTCProvider({
   }, [servers])
 
   if (!loaded || !peer.current) {
-    return <Loading text="Initializing WebRTC" />
+    return <Loading text="Initializing WebRTC connection..." />
   }
 
   return (
