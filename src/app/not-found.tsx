@@ -13,7 +13,7 @@ export default async function NotFound(): Promise<JSX.Element> {
     <div className="flex flex-col items-center space-y-5 py-10 max-w-2xl mx-auto">
       <Spinner direction="up" />
       <Wordmark />
-      <TitleText>404: Looks like this slice of FilePizza is missing!</TitleText>
+      <TitleText>404: This slice of FilePizza is missing!</TitleText>
       <ReturnHome />
     </div>
   )
