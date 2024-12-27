@@ -24,9 +24,8 @@ export default function Uploader({
   onStop: () => void
 }): JSX.Element {
   const peer = useWebRTC()
-  const uploadID = useRef(crypto.randomUUID())
   const { isLoading, error, longSlug, shortSlug, longURL, shortURL } =
-    useUploaderChannel(uploadID.current)
+    useUploaderChannel(peer.id)
   const connections = useUploaderConnections(peer, files, password)
 
   if (isLoading || !longSlug || !shortSlug) {

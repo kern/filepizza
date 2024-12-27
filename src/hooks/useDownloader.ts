@@ -15,7 +15,6 @@ import {
   mobileVendor,
   mobileModel,
 } from 'react-device-detect'
-import { useQuery, useMutation } from '@tanstack/react-query'
 const cleanErrorMessage = (errorMessage: string): string =>
   errorMessage.startsWith('Could not connect to peer')
     ? 'Could not connect to the uploader. Did they close their browser?'
@@ -23,7 +22,7 @@ const cleanErrorMessage = (errorMessage: string): string =>
 
 const getZipFilename = (): string => `filepizza-download-${Date.now()}.zip`
 
-export function useDownloader(slug: string): {
+export function useDownloader(uploaderPeerID: string): {
   filesInfo: Array<{ fileName: string; size: number; type: string }> | null
   isConnected: boolean
   isPasswordRequired: boolean
@@ -55,98 +54,10 @@ export function useDownloader(slug: string): {
   const [bytesDownloaded, setBytesDownloaded] = useState(0)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const {
-    isLoading: offerLoading,
-    error: offerError,
-    data: offerData,
-  } = useQuery({
-    queryKey: ['offer', slug],
-    queryFn: async () => {
-      const offer = await peer.createOffer()
-      const response = await fetch('/api/offer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug, offer }),
-      })
-      if (!response.ok) {
-        throw new Error('Could not offer connection to uploader')
-      }
-      const data = await response.json()
-      return { offerID: data.offerID, offer }
-    },
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    staleTime: Infinity,
-  })
-
-  const answerCheckMutation = useMutation({
-    mutationFn: async (body: { slug: string, offerID: string }) => {
-      const response = await fetch(`/api/answer?slug=${body.slug}&offerID=${body.offerID}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      })
-      if (!response.ok) {
-        throw new Error('Network response was not ok')
-      }
-      return response.json()
-    }
-  })
-
   useEffect(() => {
-    if (!offerData || isConnected) return
-
-    let timeout: NodeJS.Timeout | null = null
-
-    const run = (): void => {
-      timeout = setTimeout(() => {
-        console.log('Checking for answer', offerData)
-        answerCheckMutation.mutate(
-          { slug, offerID: offerData?.offerID },
-          {
-            onSuccess: (data) => {
-              if (data.answer) {
-                console.log('Answer check success', data)
-                setIsConnected(true)
-                if (timeout) clearTimeout(timeout)
-
-                peer.setRemoteDescription(data.answer).then(() => {
-                  peer.addIceCandidate()
-                  const conn = peer.createDataChannel('download')
-                  conn.onopen = () => {
-                    console.log('Connection opened')
-                  }
-                  conn.onerror = (e) => {
-                    console.error('Error setting remote description', e)
-                  }
-                  conn.onclose = () => {
-                    console.log('Connection closed')
-                  }
-                }).catch((e) => {
-                  console.error('Error setting remote description', e)
-                })
-              }
-            },
-            onError: (e) => {
-              console.error('Error checking for answer', e)
-            },
-          },
-        )
-        run()
-      }, 1000)
-    }
-
-    run()
-
-    return () => {
-      if (timeout) clearTimeout(timeout)
-    }
-  }, [offerData, isConnected])
-
-  useEffect(() => {
-    return
-    // const conn = peer.connect(slug, { reliable: true })
-    // setDataConnection(conn)
+    if (!peer) return
+    const conn = peer.connect(uploaderPeerID, { reliable: true })
+    setDataConnection(conn)
 
     const handleOpen = () => {
       setIsConnected(true)

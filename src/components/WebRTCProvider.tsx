@@ -1,25 +1,14 @@
 'use client'
 
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useRef } from 'react'
 import Loading from './Loading'
-
-export type WebRTCValue = {
-  createOffer: () => Promise<RTCSessionDescriptionInit>
-  createAnswer: (
-    offer: RTCSessionDescriptionInit,
-  ) => Promise<RTCSessionDescriptionInit>
-  setRemoteDescription: (
-    description: RTCSessionDescriptionInit,
-  ) => Promise<void>
-  addIceCandidate: (candidate: RTCIceCandidateInit) => Promise<void>
-  onIceCandidate: (handler: (candidate: RTCIceCandidate | null) => void) => void
-  onDataChannel: (handler: (channel: RTCDataChannel) => void) => void
-  createDataChannel: (label: string) => RTCDataChannel
-}
+import Peer from 'peerjs'
 
 const ICE_SERVERS: RTCConfiguration = {
-  iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+  iceServers: [{ urls: process.env.NEXT_PUBLIC_STUN_SERVER ?? 'stun:stun.l.google.com:19302' }],
 }
+
+export type WebRTCValue = Peer
 
 const WebRTCContext = React.createContext<WebRTCValue | null>(null)
 
@@ -31,57 +20,53 @@ export const useWebRTC = (): WebRTCValue => {
   return value
 }
 
+let globalPeer: Peer | null = null
+
+async function getPeer(): Promise<Peer> {
+  if (!globalPeer) {
+    globalPeer = new Peer({
+      config: ICE_SERVERS,
+    })
+  }
+
+  if (globalPeer.id) {
+    return globalPeer
+  }
+
+  await new Promise<void>((resolve) => {
+    globalPeer?.on('open', (id) => {
+      console.log('[WebRTCProvider] Peer ID:', id)
+      resolve()
+    })
+  })
+
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return globalPeer!
+}
+
 export function WebRTCProvider({
-  servers = ICE_SERVERS,
   children,
 }: {
-  servers?: RTCConfiguration
   children?: React.ReactNode
 }): JSX.Element {
-  const [peerConnection, setPeerConnection] =
-    useState<RTCPeerConnection | null>(null)
-  const [loaded, setLoaded] = useState(false)
+  const [peerConnection, setPeerConnection] = useState<Peer | null>(globalPeer)
 
   useEffect(() => {
-    const pc = new RTCPeerConnection(servers)
-    setPeerConnection(pc)
-    setLoaded(true)
+    getPeer().then((pc) => {
+      setPeerConnection(pc)
+    })
 
     return () => {
-      pc.close()
+      setPeerConnection(null)
     }
-  }, [servers])
+  }, [])
 
-  if (!loaded || !peerConnection) {
+  if (!peerConnection) {
     return <Loading text="Initializing WebRTC connection..." />
   }
 
-  const webRTCValue: WebRTCValue = {
-    createOffer: async () => {
-      const offer = await peerConnection.createOffer()
-      await peerConnection.setLocalDescription(offer)
-      return offer
-    },
-    createAnswer: async (offer) => {
-      await peerConnection.setRemoteDescription(offer)
-      const answer = await peerConnection.createAnswer()
-      await peerConnection.setLocalDescription(answer)
-      return answer
-    },
-    setRemoteDescription: (description) =>
-      peerConnection.setRemoteDescription(description),
-    addIceCandidate: (candidate) => peerConnection.addIceCandidate(candidate),
-    onIceCandidate: (handler) => {
-      peerConnection.onicecandidate = (event) => handler(event.candidate)
-    },
-    onDataChannel: (handler) => {
-      peerConnection.ondatachannel = (event) => handler(event.channel)
-    },
-    createDataChannel: (label) => peerConnection.createDataChannel(label),
-  }
-
   return (
-    <WebRTCContext.Provider value={webRTCValue}>
+    <WebRTCContext.Provider value={peerConnection}>
       {children}
     </WebRTCContext.Provider>
   )

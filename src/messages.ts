@@ -5,6 +5,7 @@ export enum MessageType {
   Info = 'Info',
   Start = 'Start',
   Chunk = 'Chunk',
+  Pause = 'Pause',
   Done = 'Done',
   Error = 'Error',
   PasswordRequired = 'PasswordRequired',

@@ -286,10 +286,10 @@ export function useUploaderConnections(
       })
     }
 
-    // peer.on('connection', listener)
+    peer.on('connection', listener)
 
     return () => {
-      // peer.off('connection')
+      peer.off('connection', listener)
     }
   }, [peer, files, password])
 

@@ -1,6 +1,5 @@
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useEffect } from 'react'
-import { useWebRTC } from '../components/WebRTCProvider'
 
 function generateURL(slug: string): string {
   const hostPrefix =
@@ -14,7 +13,7 @@ function generateURL(slug: string): string {
 }
 
 export function useUploaderChannel(
-  uploadID: string,
+  uploaderPeerID: string,
   renewInterval = 5000,
 ): {
   isLoading: boolean
@@ -24,13 +23,13 @@ export function useUploaderChannel(
   longURL: string | undefined
   shortURL: string | undefined
 } {
-  const peer = useWebRTC()
   const { isLoading, error, data } = useQuery({
-    queryKey: ['uploaderChannel', uploadID],
+    queryKey: ['uploaderChannel', uploaderPeerID],
     queryFn: async () => {
       const response = await fetch('/api/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uploaderPeerID }),
       })
       if (!response.ok) {
         throw new Error('Network response was not ok')
@@ -86,22 +85,6 @@ export function useUploaderChannel(
       timeout = setTimeout(() => {
         renewMutation.mutate(
           { secret },
-          {
-            onSuccess: (d) => {
-              Object.entries(d.offers).forEach(async ([offerID, offer]) => {
-                try {
-                  const answer = await peer.createAnswer(offer as RTCSessionDescriptionInit)
-                  peer.onDataChannel((channel) => {
-                    console.log('Data channel opened', channel)
-                  })
-                  console.log('Created answer:', answer)
-                  answerMutation.mutate({ offerID, answer })
-                } catch (e) {
-                  console.error('Error creating answer:', e)
-                }
-              })
-            },
-          },
         )
         run()
       }, renewInterval)
