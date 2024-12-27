@@ -17,7 +17,7 @@ const readDirectoryEntries = (reader: any): Promise<any[]> =>
 
 const scanDirectoryEntry = async (entry: any): Promise<File[]> => {
   const directoryReader = entry.createReader()
-  const result = []
+  const result: File[] = []
   // eslint-disable-next-line no-constant-condition
   while (true) {
     const subentries = await readDirectoryEntries(directoryReader)

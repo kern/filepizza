@@ -66,6 +66,10 @@ export const UsePasswordMessage = z.object({
   password: z.string(),
 })
 
+export const PauseMessage = z.object({
+  type: z.literal(MessageType.Pause),
+})
+
 export const Message = z.discriminatedUnion('type', [
   RequestInfoMessage,
   InfoMessage,
@@ -75,6 +79,7 @@ export const Message = z.discriminatedUnion('type', [
   ErrorMessage,
   PasswordRequiredMessage,
   UsePasswordMessage,
+  PauseMessage,
 ])
 
 export type Message = z.infer<typeof Message>

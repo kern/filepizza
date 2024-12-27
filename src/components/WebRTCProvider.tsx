@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useContext, useRef } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import Loading from './Loading'
 import Peer from 'peerjs'
 

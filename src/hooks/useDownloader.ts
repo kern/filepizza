@@ -215,9 +215,7 @@ export function useDownloader(uploaderPeerID: string): {
   const stopDownload = useCallback(() => {
     // TODO(@kern): Continue here with stop / pause logic
     if (dataConnection) {
-      dataConnection.send({ type: MessageType.Pause } as z.infer<
-        typeof Message
-      >)
+      dataConnection.send({ type: MessageType.Pause })
       dataConnection.close()
     }
     setIsDownloading(false)
