@@ -1,11 +1,10 @@
 'use client'
 
-import React from 'react'
+import React, { useRef } from 'react'
 import { UploadedFile, UploaderConnectionStatus } from '../types'
 import { useWebRTC } from './WebRTCProvider'
 import QRCode from 'react-qr-code'
 import Loading from './Loading'
-import { useUploaderChannelRenewal } from '../hooks/useUploaderChannelRenewal'
 import StopButton from './StopButton'
 import { useUploaderChannel } from '../hooks/useUploaderChannel'
 import { useUploaderConnections } from '../hooks/useUploaderConnections'
@@ -17,20 +16,19 @@ const QR_CODE_SIZE = 128
 export default function Uploader({
   files,
   password,
-  renewInterval = 5000,
   onStop,
 }: {
   files: UploadedFile[]
   password: string
-  renewInterval?: number
   onStop: () => void
 }): JSX.Element {
   const peer = useWebRTC()
-  const { longSlug, shortSlug, longURL, shortURL } = useUploaderChannel(peer.id)
-  useUploaderChannelRenewal(shortSlug, renewInterval)
+  const uploadID = useRef(crypto.randomUUID())
+  const { isLoading, error, longSlug, shortSlug, longURL, shortURL } =
+    useUploaderChannel(uploadID.current)
   const connections = useUploaderConnections(peer, files, password)
 
-  if (!longSlug || !shortSlug) {
+  if (isLoading || !longSlug || !shortSlug) {
     return <Loading text="Creating channel" />
   }
 

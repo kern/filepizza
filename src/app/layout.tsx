@@ -3,6 +3,7 @@ import Footer from '../components/Footer'
 import '../styles.css'
 import { ThemeProvider } from '../components/ThemeProvider'
 import { ModeToggle } from '../components/ModeToggle'
+import FilePizzaQueryClientProvider from '../components/QueryClientProvider'
 
 export const metadata = {
   title: 'FilePizza • Your files, delivered.',
@@ -29,9 +30,11 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <main>{children}</main>
-          <Footer />
-          <ModeToggle />
+          <FilePizzaQueryClientProvider>
+            <main>{children}</main>
+            <Footer />
+            <ModeToggle />
+          </FilePizzaQueryClientProvider>
         </ThemeProvider>
       </body>
     </html>

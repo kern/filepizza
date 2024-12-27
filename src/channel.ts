@@ -2,18 +2,30 @@ import 'server-only'
 import config from './config'
 import Redis from 'ioredis'
 import { generateShortSlug, generateLongSlug } from './slugs'
+import crypto from 'crypto'
+import { z } from 'zod'
 
 export type Channel = {
-  uploaderPeerID: string
+  secret?: string
   longSlug: string
   shortSlug: string
 }
 
+const ChannelSchema = z.object({
+  secret: z.string().optional(),
+  longSlug: z.string(),
+  shortSlug: z.string(),
+})
+
 export interface ChannelRepo {
-  create(uploaderPeerID: string, ttl?: number): Promise<Channel>
+  create(ttl?: number): Promise<Channel>
   fetch(slug: string): Promise<Channel | null>
-  renew(slug: string, ttl: number): Promise<void>
-  destroy(slug: string): Promise<void>
+  renew(
+    slug: string,
+    secret: string,
+    ttl: number,
+  ): Promise<RTCSessionDescriptionInit[]>
+  destroy(slug: string, secret: string): Promise<void>
 }
 
 export class RedisChannelRepo implements ChannelRepo {
@@ -23,15 +35,12 @@ export class RedisChannelRepo implements ChannelRepo {
     this.client = new Redis(redisURL)
   }
 
-  async create(
-    uploaderPeerID: string,
-    ttl: number = config.channel.ttl,
-  ): Promise<Channel> {
+  async create(ttl: number = config.channel.ttl): Promise<Channel> {
     const shortSlug = await this.generateShortSlug()
     const longSlug = await this.generateLongSlug()
 
     const channel: Channel = {
-      uploaderPeerID,
+      secret: crypto.randomUUID(),
       longSlug,
       shortSlug,
     }
@@ -43,38 +52,70 @@ export class RedisChannelRepo implements ChannelRepo {
     return channel
   }
 
-  async fetch(slug: string): Promise<Channel | null> {
+  async fetch(slug: string, scrubSecret = false): Promise<Channel | null> {
     const shortChannelStr = await this.client.get(this.getShortSlugKey(slug))
     if (shortChannelStr) {
-      return this.deserializeChannel(shortChannelStr)
+      return this.deserializeChannel(shortChannelStr, scrubSecret)
     }
 
     const longChannelStr = await this.client.get(this.getLongSlugKey(slug))
     if (longChannelStr) {
-      return this.deserializeChannel(longChannelStr)
+      return this.deserializeChannel(longChannelStr, scrubSecret)
     }
 
     return null
   }
 
-  async renew(slug: string, ttl: number = config.channel.ttl): Promise<void> {
+  async renew(
+    slug: string,
+    secret: string,
+    ttl: number = config.channel.ttl,
+  ): Promise<RTCSessionDescriptionInit[]> {
     const channel = await this.fetch(slug)
-    if (!channel) {
-      return
+    if (!channel || channel.secret !== secret) {
+      return []
     }
 
-    await this.client.expire(this.getShortSlugKey(channel.shortSlug), ttl)
     await this.client.expire(this.getLongSlugKey(channel.longSlug), ttl)
+    await this.client.expire(this.getShortSlugKey(channel.shortSlug), ttl)
+
+    const offerKey = this.getOfferKey(channel.shortSlug)
+    const offers = await this.client.lrange(offerKey, 0, -1)
+    if (offers.length > 0) {
+      return offers.map((offer) =>
+        JSON.parse(offer),
+      ) as RTCSessionDescriptionInit[]
+    }
+
+    return []
   }
 
-  async destroy(slug: string): Promise<void> {
+  async destroy(slug: string, secret: string): Promise<void> {
+    const channel = await this.fetch(slug)
+    if (!channel || channel.secret !== secret) {
+      return
+    }
+
+    await this.client.del(this.getLongSlugKey(channel.longSlug))
+    await this.client.del(this.getShortSlugKey(channel.shortSlug))
+  }
+
+  async offer(
+    slug: string,
+    offer: RTCSessionDescriptionInit,
+    ttl: number = config.channel.ttl,
+  ): Promise<void> {
     const channel = await this.fetch(slug)
     if (!channel) {
       return
     }
 
-    await this.client.del(channel.longSlug)
-    await this.client.del(channel.shortSlug)
+    const offerKey = this.getOfferKey(channel.shortSlug)
+    await this.client.rpush(offerKey, JSON.stringify(offer))
+    await this.client.expire(offerKey, ttl)
+
+    await this.client.expire(this.getLongSlugKey(channel.longSlug), ttl)
+    await this.client.expire(this.getShortSlugKey(channel.shortSlug), ttl)
   }
 
   private async generateShortSlug(): Promise<string> {
@@ -109,12 +150,22 @@ export class RedisChannelRepo implements ChannelRepo {
     return `long:${longSlug}`
   }
 
+  private getOfferKey(shortSlug: string): string {
+    return `offers:${shortSlug}`
+  }
+
   private serializeChannel(channel: Channel): string {
     return JSON.stringify(channel)
   }
 
-  private deserializeChannel(str: string): Channel {
-    return JSON.parse(str) as Channel
+  private deserializeChannel(str: string, scrubSecret = false): Channel {
+    const parsedChannel = JSON.parse(str)
+    const validatedChannel = ChannelSchema.parse(parsedChannel)
+    if (scrubSecret) {
+      return { ...validatedChannel, secret: undefined }
+    }
+
+    return validatedChannel
   }
 }
 

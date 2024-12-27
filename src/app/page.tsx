@@ -18,8 +18,6 @@ import TitleText from '../components/TitleText'
 import SubtitleText from '../components/SubtitleText'
 import { pluralize } from '../utils/pluralize'
 
-const queryClient = new QueryClient()
-
 function PageWrapper({
   children,
   isRotating = false,
@@ -28,13 +26,11 @@ function PageWrapper({
   isRotating?: boolean
 }): JSX.Element {
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className="flex flex-col items-center space-y-5 py-10 max-w-2xl mx-auto px-4">
-        <Spinner direction="up" isRotating={isRotating} />
-        <Wordmark />
-        {children}
-      </div>
-    </QueryClientProvider>
+    <div className="flex flex-col items-center space-y-5 py-10 max-w-2xl mx-auto px-4">
+      <Spinner direction="up" isRotating={isRotating} />
+      <Wordmark />
+      {children}
+    </div>
   )
 }
 

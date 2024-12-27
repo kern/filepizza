@@ -30,7 +30,7 @@ export default async function DownloadPage({
       <Spinner direction="down" />
       <Wordmark />
       <WebRTCProvider>
-        <Downloader uploaderPeerID={channel.uploaderPeerID} />
+        <Downloader slug={slug} />
       </WebRTCProvider>
     </div>
   )

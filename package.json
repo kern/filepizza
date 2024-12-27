@@ -10,7 +10,10 @@
     "build": "next build",
     "start": "next start",
     "start:peerjs": "./bin/peerjs.js",
-    "lint": "eslint 'src/**/*.ts[x]'"
+    "lint": "eslint 'src/**/*.ts[x]'",
+    "docker:build": "docker build -t kern/filepizza .",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\""
   },
   "repository": {
     "type": "git",
@@ -37,7 +40,6 @@
     "react-qr-code": "^2.0.15",
     "streamsaver": "^2.0.6",
     "tailwindcss": "^3.4.10",
-    "twilio": "^2.11.1",
     "web-streams-polyfill": "^3.3.3",
     "webrtcsupport": "^2.2.0",
     "zod": "^3.23.8"

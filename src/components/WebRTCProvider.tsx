@@ -1,20 +1,24 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useContext } from 'react'
-import type { default as PeerType } from 'peerjs'
+import React, { useState, useEffect, useContext } from 'react'
 import Loading from './Loading'
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const Peer = typeof window !== 'undefined' ? require('peerjs').default : null
-
-export type WebRTCValue = PeerType
+export type WebRTCValue = {
+  createOffer: () => Promise<RTCSessionDescriptionInit>
+  createAnswer: (
+    offer: RTCSessionDescriptionInit,
+  ) => Promise<RTCSessionDescriptionInit>
+  setRemoteDescription: (
+    description: RTCSessionDescriptionInit,
+  ) => Promise<void>
+  addIceCandidate: (candidate: RTCIceCandidateInit) => Promise<void>
+  onIceCandidate: (handler: (candidate: RTCIceCandidate | null) => void) => void
+  onDataChannel: (handler: (channel: RTCDataChannel) => void) => void
+  createDataChannel: (label: string) => RTCDataChannel
+}
 
 const ICE_SERVERS: RTCConfiguration = {
-  iceServers: [
-    {
-      urls: 'stun:stun.l.google.com:19302',
-    },
-  ],
+  iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
 }
 
 const WebRTCContext = React.createContext<WebRTCValue | null>(null)
@@ -24,7 +28,6 @@ export const useWebRTC = (): WebRTCValue => {
   if (value === null) {
     throw new Error('useWebRTC must be used within a WebRTCProvider')
   }
-
   return value
 }
 
@@ -35,43 +38,50 @@ export function WebRTCProvider({
   servers?: RTCConfiguration
   children?: React.ReactNode
 }): JSX.Element {
+  const [peerConnection, setPeerConnection] =
+    useState<RTCPeerConnection | null>(null)
   const [loaded, setLoaded] = useState(false)
-  const peer = useRef<WebRTCValue | null>(null)
 
   useEffect(() => {
-    const effect = async () => {
-      const peerConfig: {
-        host?: string
-        port?: string
-        path?: string
-        config: RTCConfiguration
-      } = {
-        config: servers,
-      }
+    const pc = new RTCPeerConnection(servers)
+    setPeerConnection(pc)
+    setLoaded(true)
 
-      if (process.env.NEXT_PUBLIC_PEERJS_HOST) {
-        peerConfig.host = process.env.NEXT_PUBLIC_PEERJS_HOST
-        peerConfig.port = process.env.NEXT_PUBLIC_PEERJS_PORT || '9000'
-        peerConfig.path = process.env.NEXT_PUBLIC_PEERJS_PATH || '/'
-      }
-
-      const peerObj = new Peer(undefined, peerConfig)
-
-      peerObj.on('open', () => {
-        peer.current = peerObj
-        setLoaded(true)
-      })
+    return () => {
+      pc.close()
     }
-
-    effect()
   }, [servers])
 
-  if (!loaded || !peer.current) {
+  if (!loaded || !peerConnection) {
     return <Loading text="Initializing WebRTC connection..." />
   }
 
+  const webRTCValue: WebRTCValue = {
+    createOffer: async () => {
+      const offer = await peerConnection.createOffer()
+      await peerConnection.setLocalDescription(offer)
+      return offer
+    },
+    createAnswer: async (offer) => {
+      await peerConnection.setRemoteDescription(offer)
+      const answer = await peerConnection.createAnswer()
+      await peerConnection.setLocalDescription(answer)
+      return answer
+    },
+    setRemoteDescription: (description) =>
+      peerConnection.setRemoteDescription(description),
+    addIceCandidate: (candidate) => peerConnection.addIceCandidate(candidate),
+    onIceCandidate: (handler) => {
+      peerConnection.onicecandidate = (event) => handler(event.candidate)
+    },
+    onDataChannel: (handler) => {
+      peerConnection.ondatachannel = (event) => handler(event.channel)
+    },
+    createDataChannel: (label) => peerConnection.createDataChannel(label),
+  }
+
   return (
-    <WebRTCContext.Provider value={peer.current}>
+    <WebRTCContext.Provider value={webRTCValue}>
       {children}
     </WebRTCContext.Provider>
   )

@@ -15,7 +15,7 @@ import {
   mobileVendor,
   mobileModel,
 } from 'react-device-detect'
-
+import { useQuery } from '@tanstack/react-query'
 const cleanErrorMessage = (errorMessage: string): string =>
   errorMessage.startsWith('Could not connect to peer')
     ? 'Could not connect to the uploader. Did they close their browser?'
@@ -23,7 +23,7 @@ const cleanErrorMessage = (errorMessage: string): string =>
 
 const getZipFilename = (): string => `filepizza-download-${Date.now()}.zip`
 
-export function useDownloader(uploaderPeerID: string): {
+export function useDownloader(slug: string): {
   filesInfo: Array<{ fileName: string; size: number; type: string }> | null
   isConnected: boolean
   isPasswordRequired: boolean
@@ -55,9 +55,35 @@ export function useDownloader(uploaderPeerID: string): {
   const [bytesDownloaded, setBytesDownloaded] = useState(0)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
+  const {
+    isLoading: offerLoading,
+    error: offerError,
+    data: offerData,
+  } = useQuery({
+    queryKey: ['offer', slug],
+    queryFn: async () => {
+      const offer = await peer.createOffer()
+      const response = await fetch('/api/offer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, offer }),
+      })
+      if (!response.ok) {
+        throw new Error('Could not offer connection to uploader')
+      }
+      const data = await response.json()
+      return data.success
+    },
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    staleTime: Infinity,
+  })
+
   useEffect(() => {
-    const conn = peer.connect(uploaderPeerID, { reliable: true })
-    setDataConnection(conn)
+    return
+    // const conn = peer.connect(slug, { reliable: true })
+    // setDataConnection(conn)
 
     const handleOpen = () => {
       setIsConnected(true)
@@ -124,7 +150,7 @@ export function useDownloader(uploaderPeerID: string): {
       conn.off('close', handleClose)
       peer.off('error', handleError)
     }
-  }, [peer, uploaderPeerID])
+  }, [peer])
 
   const submitPassword = useCallback(
     (pass: string) => {
