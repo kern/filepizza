@@ -63,7 +63,13 @@ export function useUploaderChannel(
   })
 
   const answerMutation = useMutation({
-    mutationFn: async ({ offerID, answer }: { offerID: string, answer: RTCSessionDescriptionInit }) => {
+    mutationFn: async ({
+      offerID,
+      answer,
+    }: {
+      offerID: string
+      answer: RTCSessionDescriptionInit
+    }) => {
       const response = await fetch('/api/answer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -83,9 +89,7 @@ export function useUploaderChannel(
 
     const run = (): void => {
       timeout = setTimeout(() => {
-        renewMutation.mutate(
-          { secret },
-        )
+        renewMutation.mutate({ secret })
         run()
       }, renewInterval)
     }

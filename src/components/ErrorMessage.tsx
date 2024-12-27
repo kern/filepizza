@@ -7,4 +7,4 @@ export function ErrorMessage({ message }: { message: string }): JSX.Element {
       <span className="block sm:inline">{message}</span>
     </div>
   )
-} 
+}

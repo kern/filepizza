@@ -5,7 +5,12 @@ import Loading from './Loading'
 import Peer from 'peerjs'
 
 const ICE_SERVERS: RTCConfiguration = {
-  iceServers: [{ urls: process.env.NEXT_PUBLIC_STUN_SERVER ?? 'stun:stun.l.google.com:19302' }],
+  iceServers: [
+    {
+      urls:
+        process.env.NEXT_PUBLIC_STUN_SERVER ?? 'stun:stun.l.google.com:19302',
+    },
+  ],
 }
 
 export type WebRTCValue = Peer

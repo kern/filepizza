@@ -20,16 +20,9 @@ const ChannelSchema = z.object({
 })
 
 export interface ChannelRepo {
-  createChannel(
-    uploaderPeerID: string,
-    ttl?: number,
-  ): Promise<Channel>
+  createChannel(uploaderPeerID: string, ttl?: number): Promise<Channel>
   fetchChannel(slug: string): Promise<Channel | null>
-  renewChannel(
-    slug: string,
-    secret: string,
-    ttl: number,
-  ): Promise<boolean>
+  renewChannel(slug: string, secret: string, ttl: number): Promise<boolean>
   destroyChannel(slug: string, secret: string): Promise<void>
 }
 
@@ -61,7 +54,10 @@ export class RedisChannelRepo implements ChannelRepo {
     return channel
   }
 
-  async fetchChannel(slug: string, scrubSecret = false): Promise<Channel | null> {
+  async fetchChannel(
+    slug: string,
+    scrubSecret = false,
+  ): Promise<Channel | null> {
     const shortChannelStr = await this.client.get(this.getShortSlugKey(slug))
     if (shortChannelStr) {
       return this.deserializeChannel(shortChannelStr, scrubSecret)
