@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef } from 'react'
+import React from 'react'
 import { UploadedFile, UploaderConnectionStatus } from '../types'
 import { useWebRTC } from './WebRTCProvider'
 import QRCode from 'react-qr-code'
