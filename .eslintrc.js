@@ -13,7 +13,6 @@ module.exports = {
   ],
   plugins: [
     "@typescript-eslint",
-    "prettier"
   ],
   rules: {
     "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
@@ -28,6 +27,5 @@ module.exports = {
     "no-inline-comments": "off",
     "no-shadow": "warn",
     "no-use-before-define": "off",
-    "prettier/prettier": "error",
   }
 };

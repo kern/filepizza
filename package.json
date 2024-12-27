@@ -1,6 +1,6 @@
 {
   "name": "filepizza",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "Free peer-to-peer file transfers in your browser.",
   "author": "Alex Kern <alex@kern.io> (http://kern.io)",
   "license": "BSD-3-Clause",
@@ -11,9 +11,11 @@
     "start": "next start",
     "start:peerjs": "./bin/peerjs.js",
     "lint": "eslint 'src/**/*.ts[x]'",
+    "lint:fix": "eslint 'src/**/*.ts[x]' --fix",
     "docker:build": "docker build -t kern/filepizza .",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx}\""
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
+    "type-check": "tsc --noEmit"
   },
   "repository": {
     "type": "git",
@@ -29,7 +31,7 @@
     "express": "^4.19.2",
     "ioredis": "^4.28.5",
     "next": "^14.2.8",
-    "next-themes": "^0.3.0",
+    "next-themes": "^0.4.4",
     "nodemon": "^1.19.4",
     "peer": "^0.5.3",
     "peerjs": "^1.5.4",
@@ -52,9 +54,7 @@
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "eslint": "^7.32.0",
-    "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-prettier": "^3.4.1",
     "eslint-plugin-react": "^7.35.1",
     "husky": "^4.3.8",
     "lint-staged": "^10.5.4",
@@ -69,6 +69,7 @@
   "lint-staged": {
     "*.{ts,tsx}": [
       "eslint --fix",
+      "prettier --write",
       "git add"
     ]
   }

@@ -12,6 +12,7 @@ import ProgressBar from './ProgressBar'
 import TitleText from './TitleText'
 import ReturnHome from './ReturnHome'
 import { pluralize } from '../utils/pluralize'
+import { ErrorMessage } from './ErrorMessage'
 
 interface FileInfo {
   fileName: string
@@ -131,14 +132,7 @@ export function PasswordEntry({
           </div>
         </form>
       </div>
-      {errorMessage && (
-        <div
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-          role="alert"
-        >
-          <span className="block sm:inline">{errorMessage}</span>
-        </div>
-      )}
+      {errorMessage && <ErrorMessage message={errorMessage} />}
     </>
   )
 }

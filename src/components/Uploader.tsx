@@ -10,6 +10,7 @@ import { useUploaderChannel } from '../hooks/useUploaderChannel'
 import { useUploaderConnections } from '../hooks/useUploaderConnections'
 import { CopyableInput } from './CopyableInput'
 import { ConnectionListItem } from './ConnectionListItem'
+import { ErrorMessage } from './ErrorMessage'
 
 const QR_CODE_SIZE = 128
 
@@ -35,6 +36,10 @@ export default function Uploader({
   const activeDownloaders = connections.filter(
     (conn) => conn.status === UploaderConnectionStatus.Uploading,
   ).length
+
+  if (error) {
+    return <ErrorMessage message={error.message} />
+  }
 
   return (
     <>

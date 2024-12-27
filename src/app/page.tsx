@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useCallback, useState } from 'react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import WebRTCProvider from '../components/WebRTCProvider'
 import DropZone from '../components/DropZone'
 import UploadFileList from '../components/UploadFileList'
