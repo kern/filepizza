@@ -63,7 +63,19 @@ export function useUploaderChannel(
     },
   })
 
-  // TODO(@kern): add a way to post an answer back to the client
+  const answerMutation = useMutation({
+    mutationFn: async ({ offerID, answer }: { offerID: string, answer: RTCSessionDescriptionInit }) => {
+      const response = await fetch('/api/answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: shortSlug, offerID, answer }),
+      })
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+      return response.json()
+    },
+  })
 
   useEffect(() => {
     if (!secret || !shortSlug) return
@@ -76,13 +88,16 @@ export function useUploaderChannel(
           { secret },
           {
             onSuccess: (d) => {
-              d.offers.forEach(async (offer) => {
+              Object.entries(d.offers).forEach(async ([offerID, offer]) => {
                 try {
-                  const answer = await peer.createAnswer(offer)
+                  const answer = await peer.createAnswer(offer as RTCSessionDescriptionInit)
+                  peer.onDataChannel((channel) => {
+                    console.log('Data channel opened', channel)
+                  })
                   console.log('Created answer:', answer)
-                  // TODO: Send this answer back to the client
-                } catch (error) {
-                  console.error('Error creating answer:', error)
+                  answerMutation.mutate({ offerID, answer })
+                } catch (e) {
+                  console.error('Error creating answer:', e)
                 }
               })
             },
@@ -97,7 +112,7 @@ export function useUploaderChannel(
     return () => {
       if (timeout) clearTimeout(timeout)
     }
-  }, [secret, shortSlug, renewMutation, renewInterval])
+  }, [secret, shortSlug, renewMutation, answerMutation, renewInterval])
 
   return {
     isLoading,

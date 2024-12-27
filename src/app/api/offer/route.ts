@@ -12,6 +12,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: 'Offer is required' }, { status: 400 })
   }
 
-  await channelRepo.offer(slug, offer)
-  return NextResponse.json({ success: true })
+  const offerID = await channelRepo.offer(slug, offer)
+  return NextResponse.json({ offerID })
 }

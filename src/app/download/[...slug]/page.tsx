@@ -19,7 +19,7 @@ export default async function DownloadPage({
   params: { slug: string[] }
 }): Promise<JSX.Element> {
   const slug = normalizeSlug(params.slug)
-  const channel = await channelRepo.fetch(slug)
+  const channel = await channelRepo.fetchChannel(slug)
 
   if (!channel) {
     notFound()

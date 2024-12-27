@@ -13,7 +13,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   try {
-    await channelRepo.destroy(slug, secret)
+    await channelRepo.destroyChannel(slug, secret)
     return NextResponse.json({ success: true }, { status: 200 })
   } catch (error) {
     return NextResponse.json(

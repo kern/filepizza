@@ -12,6 +12,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: 'Secret is required' }, { status: 400 })
   }
 
-  const offers = await channelRepo.renew(slug, secret)
+  const offers = await channelRepo.renewChannel(slug, secret)
   return NextResponse.json({ success: true, offers })
 }
