@@ -20,7 +20,7 @@ interface FileInfo {
   type: string
 }
 
-export function ConnectingToUploader({ showTroubleshootingAfter = 3000 }: { showTroubleshootingAfter: number }): JSX.Element {
+export function ConnectingToUploader({ showTroubleshootingAfter = 3000 }: { showTroubleshootingAfter?: number }): JSX.Element {
   const [showTroubleshooting, setShowTroubleshooting] = useState(false)
 
   useEffect(() => {
