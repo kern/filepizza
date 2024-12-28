@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useCallback, useState } from 'react'
-import WebRTCProvider from '../components/WebRTCProvider'
+import WebRTCPeerProvider from '../components/WebRTCProvider'
 import DropZone from '../components/DropZone'
 import UploadFileList from '../components/UploadFileList'
 import Uploader from '../components/Uploader'
@@ -14,8 +14,8 @@ import CancelButton from '../components/CancelButton'
 import { useMemo } from 'react'
 import { getFileName } from '../fs'
 import TitleText from '../components/TitleText'
-import SubtitleText from '../components/SubtitleText'
 import { pluralize } from '../utils/pluralize'
+import TermsAcceptance from '../components/TermsAcceptance'
 
 function PageWrapper({
   children,
@@ -42,11 +42,9 @@ function InitialState({
     <PageWrapper>
       <div className="flex flex-col items-center space-y-1 max-w-md">
         <TitleText>Peer-to-peer file transfers in your browser.</TitleText>
-        <SubtitleText>
-          We never store anything. Files only served fresh.
-        </SubtitleText>
       </div>
       <DropZone onDrop={onDrop} />
+      <TermsAcceptance />
     </PageWrapper>
   )
 }
@@ -108,9 +106,9 @@ function UploadingState({
         You are uploading {pluralize(uploadedFiles.length, 'file', 'files')}.
       </TitleText>
       <UploadFileList files={fileListData} />
-      <WebRTCProvider>
+      <WebRTCPeerProvider>
         <Uploader files={uploadedFiles} password={password} onStop={onStop} />
-      </WebRTCProvider>
+      </WebRTCPeerProvider>
     </PageWrapper>
   )
 }

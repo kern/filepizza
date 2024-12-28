@@ -10,6 +10,7 @@ export enum MessageType {
   Error = 'Error',
   PasswordRequired = 'PasswordRequired',
   UsePassword = 'UsePassword',
+  Report = 'Report',
 }
 
 export const RequestInfoMessage = z.object({
@@ -70,6 +71,10 @@ export const PauseMessage = z.object({
   type: z.literal(MessageType.Pause),
 })
 
+export const ReportMessage = z.object({
+  type: z.literal(MessageType.Report),
+})
+
 export const Message = z.discriminatedUnion('type', [
   RequestInfoMessage,
   InfoMessage,
@@ -80,6 +85,7 @@ export const Message = z.discriminatedUnion('type', [
   PasswordRequiredMessage,
   UsePasswordMessage,
   PauseMessage,
+  ReportMessage,
 ])
 
 export type Message = z.infer<typeof Message>

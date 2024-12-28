@@ -87,9 +87,9 @@ export class RedisChannelRepo implements ChannelRepo {
     return true
   }
 
-  async destroyChannel(slug: string, secret: string): Promise<void> {
+  async destroyChannel(slug: string): Promise<void> {
     const channel = await this.fetchChannel(slug)
-    if (!channel || channel.secret !== secret) {
+    if (!channel) {
       return
     }
 

@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { useWebRTC } from '../components/WebRTCProvider'
+import { useWebRTCPeer } from '../components/WebRTCProvider'
 import { z } from 'zod'
 import { ChunkMessage, decodeMessage, Message, MessageType } from '../messages'
 import { DataConnection } from 'peerjs'
@@ -35,7 +35,7 @@ export function useDownloader(uploaderPeerID: string): {
   totalSize: number
   bytesDownloaded: number
 } {
-  const peer = useWebRTC()
+  const { peer } = useWebRTCPeer()
   const [dataConnection, setDataConnection] = useState<DataConnection | null>(
     null,
   )
@@ -56,6 +56,7 @@ export function useDownloader(uploaderPeerID: string): {
 
   useEffect(() => {
     if (!peer) return
+    console.log('[Downloader] connecting to uploader', uploaderPeerID)
     const conn = peer.connect(uploaderPeerID, { reliable: true })
     setDataConnection(conn)
 
@@ -90,6 +91,10 @@ export function useDownloader(uploaderPeerID: string): {
             console.error(message.error)
             setErrorMessage(message.error)
             conn.close()
+            break
+          case MessageType.Report:
+            // Hard-redirect downloader to reported page
+            window.location.href = '/reported'
             break
         }
       } catch (err) {

@@ -1,8 +1,8 @@
 'use client'
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { UploadedFile, UploaderConnectionStatus } from '../types'
-import { useWebRTC } from './WebRTCProvider'
+import { useWebRTCPeer } from './WebRTCProvider'
 import QRCode from 'react-qr-code'
 import Loading from './Loading'
 import StopButton from './StopButton'
@@ -23,13 +23,18 @@ export default function Uploader({
   password: string
   onStop: () => void
 }): JSX.Element {
-  const peer = useWebRTC()
+  const { peer, stop } = useWebRTCPeer()
   const { isLoading, error, longSlug, shortSlug, longURL, shortURL } =
     useUploaderChannel(peer.id)
   const connections = useUploaderConnections(peer, files, password)
 
+  const handleStop = useCallback(() => {
+    stop()
+    onStop()
+  }, [stop, onStop])
+
   if (isLoading || !longSlug || !shortSlug) {
-    return <Loading text="Creating channel" />
+    return <Loading text="Creating channel..." />
   }
 
   const activeDownloaders = connections.filter(
@@ -56,7 +61,7 @@ export default function Uploader({
           <h2 className="text-lg font-semibold text-stone-400 dark:text-stone-200">
             {activeDownloaders} Downloading, {connections.length} Total
           </h2>
-          <StopButton onClick={onStop} />
+          <StopButton onClick={handleStop} />
         </div>
         {connections.map((conn, i) => (
           <ConnectionListItem key={i} conn={conn} />

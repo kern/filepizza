@@ -62,26 +62,6 @@ export function useUploaderChannel(
     },
   })
 
-  const answerMutation = useMutation({
-    mutationFn: async ({
-      offerID,
-      answer,
-    }: {
-      offerID: string
-      answer: RTCSessionDescriptionInit
-    }) => {
-      const response = await fetch('/api/answer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: shortSlug, offerID, answer }),
-      })
-      if (!response.ok) {
-        throw new Error('Network response was not ok')
-      }
-      return response.json()
-    },
-  })
-
   useEffect(() => {
     if (!secret || !shortSlug) return
 
@@ -99,7 +79,7 @@ export function useUploaderChannel(
     return () => {
       if (timeout) clearTimeout(timeout)
     }
-  }, [secret, shortSlug, renewMutation, answerMutation, renewInterval])
+  }, [secret, shortSlug, renewMutation, renewInterval])
 
   return {
     isLoading,

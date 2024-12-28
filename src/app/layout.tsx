@@ -4,18 +4,25 @@ import '../styles.css'
 import { ThemeProvider } from '../components/ThemeProvider'
 import { ModeToggle } from '../components/ModeToggle'
 import FilePizzaQueryClientProvider from '../components/QueryClientProvider'
+import { Viewport } from 'next'
 
 export const metadata = {
   title: 'FilePizza • Your files, delivered.',
   description: 'Peer-to-peer file transfers in your web browser.',
   charSet: 'utf-8',
-  viewport: 'width=device-width, initial-scale=1',
   openGraph: {
     url: 'https://file.pizza',
     title: 'FilePizza • Your files, delivered.',
     description: 'Peer-to-peer file transfers in your web browser.',
     images: [{ url: 'https://file.pizza/images/fb.png' }],
   },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false
 }
 
 export default function RootLayout({

@@ -3,7 +3,8 @@ import { channelRepo } from '../../../channel'
 import Spinner from '../../../components/Spinner'
 import Wordmark from '../../../components/Wordmark'
 import Downloader from '../../../components/Downloader'
-import WebRTCProvider from '../../../components/WebRTCProvider'
+import WebRTCPeerProvider from '../../../components/WebRTCProvider'
+import ReportTermsViolationButton from '../../../components/ReportTermsViolationButton'
 
 const normalizeSlug = (rawSlug: string | string[]): string => {
   if (typeof rawSlug === 'string') {
@@ -29,9 +30,10 @@ export default async function DownloadPage({
     <div className="flex flex-col items-center space-y-5 py-10 max-w-2xl mx-auto">
       <Spinner direction="down" />
       <Wordmark />
-      <WebRTCProvider>
+      <WebRTCPeerProvider>
         <Downloader uploaderPeerID={channel.uploaderPeerID} />
-      </WebRTCProvider>
+        <ReportTermsViolationButton uploaderPeerID={channel.uploaderPeerID} slug={slug} />
+      </WebRTCPeerProvider>
     </div>
   )
 }

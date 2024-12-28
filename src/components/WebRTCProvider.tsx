@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react'
 import Loading from './Loading'
 import Peer from 'peerjs'
 
@@ -13,11 +13,14 @@ const ICE_SERVERS: RTCConfiguration = {
   ],
 }
 
-export type WebRTCValue = Peer
+export type WebRTCPeerValue = {
+  peer: Peer
+  stop: () => void
+}
 
-const WebRTCContext = React.createContext<WebRTCValue | null>(null)
+const WebRTCContext = React.createContext<WebRTCPeerValue | null>(null)
 
-export const useWebRTC = (): WebRTCValue => {
+export const useWebRTCPeer = (): WebRTCPeerValue => {
   const value = useContext(WebRTCContext)
   if (value === null) {
     throw new Error('useWebRTC must be used within a WebRTCProvider')
@@ -27,7 +30,7 @@ export const useWebRTC = (): WebRTCValue => {
 
 let globalPeer: Peer | null = null
 
-async function getPeer(): Promise<Peer> {
+async function getOrCreateGlobalPeer(): Promise<Peer> {
   if (!globalPeer) {
     globalPeer = new Peer({
       config: ICE_SERVERS,
@@ -39,42 +42,54 @@ async function getPeer(): Promise<Peer> {
   }
 
   await new Promise<void>((resolve) => {
-    globalPeer?.on('open', (id) => {
+    const listener = (id: string) => {
       console.log('[WebRTCProvider] Peer ID:', id)
+      globalPeer?.off('open', listener)
       resolve()
-    })
+    }
+    globalPeer?.on('open', listener)
   })
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return globalPeer!
 }
 
-export function WebRTCProvider({
+export default function WebRTCPeerProvider({
   children,
 }: {
   children?: React.ReactNode
 }): JSX.Element {
-  const [peerConnection, setPeerConnection] = useState<Peer | null>(globalPeer)
+  const [peerValue, setPeerValue] = useState<Peer | null>(globalPeer)
+  const [isStopped, setIsStopped] = useState(false)
 
-  useEffect(() => {
-    getPeer().then((pc) => {
-      setPeerConnection(pc)
-    })
-
-    return () => {
-      setPeerConnection(null)
-    }
+  const stop = useCallback(() => {
+    globalPeer?.destroy()
+    globalPeer = null
+    setPeerValue(null)
+    setIsStopped(true)
   }, [])
 
-  if (!peerConnection) {
-    return <Loading text="Initializing WebRTC connection..." />
+  useEffect(() => {
+    getOrCreateGlobalPeer().then(setPeerValue)
+  }, [])
+
+  const value = useMemo(
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    () => ({ peer: peerValue!, stop }),
+    [peerValue, stop]
+  )
+
+  if (isStopped) {
+    return <></>
+  }
+
+  if (!peerValue) {
+    return <Loading text="Initializing WebRTC peer..." />
   }
 
   return (
-    <WebRTCContext.Provider value={peerConnection}>
+    <WebRTCContext.Provider value={value}>
       {children}
     </WebRTCContext.Provider>
   )
 }
-
-export default WebRTCProvider

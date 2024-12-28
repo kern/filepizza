@@ -32,8 +32,25 @@ export function useUploaderConnections(
 ): Array<UploaderConnection> {
   const [connections, setConnections] = useState<Array<UploaderConnection>>([])
 
+  console.log('connections', connections)
+
   useEffect(() => {
     const listener = (conn: DataConnection) => {
+      // If the connection is a report, we need to hard-redirect the uploader to the reported page to prevent them from uploading more files.
+      if (conn.metadata?.type === 'report') {
+        // Broadcast report message to all connections
+        connections.forEach((c) => {
+          c.dataConnection.send({
+            type: MessageType.Report,
+          })
+          c.dataConnection.close()
+        })
+
+        // Hard-redirect uploader to reported page
+        window.location.href = '/reported'
+        return
+      }
+
       let sendChunkTimeout: NodeJS.Timeout | null = null
       const newConn = {
         status: UploaderConnectionStatus.Pending,
@@ -43,7 +60,15 @@ export function useUploaderConnections(
         currentFileProgress: 0,
       }
 
-      setConnections((conns) => [newConn, ...conns])
+      setConnections((conns) => {
+        // Check if connection already exists
+        const exists = conns.some(conn => conn.dataConnection === newConn.dataConnection)
+        if (exists) {
+          console.log('connection already exists!', newConn.dataConnection)
+          return conns
+        }
+        return [newConn, ...conns]
+      })
       const updateConnection = (
         fn: (c: UploaderConnection) => UploaderConnection,
       ) => {
