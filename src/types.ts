@@ -4,6 +4,7 @@ export type UploadedFile = File & { entryFullPath?: string }
 
 export enum UploaderConnectionStatus {
   Pending = 'PENDING',
+  Ready = 'READY',
   Paused = 'PAUSED',
   Uploading = 'UPLOADING',
   Done = 'DONE',

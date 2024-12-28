@@ -32,9 +32,9 @@ export function useUploaderConnections(
 ): Array<UploaderConnection> {
   const [connections, setConnections] = useState<Array<UploaderConnection>>([])
 
-  console.log('connections', connections)
-
   useEffect(() => {
+    const cleanupHandlers: Array<() => void> = []
+
     const listener = (conn: DataConnection) => {
       // If the connection is a report, we need to hard-redirect the uploader to the reported page to prevent them from uploading more files.
       if (conn.metadata?.type === 'report') {
@@ -61,14 +61,9 @@ export function useUploaderConnections(
       }
 
       setConnections((conns) => {
-        // Check if connection already exists
-        const exists = conns.some(conn => conn.dataConnection === newConn.dataConnection)
-        if (exists) {
-          console.log('connection already exists!', newConn.dataConnection)
-          return conns
-        }
         return [newConn, ...conns]
       })
+
       const updateConnection = (
         fn: (c: UploaderConnection) => UploaderConnection,
       ) => {
@@ -77,7 +72,7 @@ export function useUploaderConnections(
         )
       }
 
-      conn.on('data', (data): void => {
+      const onData = (data: any): void => {
         try {
           const message = decodeMessage(data)
           switch (message.type) {
@@ -120,7 +115,7 @@ export function useUploaderConnections(
                 return {
                   ...draft,
                   ...newConnectionState,
-                  status: UploaderConnectionStatus.Paused,
+                  status: UploaderConnectionStatus.Ready,
                 }
               })
 
@@ -146,14 +141,15 @@ export function useUploaderConnections(
               if (submittedPassword === password) {
                 updateConnection((draft) => {
                   if (
-                    draft.status !== UploaderConnectionStatus.Authenticating
+                    draft.status !== UploaderConnectionStatus.Authenticating &&
+                    draft.status !== UploaderConnectionStatus.InvalidPassword
                   ) {
                     return draft
                   }
 
                   return {
                     ...draft,
-                    status: UploaderConnectionStatus.Paused,
+                    status: UploaderConnectionStatus.Ready,
                   }
                 })
 
@@ -196,10 +192,49 @@ export function useUploaderConnections(
               const fileName = message.fileName
               let offset = message.offset
               const file = validateOffset(files, fileName, offset)
+
+              const sendNextChunkAsync = () => {
+                sendChunkTimeout = setTimeout(() => {
+                  const end = Math.min(file.size, offset + MAX_CHUNK_SIZE)
+                  const chunkSize = end - offset
+                  const final = chunkSize < MAX_CHUNK_SIZE
+                  const request: Message = {
+                    type: MessageType.Chunk,
+                    fileName,
+                    offset,
+                    bytes: file.slice(offset, end),
+                    final,
+                  }
+                  conn.send(request)
+
+                  updateConnection((draft) => {
+                    offset = end
+                    if (final) {
+                      console.log('final chunk', draft.completedFiles + 1)
+                      return {
+                        ...draft,
+                        status: UploaderConnectionStatus.Ready,
+                        completedFiles: draft.completedFiles + 1,
+                        currentFileProgress: 0,
+                      }
+                    } else {
+                      sendNextChunkAsync()
+                      return {
+                        ...draft,
+                        uploadingOffset: end,
+                        currentFileProgress: end / file.size,
+                      }
+                    }
+                  })
+                }, 0)
+              }
+
               updateConnection((draft) => {
-                if (draft.status !== UploaderConnectionStatus.Paused) {
+                if (draft.status !== UploaderConnectionStatus.Ready && draft.status !== UploaderConnectionStatus.Paused) {
                   return draft
                 }
+
+                sendNextChunkAsync()
 
                 return {
                   ...draft,
@@ -209,42 +244,6 @@ export function useUploaderConnections(
                   currentFileProgress: offset / file.size,
                 }
               })
-
-              const sendNextChunk = () => {
-                const end = Math.min(file.size, offset + MAX_CHUNK_SIZE)
-                const chunkSize = end - offset
-                const final = chunkSize < MAX_CHUNK_SIZE
-                const request: Message = {
-                  type: MessageType.Chunk,
-                  fileName,
-                  offset,
-                  bytes: file.slice(offset, end),
-                  final,
-                }
-                conn.send(request)
-
-                updateConnection((draft) => {
-                  offset = end
-                  if (final) {
-                    return {
-                      ...draft,
-                      status: UploaderConnectionStatus.Paused,
-                      completedFiles: draft.completedFiles + 1,
-                      currentFileProgress: 0,
-                    }
-                  } else {
-                    sendChunkTimeout = setTimeout(() => {
-                      sendNextChunk()
-                    }, 0)
-                    return {
-                      ...draft,
-                      uploadingOffset: end,
-                      currentFileProgress: end / file.size,
-                    }
-                  }
-                })
-              }
-              sendNextChunk()
 
               break
             }
@@ -270,7 +269,7 @@ export function useUploaderConnections(
 
             case MessageType.Done: {
               updateConnection((draft) => {
-                if (draft.status !== UploaderConnectionStatus.Paused) {
+                if (draft.status !== UploaderConnectionStatus.Ready) {
                   return draft
                 }
 
@@ -286,9 +285,9 @@ export function useUploaderConnections(
         } catch (err) {
           console.error(err)
         }
-      })
+      }
 
-      conn.on('close', (): void => {
+      const onClose = (): void => {
         if (sendChunkTimeout) {
           clearTimeout(sendChunkTimeout)
         }
@@ -308,6 +307,15 @@ export function useUploaderConnections(
             status: UploaderConnectionStatus.Closed,
           }
         })
+      }
+
+      conn.on('data', onData)
+      conn.on('close', onClose)
+
+      cleanupHandlers.push(() => {
+        conn.off('data', onData)
+        conn.off('close', onClose)
+        conn.close()
       })
     }
 
@@ -315,6 +323,7 @@ export function useUploaderConnections(
 
     return () => {
       peer.off('connection', listener)
+      cleanupHandlers.forEach((fn) => fn())
     }
   }, [peer, files, password])
 

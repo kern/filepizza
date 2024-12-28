@@ -81,6 +81,26 @@ export function useUploaderChannel(
     }
   }, [secret, shortSlug, renewMutation, renewInterval])
 
+  useEffect(() => {
+    if (!shortSlug || !secret) return
+
+    const handleUnload = (): void => {
+      // Using sendBeacon for best-effort delivery during page unload
+      navigator.sendBeacon(
+        '/api/destroy',
+        JSON.stringify({ slug: shortSlug })
+      )
+    }
+
+    window.addEventListener('beforeunload', handleUnload)
+    window.addEventListener('unload', handleUnload)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleUnload)
+      window.removeEventListener('unload', handleUnload)
+    }
+  }, [shortSlug, secret])
+
   return {
     isLoading,
     error,

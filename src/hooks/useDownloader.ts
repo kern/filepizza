@@ -122,7 +122,14 @@ export function useDownloader(uploaderPeerID: string): {
     peer.on('error', handleError)
 
     return () => {
-      if (conn.open) conn.close()
+      if (conn.open) {
+        conn.close()
+      } else {
+        conn.once('open', () => {
+          conn.close()
+        })
+      }
+
       conn.off('open', handleOpen)
       conn.off('data', handleData)
       conn.off('error', handleError)
