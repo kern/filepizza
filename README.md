@@ -26,13 +26,11 @@ $ pnpm docker:down
 
 ## Stack
 
-FilePizza uses:
-
 * Next.js
 * Tailwind
 * TypeScript
 * React
-* PeerJS
+* PeerJS for WebRTC
 * View Transitions
 * Redis (optional)
 

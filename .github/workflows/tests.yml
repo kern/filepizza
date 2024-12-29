@@ -4,14 +4,10 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js 14
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "pnpm"
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - run: pnpm install
-      - run: pnpm lint
+      - run: pnpm lint:check
       - run: pnpm format:check
-      - run: pnpm type-check
+      - run: pnpm type:check
       - run: pnpm build
