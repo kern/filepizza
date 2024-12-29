@@ -17,16 +17,10 @@ import TitleText from '../components/TitleText'
 import { pluralize } from '../utils/pluralize'
 import TermsAcceptance from '../components/TermsAcceptance'
 
-function PageWrapper({
-  children,
-  isRotating = false,
-}: {
-  children: React.ReactNode
-  isRotating?: boolean
-}): JSX.Element {
+function PageWrapper({ children }: { children: React.ReactNode }): JSX.Element {
   return (
     <div className="flex flex-col items-center space-y-5 py-10 max-w-2xl mx-auto px-4">
-      <Spinner direction="up" isRotating={isRotating} />
+      <Spinner direction="up" />
       <Wordmark />
       {children}
     </div>
@@ -101,7 +95,7 @@ function UploadingState({
 }): JSX.Element {
   const fileListData = useUploaderFileListData(uploadedFiles)
   return (
-    <PageWrapper isRotating={true}>
+    <PageWrapper>
       <TitleText>
         You are uploading {pluralize(uploadedFiles.length, 'file', 'files')}.
       </TitleText>
