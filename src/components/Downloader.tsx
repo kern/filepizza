@@ -58,9 +58,10 @@ export function ConnectingToUploader({
             <li className="flex items-start gap-3 px-4 py-2 rounded-lg bg-stone-100 dark:bg-stone-800">
               <span className="text-base">🚪</span>
               <span className="text-sm">
-                The uploader may have closed their browser. FilePizza requires
-                the uploader to stay online continuously because files are
-                transferred directly between b.
+                The uploader may have closed their browser, lost connectivity,
+                or stopped the upload. FilePizza requires the uploader to stay
+                online continuously because files are transferred directly
+                between browsers.
               </span>
             </li>
             <li className="flex items-start gap-3 px-4 py-2 rounded-lg bg-stone-100 dark:bg-stone-800">
