@@ -2,7 +2,7 @@ services:
   redis:
     image: redis:latest
     ports:
-      - 6379:6379
+      - 127.0.0.1:6379:6379
     networks:
       - filepizza
     volumes:
@@ -11,7 +11,7 @@ services:
     build: .
     image: kern/filepizza:latest
     ports:
-      - 80:80
+      - 0.0.0.0:80:80
     environment:
       - PORT=80
       - REDIS_URL=redis://redis:6379
