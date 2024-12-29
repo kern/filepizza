@@ -6,9 +6,7 @@ function generateURL(slug: string): string {
     window.location.protocol +
     '//' +
     window.location.hostname +
-    (['80', '443'].includes(window.location.port)
-      ? ''
-      : ':' + window.location.port)
+    (window.location.port ? ':' + window.location.port : '')
   return `${hostPrefix}/download/${slug}`
 }
 

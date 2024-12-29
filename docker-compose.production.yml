@@ -11,9 +11,9 @@ services:
     build: .
     image: kern/filepizza:latest
     ports:
-      - 8080:8080
+      - 80:80
     environment:
-      - PORT=8080
+      - PORT=80
       - REDIS_URL=redis://redis:6379
     networks:
       - filepizza
