@@ -15,7 +15,6 @@ services:
     environment:
       - PORT=80
       - REDIS_URL=redis://redis:6379
-      - NEXT_PUBLIC_BASE_URL=https://file.pizza
     networks:
       - filepizza
     depends_on:
