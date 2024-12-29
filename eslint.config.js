@@ -28,5 +28,10 @@ module.exports = {
     "no-inline-comments": "off",
     "no-shadow": "warn",
     "no-use-before-define": "off",
-  }
+  },
+  ignores: [
+    'legacy/',
+    'node_modules/',
+    '.next/'
+  ]
 };
