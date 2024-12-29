@@ -6,6 +6,17 @@ Using [WebRTC](http://www.webrtc.org), FilePizza eliminates the initial upload s
 
 A hosted instance of FilePizza is available at [file.pizza](https://file.pizza).
 
+## What's new with FilePizza v2
+
+* A new UI with dark mode support, now built on modern browser technologies.
+* Works on most mobile browsers, including Mobile Safari.
+* Transfers are now directly from the uploader to the downloader's browser (WebRTC without WebTorrent) with faster handshakes.
+* Uploaders can monitor the progress of the transfer and stop it if they want.
+* Better security and safety measures with password protection and reporting.
+* Support for uploading multiple files at once, which downloaders receive as a zip file.
+* Streaming downloads with a Service Worker.
+* Out-of-process storage of server state using Redis.
+
 ## Development
 
 ```
