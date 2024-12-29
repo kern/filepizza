@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { JSX } from 'react'
 import { UploaderConnection, UploaderConnectionStatus } from '../types'
 import ProgressBar from './ProgressBar'
 
@@ -51,11 +51,12 @@ export function ConnectionListItem({
           <div>
             Completed: {conn.completedFiles} / {conn.totalFiles} files
           </div>
-          {conn.uploadingFileName && conn.status === UploaderConnectionStatus.Uploading && (
-            <div>
-              Current file: {Math.round(conn.currentFileProgress * 100)}%
-            </div>
-          )}
+          {conn.uploadingFileName &&
+            conn.status === UploaderConnectionStatus.Uploading && (
+              <div>
+                Current file: {Math.round(conn.currentFileProgress * 100)}%
+              </div>
+            )}
         </div>
       </div>
       <ProgressBar

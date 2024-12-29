@@ -1,6 +1,13 @@
 'use client'
 
-import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react'
+import React, {
+  JSX,
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+  useMemo,
+} from 'react'
 import Loading from './Loading'
 import Peer from 'peerjs'
 
@@ -76,7 +83,7 @@ export default function WebRTCPeerProvider({
   const value = useMemo(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     () => ({ peer: peerValue!, stop }),
-    [peerValue, stop]
+    [peerValue, stop],
   )
 
   if (isStopped) {
@@ -88,8 +95,6 @@ export default function WebRTCPeerProvider({
   }
 
   return (
-    <WebRTCContext.Provider value={value}>
-      {children}
-    </WebRTCContext.Provider>
+    <WebRTCContext.Provider value={value}>{children}</WebRTCContext.Provider>
   )
 }

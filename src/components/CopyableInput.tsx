@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { JSX } from 'react'
 import useClipboard from '../hooks/useClipboard'
 import InputLabel from './InputLabel'
 

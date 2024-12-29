@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useState } from 'react'
+import React, { JSX, useCallback, useState } from 'react'
 import WebRTCPeerProvider from '../components/WebRTCProvider'
 import DropZone from '../components/DropZone'
 import UploadFileList from '../components/UploadFileList'

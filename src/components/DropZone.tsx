@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react'
+import React, { JSX, useState, useCallback, useEffect, useRef } from 'react'
 import { extractFileList } from '../fs'
 
 export default function DropZone({

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { JSX } from 'react'
 
 function getTypeColor(fileType: string): string {
   if (fileType.startsWith('image/'))

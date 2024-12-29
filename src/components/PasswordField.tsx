@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { JSX, useCallback } from 'react'
 import InputLabel from './InputLabel'
 
 export default function PasswordField({
@@ -21,7 +21,10 @@ export default function PasswordField({
 
   return (
     <div className="flex flex-col w-full">
-      <InputLabel hasError={isInvalid}>
+      <InputLabel
+        hasError={isInvalid}
+        tooltip="The downloader must provide this password to start downloading the file. If you don't specify a password here, any downloader with the link to the file will be able to download it. It is not used to encrypt the file, as this is performed by WebRTC's DTLS already."
+      >
         {isRequired ? 'Password' : 'Password (optional)'}
       </InputLabel>
       <input

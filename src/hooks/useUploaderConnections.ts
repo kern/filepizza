@@ -230,7 +230,10 @@ export function useUploaderConnections(
               }
 
               updateConnection((draft) => {
-                if (draft.status !== UploaderConnectionStatus.Ready && draft.status !== UploaderConnectionStatus.Paused) {
+                if (
+                  draft.status !== UploaderConnectionStatus.Ready &&
+                  draft.status !== UploaderConnectionStatus.Paused
+                ) {
                   return draft
                 }
 

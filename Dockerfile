@@ -7,6 +7,7 @@ RUN pnpm install
 COPY . ./
 RUN pnpm build
 
+ENV PORT 3000
 ENV NODE_ENV production
-EXPOSE 80
-CMD node ./dist/index.js
+EXPOSE 3000
+CMD pnpm start

@@ -1,5 +1,6 @@
+import { JSX } from 'react'
 import { notFound } from 'next/navigation'
-import { channelRepo } from '../../../channel'
+import { getOrCreateChannelRepo } from '../../../channel'
 import Spinner from '../../../components/Spinner'
 import Wordmark from '../../../components/Wordmark'
 import Downloader from '../../../components/Downloader'
@@ -17,10 +18,11 @@ const normalizeSlug = (rawSlug: string | string[]): string => {
 export default async function DownloadPage({
   params,
 }: {
-  params: { slug: string[] }
+  params: Promise<{ slug: string[] }>
 }): Promise<JSX.Element> {
-  const slug = normalizeSlug(params.slug)
-  const channel = await channelRepo.fetchChannel(slug)
+  const { slug: slugRaw } = await params
+  const slug = normalizeSlug(slugRaw)
+  const channel = await getOrCreateChannelRepo().fetchChannel(slug)
 
   if (!channel) {
     notFound()
@@ -32,7 +34,10 @@ export default async function DownloadPage({
       <Wordmark />
       <WebRTCPeerProvider>
         <Downloader uploaderPeerID={channel.uploaderPeerID} />
-        <ReportTermsViolationButton uploaderPeerID={channel.uploaderPeerID} slug={slug} />
+        <ReportTermsViolationButton
+          uploaderPeerID={channel.uploaderPeerID}
+          slug={slug}
+        />
       </WebRTCPeerProvider>
     </div>
   )

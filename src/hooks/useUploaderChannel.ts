@@ -86,10 +86,7 @@ export function useUploaderChannel(
 
     const handleUnload = (): void => {
       // Using sendBeacon for best-effort delivery during page unload
-      navigator.sendBeacon(
-        '/api/destroy',
-        JSON.stringify({ slug: shortSlug })
-      )
+      navigator.sendBeacon('/api/destroy', JSON.stringify({ slug: shortSlug }))
     }
 
     window.addEventListener('beforeunload', handleUnload)

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { Channel, channelRepo } from '../../../channel'
+import { getOrCreateChannelRepo } from '../../../channel'
 
 export async function POST(request: Request): Promise<NextResponse> {
   const { uploaderPeerID } = await request.json()
@@ -11,6 +11,8 @@ export async function POST(request: Request): Promise<NextResponse> {
     )
   }
 
-  const channel: Channel = await channelRepo.createChannel(uploaderPeerID)
+  const channel = await getOrCreateChannelRepo().createChannel(
+    uploaderPeerID,
+  )
   return NextResponse.json(channel)
 }

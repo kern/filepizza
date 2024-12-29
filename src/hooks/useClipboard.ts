@@ -1,6 +1,12 @@
 import { useState, useCallback, useEffect } from 'react'
 
-export default function useClipboard(text: string, delay = 1000) {
+export default function useClipboard(
+  text: string,
+  delay = 1000,
+): {
+  hasCopied: boolean
+  onCopy: () => void
+} {
   const [hasCopied, setHasCopied] = useState(false)
 
   const onCopy = useCallback(() => {

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback } from 'react'
+import React, { JSX, useCallback } from 'react'
 import { UploadedFile, UploaderConnectionStatus } from '../types'
 import { useWebRTCPeer } from './WebRTCProvider'
 import QRCode from 'react-qr-code'

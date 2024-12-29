@@ -22,23 +22,90 @@ const ChannelSchema = z.object({
 export interface ChannelRepo {
   createChannel(uploaderPeerID: string, ttl?: number): Promise<Channel>
   fetchChannel(slug: string): Promise<Channel | null>
-  renewChannel(slug: string, secret: string, ttl: number): Promise<boolean>
-  destroyChannel(slug: string, secret: string): Promise<void>
+  renewChannel(slug: string, secret: string, ttl?: number): Promise<boolean>
+  destroyChannel(slug: string): Promise<void>
 }
 
-export class RedisChannelRepo implements ChannelRepo {
-  client: Redis.Redis
+function getShortSlugKey(shortSlug: string): string {
+  return `short:${shortSlug}`
+}
 
-  constructor(redisURL: string) {
-    this.client = new Redis(redisURL)
+function getLongSlugKey(longSlug: string): string {
+  return `long:${longSlug}`
+}
+
+async function generateShortSlugUntilUnique(checkExists: (key: string) => Promise<boolean>): Promise<string> {
+  for (let i = 0; i < config.shortSlug.maxAttempts; i++) {
+    const slug = generateShortSlug()
+    const exists = await checkExists(getShortSlugKey(slug))
+    if (!exists) {
+      return slug
+    }
+  }
+
+  throw new Error('max attempts reached generating short slug')
+}
+
+async function generateLongSlugUntilUnique(checkExists: (key: string) => Promise<boolean>): Promise<string> {
+  for (let i = 0; i < config.longSlug.maxAttempts; i++) {
+    const slug = await generateLongSlug()
+    const exists = await checkExists(getLongSlugKey(slug))
+    if (!exists) {
+      return slug
+    }
+  }
+
+  throw new Error('max attempts reached generating long slug')
+}
+
+function serializeChannel(channel: Channel): string {
+  return JSON.stringify(channel)
+}
+
+function deserializeChannel(str: string, scrubSecret = false): Channel {
+  const parsedChannel = JSON.parse(str)
+  const validatedChannel = ChannelSchema.parse(parsedChannel)
+  if (scrubSecret) {
+    return { ...validatedChannel, secret: undefined }
+  }
+  return validatedChannel
+}
+
+type MemoryStoredChannel = {
+  channel: Channel
+  expiresAt: number
+}
+
+export class MemoryChannelRepo implements ChannelRepo {
+  private channels: Map<string, MemoryStoredChannel> = new Map()
+  private timeouts: Map<string, NodeJS.Timeout> = new Map()
+
+  private setChannelTimeout(slug: string, ttl: number) {
+    // Clear any existing timeout
+    const existingTimeout = this.timeouts.get(slug)
+    if (existingTimeout) {
+      clearTimeout(existingTimeout)
+    }
+
+    // Set new timeout to remove channel when expired
+    const timeout = setTimeout(() => {
+      this.channels.delete(slug)
+      this.timeouts.delete(slug)
+    }, ttl * 1000)
+
+    this.timeouts.set(slug, timeout)
   }
 
   async createChannel(
     uploaderPeerID: string,
     ttl: number = config.channel.ttl,
   ): Promise<Channel> {
-    const shortSlug = await this.generateShortSlug()
-    const longSlug = await this.generateLongSlug()
+    const shortSlug = await generateShortSlugUntilUnique(
+      async (key) => this.channels.has(key),
+    )
+    const longSlug = await generateLongSlugUntilUnique(
+      async (key) => this.channels.has(key),
+    )
 
     const channel: Channel = {
       secret: crypto.randomUUID(),
@@ -46,10 +113,18 @@ export class RedisChannelRepo implements ChannelRepo {
       shortSlug,
       uploaderPeerID,
     }
-    const channelStr = this.serializeChannel(channel)
 
-    await this.client.setex(this.getLongSlugKey(longSlug), ttl, channelStr)
-    await this.client.setex(this.getShortSlugKey(shortSlug), ttl, channelStr)
+    const expiresAt = Date.now() + ttl * 1000
+    const storedChannel = { channel, expiresAt }
+
+    const shortKey = getShortSlugKey(shortSlug)
+    const longKey = getLongSlugKey(longSlug)
+
+    this.channels.set(shortKey, storedChannel)
+    this.channels.set(longKey, storedChannel)
+
+    this.setChannelTimeout(shortKey, ttl)
+    this.setChannelTimeout(longKey, ttl)
 
     return channel
   }
@@ -58,14 +133,20 @@ export class RedisChannelRepo implements ChannelRepo {
     slug: string,
     scrubSecret = false,
   ): Promise<Channel | null> {
-    const shortChannelStr = await this.client.get(this.getShortSlugKey(slug))
-    if (shortChannelStr) {
-      return this.deserializeChannel(shortChannelStr, scrubSecret)
+    const shortKey = getShortSlugKey(slug)
+    const shortChannel = this.channels.get(shortKey)
+    if (shortChannel) {
+      return scrubSecret 
+        ? { ...shortChannel.channel, secret: undefined }
+        : shortChannel.channel
     }
 
-    const longChannelStr = await this.client.get(this.getLongSlugKey(slug))
-    if (longChannelStr) {
-      return this.deserializeChannel(longChannelStr, scrubSecret)
+    const longKey = getLongSlugKey(slug)
+    const longChannel = this.channels.get(longKey)
+    if (longChannel) {
+      return scrubSecret
+        ? { ...longChannel.channel, secret: undefined }
+        : longChannel.channel
     }
 
     return null
@@ -81,8 +162,17 @@ export class RedisChannelRepo implements ChannelRepo {
       return false
     }
 
-    await this.client.expire(this.getLongSlugKey(channel.longSlug), ttl)
-    await this.client.expire(this.getShortSlugKey(channel.shortSlug), ttl)
+    const expiresAt = Date.now() + ttl * 1000
+    const storedChannel = { channel, expiresAt }
+
+    const shortKey = getShortSlugKey(channel.shortSlug)
+    const longKey = getLongSlugKey(channel.longSlug)
+
+    this.channels.set(longKey, storedChannel)
+    this.channels.set(shortKey, storedChannel)
+
+    this.setChannelTimeout(shortKey, ttl)
+    this.setChannelTimeout(longKey, ttl)
 
     return true
   }
@@ -93,55 +183,114 @@ export class RedisChannelRepo implements ChannelRepo {
       return
     }
 
-    await this.client.del(this.getLongSlugKey(channel.longSlug))
-    await this.client.del(this.getShortSlugKey(channel.shortSlug))
-  }
+    const shortKey = getShortSlugKey(channel.shortSlug)
+    const longKey = getLongSlugKey(channel.longSlug)
 
-  private async generateShortSlug(): Promise<string> {
-    for (let i = 0; i < config.shortSlug.maxAttempts; i++) {
-      const slug = generateShortSlug()
-      const currVal = await this.client.get(this.getShortSlugKey(slug))
-      if (!currVal) {
-        return slug
-      }
+    // Clear timeouts
+    const shortTimeout = this.timeouts.get(shortKey)
+    if (shortTimeout) {
+      clearTimeout(shortTimeout)
+      this.timeouts.delete(shortKey)
     }
 
-    throw new Error('max attempts reached generating short slug')
-  }
-
-  private async generateLongSlug(): Promise<string> {
-    for (let i = 0; i < config.longSlug.maxAttempts; i++) {
-      const slug = await generateLongSlug()
-      const currVal = await this.client.get(this.getLongSlugKey(slug))
-      if (!currVal) {
-        return slug
-      }
+    const longTimeout = this.timeouts.get(longKey)
+    if (longTimeout) {
+      clearTimeout(longTimeout)
+      this.timeouts.delete(longKey)
     }
 
-    throw new Error('max attempts reached generating long slug')
-  }
-
-  private getShortSlugKey(shortSlug: string): string {
-    return `short:${shortSlug}`
-  }
-
-  private getLongSlugKey(longSlug: string): string {
-    return `long:${longSlug}`
-  }
-
-  private serializeChannel(channel: Channel): string {
-    return JSON.stringify(channel)
-  }
-
-  private deserializeChannel(str: string, scrubSecret = false): Channel {
-    const parsedChannel = JSON.parse(str)
-    const validatedChannel = ChannelSchema.parse(parsedChannel)
-    if (scrubSecret) {
-      return { ...validatedChannel, secret: undefined }
-    }
-
-    return validatedChannel
+    this.channels.delete(longKey)
+    this.channels.delete(shortKey)
   }
 }
 
-export const channelRepo = new RedisChannelRepo(config.redisURL)
+export class RedisChannelRepo implements ChannelRepo {
+  client: Redis.Redis
+
+  constructor(redisURL: string) {
+    this.client = new Redis(redisURL)
+  }
+
+  async createChannel(
+    uploaderPeerID: string,
+    ttl: number = config.channel.ttl,
+  ): Promise<Channel> {
+    const shortSlug = await generateShortSlugUntilUnique(
+      async (key) => (await this.client.get(key)) !== null
+    )
+    const longSlug = await generateLongSlugUntilUnique(
+      async (key) => (await this.client.get(key)) !== null
+    )
+
+    const channel: Channel = {
+      secret: crypto.randomUUID(),
+      longSlug,
+      shortSlug,
+      uploaderPeerID,
+    }
+    const channelStr = serializeChannel(channel)
+
+    await this.client.setex(getLongSlugKey(longSlug), ttl, channelStr)
+    await this.client.setex(getShortSlugKey(shortSlug), ttl, channelStr)
+
+    return channel
+  }
+
+  async fetchChannel(
+    slug: string,
+    scrubSecret = false,
+  ): Promise<Channel | null> {
+    const shortChannelStr = await this.client.get(getShortSlugKey(slug))
+    if (shortChannelStr) {
+      return deserializeChannel(shortChannelStr, scrubSecret)
+    }
+
+    const longChannelStr = await this.client.get(getLongSlugKey(slug))
+    if (longChannelStr) {
+      return deserializeChannel(longChannelStr, scrubSecret)
+    }
+
+    return null
+  }
+
+  async renewChannel(
+    slug: string,
+    secret: string,
+    ttl: number = config.channel.ttl,
+  ): Promise<boolean> {
+    const channel = await this.fetchChannel(slug)
+    if (!channel || channel.secret !== secret) {
+      return false
+    }
+
+    await this.client.expire(getLongSlugKey(channel.longSlug), ttl)
+    await this.client.expire(getShortSlugKey(channel.shortSlug), ttl)
+
+    return true
+  }
+
+  async destroyChannel(slug: string): Promise<void> {
+    const channel = await this.fetchChannel(slug)
+    if (!channel) {
+      return
+    }
+
+    await this.client.del(getLongSlugKey(channel.longSlug))
+    await this.client.del(getShortSlugKey(channel.shortSlug))
+  }
+}
+
+let _channelRepo: ChannelRepo | null = null
+
+export function getOrCreateChannelRepo(): ChannelRepo {
+  if (!_channelRepo) {
+    if (process.env.REDIS_URL) {
+      _channelRepo = new RedisChannelRepo(process.env.REDIS_URL)
+      console.log('[ChannelRepo] Using Redis storage')
+    } else {
+      _channelRepo = new MemoryChannelRepo()
+      console.log('[ChannelRepo] Using in-memory storage') 
+    }
+  }
+  return _channelRepo
+}

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { JSX, useState, useCallback, useEffect } from 'react'
 import { useDownloader } from '../hooks/useDownloader'
 import PasswordField from './PasswordField'
 import UnlockButton from './UnlockButton'
@@ -20,7 +20,11 @@ interface FileInfo {
   type: string
 }
 
-export function ConnectingToUploader({ showTroubleshootingAfter = 3000 }: { showTroubleshootingAfter?: number }): JSX.Element {
+export function ConnectingToUploader({
+  showTroubleshootingAfter = 3000,
+}: {
+  showTroubleshootingAfter?: number
+}): JSX.Element {
   const [showTroubleshooting, setShowTroubleshooting] = useState(false)
 
   useEffect(() => {
@@ -37,44 +41,55 @@ export function ConnectingToUploader({ showTroubleshootingAfter = 3000 }: { show
   return (
     <>
       <Loading text="Connecting to uploader..." />
-      
-      <div 
-        className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg p-8 max-w-md w-full"
-      >
-        <h2 
-          className="text-xl font-bold mb-4 text-stone-900 dark:text-stone-50"
-        >
+
+      <div className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg p-8 max-w-md w-full">
+        <h2 className="text-xl font-bold mb-4 text-stone-900 dark:text-stone-50">
           Having trouble connecting?
         </h2>
-        
+
         <div className="space-y-4 text-stone-700 dark:text-stone-300">
-          <p>FilePizza uses direct peer-to-peer connections, but sometimes the connection can get stuck. Here are some possible reasons this can happen:</p>
-          
+          <p>
+            FilePizza uses direct peer-to-peer connections, but sometimes the
+            connection can get stuck. Here are some possible reasons this can
+            happen:
+          </p>
+
           <ul className="list-none space-y-3">
             <li className="flex items-start gap-3 px-4 py-2 rounded-lg bg-stone-100 dark:bg-stone-800">
               <span className="text-base">🚪</span>
-              <span className="text-sm">The uploader may have closed their browser. FilePizza requires the uploader to stay online continuously because files are transferred directly between b.</span>
+              <span className="text-sm">
+                The uploader may have closed their browser. FilePizza requires
+                the uploader to stay online continuously because files are
+                transferred directly between b.
+              </span>
             </li>
             <li className="flex items-start gap-3 px-4 py-2 rounded-lg bg-stone-100 dark:bg-stone-800">
               <span className="text-base">🔒</span>
-              <span className="text-sm">Your network might have strict firewalls or NAT settings, such as having UPnP disabled</span>
+              <span className="text-sm">
+                Your network might have strict firewalls or NAT settings, such
+                as having UPnP disabled
+              </span>
             </li>
             <li className="flex items-start gap-3 px-4 py-2 rounded-lg bg-stone-100 dark:bg-stone-800">
               <span className="text-base">🌐</span>
-              <span className="text-sm">Some corporate or school networks block peer-to-peer connections</span>
+              <span className="text-sm">
+                Some corporate or school networks block peer-to-peer connections
+              </span>
             </li>
           </ul>
 
           <p className="text-sm text-stone-500 dark:text-stone-400 italic">
-            Note: FilePizza is designed for direct transfers between known parties and doesn't use{" "}
-            <a 
-              href="https://en.wikipedia.org/wiki/Traversal_Using_Relays_around_NAT" 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            Note: FilePizza is designed for direct transfers between known
+            parties and doesn't use{' '}
+            <a
+              href="https://en.wikipedia.org/wiki/Traversal_Using_Relays_around_NAT"
+              target="_blank"
+              rel="noopener noreferrer"
               className="underline"
             >
               TURN
-            </a> relay servers. This means it may not work on all networks.
+            </a>{' '}
+            relay servers. This means it may not work on all networks.
           </p>
         </div>
       </div>

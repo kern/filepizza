@@ -5,6 +5,7 @@ import { ThemeProvider } from '../components/ThemeProvider'
 import { ModeToggle } from '../components/ModeToggle'
 import FilePizzaQueryClientProvider from '../components/QueryClientProvider'
 import { Viewport } from 'next'
+import { ViewTransitions } from 'next-view-transitions'
 
 export const metadata = {
   title: 'FilePizza • Your files, delivered.',
@@ -22,7 +23,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  userScalable: false
+  userScalable: false,
 }
 
 export default function RootLayout({
@@ -31,8 +32,9 @@ export default function RootLayout({
   children: React.ReactNode
 }): React.ReactElement {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
+    <ViewTransitions>
+      <html lang="en" suppressHydrationWarning>
+        <head>
         <meta name="monetization" content="$twitter.xrptipbot.com/kernio" />
       </head>
       <body>
@@ -43,7 +45,8 @@ export default function RootLayout({
             <ModeToggle />
           </FilePizzaQueryClientProvider>
         </ThemeProvider>
-      </body>
-    </html>
+        </body>
+      </html>
+    </ViewTransitions>
   )
 }

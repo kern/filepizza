@@ -1,3 +1,5 @@
+import { JSX } from 'react'
+
 export function ErrorMessage({ message }: { message: string }): JSX.Element {
   return (
     <div

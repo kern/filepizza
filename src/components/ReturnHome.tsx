@@ -1,4 +1,5 @@
-import Link from 'next/link'
+import { Link } from 'next-view-transitions'
+import { JSX } from 'react'
 
 export default function ReturnHome(): JSX.Element {
   return (

@@ -1,12 +1,12 @@
 import { createZipStream } from '../zip-stream'
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 if (typeof window !== 'undefined') require('web-streams-polyfill/ponyfill')
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const streamSaver =
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   typeof window !== 'undefined' ? require('streamsaver') : null
 if (typeof window !== 'undefined') {
   streamSaver.mitm = baseURL + '/stream.html'
