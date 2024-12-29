@@ -7,9 +7,10 @@ import {
 } from '../types'
 import { decodeMessage, Message, MessageType } from '../messages'
 import { getFileName } from '../fs'
+import { setRotating } from './useRotatingSpinner'
 
 // TODO(@kern): Test for better values
-const MAX_CHUNK_SIZE = 10 * 1024 * 1024 // 10 Mi
+const MAX_CHUNK_SIZE = 256 * 1024 // 256 KB
 
 function validateOffset(
   files: UploadedFile[],

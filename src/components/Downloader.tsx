@@ -93,6 +93,7 @@ export function ConnectingToUploader({
           </p>
         </div>
       </div>
+      <ReturnHome />
     </>
   )
 }

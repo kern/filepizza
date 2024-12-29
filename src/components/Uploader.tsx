@@ -1,6 +1,6 @@
 'use client'
 
-import React, { JSX, useCallback } from 'react'
+import React, { JSX, useCallback, useEffect } from 'react'
 import { UploadedFile, UploaderConnectionStatus } from '../types'
 import { useWebRTCPeer } from './WebRTCProvider'
 import QRCode from 'react-qr-code'
@@ -11,6 +11,7 @@ import { useUploaderConnections } from '../hooks/useUploaderConnections'
 import { CopyableInput } from './CopyableInput'
 import { ConnectionListItem } from './ConnectionListItem'
 import { ErrorMessage } from './ErrorMessage'
+import { setRotating } from '../hooks/useRotatingSpinner'
 
 const QR_CODE_SIZE = 128
 
@@ -33,13 +34,17 @@ export default function Uploader({
     onStop()
   }, [stop, onStop])
 
-  if (isLoading || !longSlug || !shortSlug) {
-    return <Loading text="Creating channel..." />
-  }
-
   const activeDownloaders = connections.filter(
     (conn) => conn.status === UploaderConnectionStatus.Uploading,
   ).length
+
+  useEffect(() => {
+    setRotating(activeDownloaders > 0)
+  }, [activeDownloaders])
+
+  if (isLoading || !longSlug || !shortSlug) {
+    return <Loading text="Creating channel..." />
+  }
 
   if (error) {
     return <ErrorMessage message={error.message} />

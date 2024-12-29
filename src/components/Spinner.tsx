@@ -1,4 +1,7 @@
+'use client'
+
 import React, { JSX } from 'react'
+import { useRotatingSpinner } from '../hooks/useRotatingSpinner'
 
 function Pizza({ isRotating }: { isRotating?: boolean }): JSX.Element {
   return (
@@ -1680,11 +1683,10 @@ function Arrow({ direction }: { direction: 'up' | 'down' }): JSX.Element {
 
 export default function Spinner({
   direction,
-  isRotating,
 }: {
   direction: 'up' | 'down'
-  isRotating?: boolean
 }): JSX.Element {
+  const isRotating = useRotatingSpinner()
   return (
     <div className="relative w-[300px] h-[300px]">
       <Pizza isRotating={isRotating} />

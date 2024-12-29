@@ -15,6 +15,7 @@ import {
   mobileVendor,
   mobileModel,
 } from 'react-device-detect'
+import { setRotating } from './useRotatingSpinner'
 const cleanErrorMessage = (errorMessage: string): string =>
   errorMessage.startsWith('Could not connect to peer')
     ? 'Could not connect to the uploader. Did they close their browser?'
@@ -86,6 +87,7 @@ export function useDownloader(uploaderPeerID: string): {
             break
           case MessageType.Chunk:
             processChunk.current?.(message)
+            setRotating(true)
             break
           case MessageType.Error:
             console.error(message.error)
@@ -103,6 +105,7 @@ export function useDownloader(uploaderPeerID: string): {
     }
 
     const handleClose = () => {
+      setRotating(false)
       setDataConnection(null)
       setIsConnected(false)
       setIsDownloading(false)
