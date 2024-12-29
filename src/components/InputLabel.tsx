@@ -20,7 +20,7 @@ export default function InputLabel({
       </label>
       {tooltip && (
         <div className="relative">
-          <div 
+          <div
             className="text-[11px] text-stone-400 dark:text-stone-400 cursor-help hover:opacity-80 peer focus:opacity-80"
             role="button"
             aria-label="Show tooltip"

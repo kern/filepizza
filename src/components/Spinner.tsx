@@ -1657,11 +1657,15 @@ function Arrow({ direction }: { direction: 'up' | 'down' }): JSX.Element {
       viewBox="0 0 232 335"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={direction === 'down' ? 'rotate-180 transition-transform duration-150' : 'transition-transform duration-150'}
+      className={
+        direction === 'down'
+          ? 'rotate-180 transition-transform duration-150'
+          : 'transition-transform duration-150'
+      }
       role="img"
       aria-label={`Arrow pointing ${direction}`}
       style={{
-        viewTransitionName: 'arrow-direction'
+        viewTransitionName: 'arrow-direction',
       }}
     >
       <path

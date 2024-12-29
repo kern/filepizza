@@ -57,8 +57,7 @@ async function getOrCreateGlobalPeer(): Promise<Peer> {
     globalPeer?.on('open', listener)
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return globalPeer!
+  return globalPeer
 }
 
 export default function WebRTCPeerProvider({
@@ -80,11 +79,7 @@ export default function WebRTCPeerProvider({
     getOrCreateGlobalPeer().then(setPeerValue)
   }, [])
 
-  const value = useMemo(
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    () => ({ peer: peerValue!, stop }),
-    [peerValue, stop],
-  )
+  const value = useMemo(() => ({ peer: peerValue!, stop }), [peerValue, stop])
 
   if (isStopped) {
     return <></>

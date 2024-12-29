@@ -11,8 +11,6 @@ export async function POST(request: Request): Promise<NextResponse> {
     )
   }
 
-  const channel = await getOrCreateChannelRepo().createChannel(
-    uploaderPeerID,
-  )
+  const channel = await getOrCreateChannelRepo().createChannel(uploaderPeerID)
   return NextResponse.json(channel)
 }

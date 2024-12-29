@@ -121,14 +121,14 @@ export function createZipStream(
           header.view.setUint16(
             6,
             (((date.getHours() << 6) | date.getMinutes()) << 5) |
-            (date.getSeconds() / 2),
+              (date.getSeconds() / 2),
             true,
           )
           header.view.setUint16(
             8,
             ((((date.getFullYear() - 1980) << 4) | (date.getMonth() + 1)) <<
               5) |
-            date.getDate(),
+              date.getDate(),
             true,
           )
           header.view.setUint16(22, nameBuf.length, true)
@@ -229,7 +229,8 @@ export function createZipStream(
   return new ReadableStream({
     start: (c) => {
       ctrl = c
-      if (underlyingSource.start) Promise.resolve(underlyingSource.start(zipWriter))
+      if (underlyingSource.start)
+        Promise.resolve(underlyingSource.start(zipWriter))
     },
     pull() {
       return (

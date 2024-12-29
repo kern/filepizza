@@ -35,16 +35,16 @@ export default function RootLayout({
     <ViewTransitions>
       <html lang="en" suppressHydrationWarning>
         <head>
-        <meta name="monetization" content="$twitter.xrptipbot.com/kernio" />
-      </head>
-      <body>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <FilePizzaQueryClientProvider>
-            <main>{children}</main>
-            <Footer />
-            <ModeToggle />
-          </FilePizzaQueryClientProvider>
-        </ThemeProvider>
+          <meta name="monetization" content="$twitter.xrptipbot.com/kernio" />
+        </head>
+        <body>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <FilePizzaQueryClientProvider>
+              <main>{children}</main>
+              <Footer />
+              <ModeToggle />
+            </FilePizzaQueryClientProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ViewTransitions>

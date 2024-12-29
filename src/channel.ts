@@ -34,7 +34,9 @@ function getLongSlugKey(longSlug: string): string {
   return `long:${longSlug}`
 }
 
-async function generateShortSlugUntilUnique(checkExists: (key: string) => Promise<boolean>): Promise<string> {
+async function generateShortSlugUntilUnique(
+  checkExists: (key: string) => Promise<boolean>,
+): Promise<string> {
   for (let i = 0; i < config.shortSlug.maxAttempts; i++) {
     const slug = generateShortSlug()
     const exists = await checkExists(getShortSlugKey(slug))
@@ -46,7 +48,9 @@ async function generateShortSlugUntilUnique(checkExists: (key: string) => Promis
   throw new Error('max attempts reached generating short slug')
 }
 
-async function generateLongSlugUntilUnique(checkExists: (key: string) => Promise<boolean>): Promise<string> {
+async function generateLongSlugUntilUnique(
+  checkExists: (key: string) => Promise<boolean>,
+): Promise<string> {
   for (let i = 0; i < config.longSlug.maxAttempts; i++) {
     const slug = await generateLongSlug()
     const exists = await checkExists(getLongSlugKey(slug))
@@ -100,11 +104,11 @@ export class MemoryChannelRepo implements ChannelRepo {
     uploaderPeerID: string,
     ttl: number = config.channel.ttl,
   ): Promise<Channel> {
-    const shortSlug = await generateShortSlugUntilUnique(
-      async (key) => this.channels.has(key),
+    const shortSlug = await generateShortSlugUntilUnique(async (key) =>
+      this.channels.has(key),
     )
-    const longSlug = await generateLongSlugUntilUnique(
-      async (key) => this.channels.has(key),
+    const longSlug = await generateLongSlugUntilUnique(async (key) =>
+      this.channels.has(key),
     )
 
     const channel: Channel = {
@@ -136,7 +140,7 @@ export class MemoryChannelRepo implements ChannelRepo {
     const shortKey = getShortSlugKey(slug)
     const shortChannel = this.channels.get(shortKey)
     if (shortChannel) {
-      return scrubSecret 
+      return scrubSecret
         ? { ...shortChannel.channel, secret: undefined }
         : shortChannel.channel
     }
@@ -216,10 +220,10 @@ export class RedisChannelRepo implements ChannelRepo {
     ttl: number = config.channel.ttl,
   ): Promise<Channel> {
     const shortSlug = await generateShortSlugUntilUnique(
-      async (key) => (await this.client.get(key)) !== null
+      async (key) => (await this.client.get(key)) !== null,
     )
     const longSlug = await generateLongSlugUntilUnique(
-      async (key) => (await this.client.get(key)) !== null
+      async (key) => (await this.client.get(key)) !== null,
     )
 
     const channel: Channel = {
@@ -289,7 +293,7 @@ export function getOrCreateChannelRepo(): ChannelRepo {
       console.log('[ChannelRepo] Using Redis storage')
     } else {
       _channelRepo = new MemoryChannelRepo()
-      console.log('[ChannelRepo] Using in-memory storage') 
+      console.log('[ChannelRepo] Using in-memory storage')
     }
   }
   return _channelRepo
