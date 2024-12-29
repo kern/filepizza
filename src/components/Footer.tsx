@@ -49,7 +49,7 @@ export function Footer(): JSX.Element {
           <p className="text-stone-600 dark:text-stone-400">
             Cooked up by{' '}
             <FooterLink href="http://kern.io">Alex Kern</FooterLink> &amp;{' '}
-            <FooterLink href="http://neeraj.io">Neeraj Baid</FooterLink> while
+            <FooterLink href="https://github.com/neerajbaid">Neeraj Baid</FooterLink> while
             eating <strong>Sliver</strong> @ UC Berkeley &middot;{' '}
             <FooterLink href="https://github.com/kern/filepizza#faq">
               FAQ
