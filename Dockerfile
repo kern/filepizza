@@ -1,9 +1,13 @@
-FROM node:alpine
-MAINTAINER Alexander Kern <filepizza@kern.io>
+FROM node:lts-alpine
 
+RUN apk add --no-cache pnpm
+
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install
 COPY . ./
-RUN npm install && npm run build
+RUN pnpm build
 
+ENV PORT 3000
 ENV NODE_ENV production
-EXPOSE 80
-CMD node ./dist/index.js
+EXPOSE 3000
+CMD pnpm start

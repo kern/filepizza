@@ -1,0 +1,24 @@
+version: '3'
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    networks:
+      - filepizza
+  filepizza:
+    build: .
+    image: kern/filepizza:master
+    ports:
+      - 8080:8080
+    environment:
+      - PORT=8080
+      - REDIS_URL=redis://redis:6379
+    networks:
+      - filepizza
+    depends_on:
+      - redis
+
+networks:
+  filepizza:
+    driver: bridge
