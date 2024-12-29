@@ -2,3 +2,4 @@
 .next
 node_modules
 dist
+tsconfig.tsbuildinfo
