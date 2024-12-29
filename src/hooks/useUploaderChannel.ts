@@ -12,7 +12,7 @@ function generateURL(slug: string): string {
 
 export function useUploaderChannel(
   uploaderPeerID: string,
-  renewInterval = 5000,
+  renewInterval = 60_000,
 ): {
   isLoading: boolean
   error: Error | null
