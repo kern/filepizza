@@ -78,20 +78,6 @@ export function ConnectingToUploader({
               </span>
             </li>
           </ul>
-
-          <p className="text-sm text-stone-500 dark:text-stone-400 italic">
-            Note: FilePizza is designed for direct transfers between known
-            parties and doesn't use{' '}
-            <a
-              href="https://en.wikipedia.org/wiki/Traversal_Using_Relays_around_NAT"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              TURN
-            </a>{' '}
-            relay servers. This means it may not work on all networks.
-          </p>
         </div>
       </div>
       <ReturnHome />

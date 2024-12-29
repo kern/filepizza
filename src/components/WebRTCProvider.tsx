@@ -11,15 +11,6 @@ import React, {
 import Loading from './Loading'
 import Peer from 'peerjs'
 
-const ICE_SERVERS: RTCConfiguration = {
-  iceServers: [
-    {
-      urls:
-        process.env.NEXT_PUBLIC_STUN_SERVER ?? 'stun:stun.l.google.com:19302',
-    },
-  ],
-}
-
 export type WebRTCPeerValue = {
   peer: Peer
   stop: () => void
@@ -39,9 +30,7 @@ let globalPeer: Peer | null = null
 
 async function getOrCreateGlobalPeer(): Promise<Peer> {
   if (!globalPeer) {
-    globalPeer = new Peer({
-      config: ICE_SERVERS,
-    })
+    globalPeer = new Peer()
   }
 
   if (globalPeer.id) {
