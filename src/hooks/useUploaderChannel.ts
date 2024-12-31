@@ -24,20 +24,26 @@ export function useUploaderChannel(
   const { isLoading, error, data } = useQuery({
     queryKey: ['uploaderChannel', uploaderPeerID],
     queryFn: async () => {
-      console.log('[UploaderChannel] creating new channel for peer', uploaderPeerID)
+      console.log(
+        '[UploaderChannel] creating new channel for peer',
+        uploaderPeerID,
+      )
       const response = await fetch('/api/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ uploaderPeerID }),
       })
       if (!response.ok) {
-        console.error('[UploaderChannel] failed to create channel:', response.status)
+        console.error(
+          '[UploaderChannel] failed to create channel:',
+          response.status,
+        )
         throw new Error('Network response was not ok')
       }
       const data = await response.json()
       console.log('[UploaderChannel] channel created successfully:', {
         longSlug: data.longSlug,
-        shortSlug: data.shortSlug
+        shortSlug: data.shortSlug,
       })
       return data
     },
@@ -62,7 +68,10 @@ export function useUploaderChannel(
         body: JSON.stringify({ slug: shortSlug, secret: s }),
       })
       if (!response.ok) {
-        console.error('[UploaderChannel] failed to renew channel', response.status)
+        console.error(
+          '[UploaderChannel] failed to renew channel',
+          response.status,
+        )
         throw new Error('Network response was not ok')
       }
       const data = await response.json()
@@ -78,7 +87,11 @@ export function useUploaderChannel(
 
     const run = (): void => {
       timeout = setTimeout(() => {
-        console.log('[UploaderChannel] scheduling channel renewal in', renewInterval, 'ms')
+        console.log(
+          '[UploaderChannel] scheduling channel renewal in',
+          renewInterval,
+          'ms',
+        )
         renewMutation.mutate({ secret })
         run()
       }, renewInterval)

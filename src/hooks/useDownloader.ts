@@ -188,7 +188,10 @@ export function useDownloader(uploaderPeerID: string): {
     let nextFileIndex = 0
     const startNextFileOrFinish = () => {
       if (nextFileIndex >= filesInfo.length) return
-      console.log('[Downloader] starting next file:', filesInfo[nextFileIndex].fileName)
+      console.log(
+        '[Downloader] starting next file:',
+        filesInfo[nextFileIndex].fileName,
+      )
       dataConnection.send({
         type: MessageType.Start,
         fileName: filesInfo[nextFileIndex].fileName,

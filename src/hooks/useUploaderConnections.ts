@@ -34,14 +34,20 @@ export function useUploaderConnections(
   const [connections, setConnections] = useState<Array<UploaderConnection>>([])
 
   useEffect(() => {
-    console.log('[UploaderConnections] initializing with', files.length, 'files')
+    console.log(
+      '[UploaderConnections] initializing with',
+      files.length,
+      'files',
+    )
     const cleanupHandlers: Array<() => void> = []
 
     const listener = (conn: DataConnection) => {
       console.log('[UploaderConnections] new connection from peer', conn.peer)
       // If the connection is a report, we need to hard-redirect the uploader to the reported page to prevent them from uploading more files.
       if (conn.metadata?.type === 'report') {
-        console.log('[UploaderConnections] received report connection, redirecting')
+        console.log(
+          '[UploaderConnections] received report connection, redirecting',
+        )
         // Broadcast report message to all connections
         connections.forEach((c) => {
           c.dataConnection.send({
@@ -85,7 +91,9 @@ export function useUploaderConnections(
               console.log('[UploaderConnections] client info:', {
                 browser: `${message.browserName} ${message.browserVersion}`,
                 os: `${message.osName} ${message.osVersion}`,
-                mobile: message.mobileVendor ? `${message.mobileVendor} ${message.mobileModel}` : 'N/A'
+                mobile: message.mobileVendor
+                  ? `${message.mobileVendor} ${message.mobileModel}`
+                  : 'N/A',
               })
               const newConnectionState = {
                 browserName: message.browserName,
@@ -97,7 +105,9 @@ export function useUploaderConnections(
               }
 
               if (password) {
-                console.log('[UploaderConnections] password required, requesting authentication')
+                console.log(
+                  '[UploaderConnections] password required, requesting authentication',
+                )
                 const request: Message = {
                   type: MessageType.PasswordRequired,
                 }
@@ -206,7 +216,12 @@ export function useUploaderConnections(
             case MessageType.Start: {
               const fileName = message.fileName
               let offset = message.offset
-              console.log('[UploaderConnections] starting transfer of', fileName, 'from offset', offset)
+              console.log(
+                '[UploaderConnections] starting transfer of',
+                fileName,
+                'from offset',
+                offset,
+              )
               const file = validateOffset(files, fileName, offset)
 
               const sendNextChunkAsync = () => {
@@ -226,7 +241,14 @@ export function useUploaderConnections(
                   updateConnection((draft) => {
                     offset = end
                     if (final) {
-                      console.log('[UploaderConnections] completed file', fileName, '- file', draft.completedFiles + 1, 'of', draft.totalFiles)
+                      console.log(
+                        '[UploaderConnections] completed file',
+                        fileName,
+                        '- file',
+                        draft.completedFiles + 1,
+                        'of',
+                        draft.totalFiles,
+                      )
                       return {
                         ...draft,
                         status: UploaderConnectionStatus.Ready,
@@ -288,7 +310,9 @@ export function useUploaderConnections(
             }
 
             case MessageType.Done: {
-              console.log('[UploaderConnections] transfer completed successfully')
+              console.log(
+                '[UploaderConnections] transfer completed successfully',
+              )
               updateConnection((draft) => {
                 if (draft.status !== UploaderConnectionStatus.Ready) {
                   return draft
