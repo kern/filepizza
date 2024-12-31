@@ -45,8 +45,8 @@ dependencies:
     specifier: ^18.2.0
     version: 18.3.1
   react-device-detect:
-    specifier: ^1.17.0
-    version: 1.17.0(react-dom@18.3.1)(react@18.3.1)
+    specifier: ^2.0.0
+    version: 2.2.3(react-dom@18.3.1)(react@18.3.1)
   react-dom:
     specifier: ^18.2.0
     version: 18.3.1(react@18.3.1)
@@ -3842,15 +3842,15 @@ packages:
       unpipe: 1.0.0
     dev: false
 
-  /react-device-detect@1.17.0(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-bBblIStwpHmoS281JFIVqeimcN3LhpoP5YKDWzxQdBIUP8S2xPvHDgizLDhUq2ScguLfVPmwfF5y268EEQR60w==}
+  /react-device-detect@2.2.3(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-buYY3qrCnQVlIFHrC5UcUoAj7iANs/+srdkwsnNjI7anr3Tt7UY6MqNxtMLlr0tMBied0O49UZVK8XKs3ZIiPw==}
     peerDependencies:
-      react: '>= 0.14.0 < 18.0.0'
-      react-dom: '>= 0.14.0 < 18.0.0'
+      react: '>= 0.14.0'
+      react-dom: '>= 0.14.0'
     dependencies:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      ua-parser-js: 0.7.38
+      ua-parser-js: 1.0.40
     dev: false
 
   /react-dom@18.3.1(react@18.3.1):
@@ -4740,8 +4740,9 @@ packages:
     hasBin: true
     dev: true
 
-  /ua-parser-js@0.7.38:
-    resolution: {integrity: sha512-fYmIy7fKTSFAhG3fuPlubeGaMoAd6r0rSnfEsO5nEY55i26KSLt9EH7PLQiiqPUhNqYIJvSkTy1oArIcXAbPbA==}
+  /ua-parser-js@1.0.40:
+    resolution: {integrity: sha512-z6PJ8Lml+v3ichVojCiB8toQJBuwR42ySM4ezjXIqXK3M0HczmKQ3LF4rhU55PfD99KEEXQG6yb7iOMyvYuHew==}
+    hasBin: true
     dev: false
 
   /unbox-primitive@1.0.2:
