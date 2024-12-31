@@ -1,6 +1,6 @@
 import 'server-only'
 import config from './config'
-import Redis from 'ioredis'
+import { Redis, getRedisClient } from './redisClient'
 import { generateShortSlug, generateLongSlug } from './slugs'
 import crypto from 'crypto'
 import { z } from 'zod'
@@ -211,8 +211,8 @@ export class MemoryChannelRepo implements ChannelRepo {
 export class RedisChannelRepo implements ChannelRepo {
   client: Redis.Redis
 
-  constructor(redisURL: string) {
-    this.client = new Redis(redisURL)
+  constructor() {
+    this.client = getRedisClient()
   }
 
   async createChannel(
@@ -289,7 +289,7 @@ let _channelRepo: ChannelRepo | null = null
 export function getOrCreateChannelRepo(): ChannelRepo {
   if (!_channelRepo) {
     if (process.env.REDIS_URL) {
-      _channelRepo = new RedisChannelRepo(process.env.REDIS_URL)
+      _channelRepo = new RedisChannelRepo()
       console.log('[ChannelRepo] Using Redis storage')
     } else {
       _channelRepo = new MemoryChannelRepo()

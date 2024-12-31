@@ -34,9 +34,6 @@ export default function RootLayout({
   return (
     <ViewTransitions>
       <html lang="en" suppressHydrationWarning>
-        <head>
-          <meta name="monetization" content="$twitter.xrptipbot.com/kernio" />
-        </head>
         <body>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <FilePizzaQueryClientProvider>

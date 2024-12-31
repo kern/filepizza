@@ -7,7 +7,7 @@
   "homepage": "https://github.com/kern/filepizza",
   "scripts": {
     "dev": "next",
-    "dev:redis": "docker compose up redis -d && REDIS_URL=redis://localhost:6379 next",
+    "dev:full": "docker compose up redis coturn -d && COTURN_ENABLED=true REDIS_URL=redis://localhost:6379 next",
     "build": "next build",
     "start": "next start",
     "start:peerjs": "./bin/peerjs.js",

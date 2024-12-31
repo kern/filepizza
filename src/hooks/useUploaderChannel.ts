@@ -24,15 +24,22 @@ export function useUploaderChannel(
   const { isLoading, error, data } = useQuery({
     queryKey: ['uploaderChannel', uploaderPeerID],
     queryFn: async () => {
+      console.log('[UploaderChannel] creating new channel for peer', uploaderPeerID)
       const response = await fetch('/api/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ uploaderPeerID }),
       })
       if (!response.ok) {
+        console.error('[UploaderChannel] failed to create channel:', response.status)
         throw new Error('Network response was not ok')
       }
-      return response.json()
+      const data = await response.json()
+      console.log('[UploaderChannel] channel created successfully:', {
+        longSlug: data.longSlug,
+        shortSlug: data.shortSlug
+      })
+      return data
     },
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -48,15 +55,19 @@ export function useUploaderChannel(
 
   const renewMutation = useMutation({
     mutationFn: async ({ secret: s }: { secret: string }) => {
+      console.log('[UploaderChannel] renewing channel for slug', shortSlug)
       const response = await fetch('/api/renew', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ slug: shortSlug, secret: s }),
       })
       if (!response.ok) {
+        console.error('[UploaderChannel] failed to renew channel', response.status)
         throw new Error('Network response was not ok')
       }
-      return response.json()
+      const data = await response.json()
+      console.log('[UploaderChannel] channel renewed successfully')
+      return data
     },
   })
 
@@ -67,6 +78,7 @@ export function useUploaderChannel(
 
     const run = (): void => {
       timeout = setTimeout(() => {
+        console.log('[UploaderChannel] scheduling channel renewal in', renewInterval, 'ms')
         renewMutation.mutate({ secret })
         run()
       }, renewInterval)
@@ -75,7 +87,10 @@ export function useUploaderChannel(
     run()
 
     return () => {
-      if (timeout) clearTimeout(timeout)
+      if (timeout) {
+        console.log('[UploaderChannel] clearing renewal timeout')
+        clearTimeout(timeout)
+      }
     }
   }, [secret, shortSlug, renewMutation, renewInterval])
 
@@ -83,16 +98,15 @@ export function useUploaderChannel(
     if (!shortSlug || !secret) return
 
     const handleUnload = (): void => {
+      console.log('[UploaderChannel] destroying channel on page unload')
       // Using sendBeacon for best-effort delivery during page unload
       navigator.sendBeacon('/api/destroy', JSON.stringify({ slug: shortSlug }))
     }
 
     window.addEventListener('beforeunload', handleUnload)
-    window.addEventListener('unload', handleUnload)
 
     return () => {
       window.removeEventListener('beforeunload', handleUnload)
-      window.removeEventListener('unload', handleUnload)
     }
   }, [shortSlug, secret])
 

@@ -231,8 +231,19 @@ export default function Downloader({
     )
   }
 
-  if (!isConnected) {
-    return <ConnectingToUploader />
+  if (isPasswordRequired) {
+    return (
+      <PasswordEntry errorMessage={errorMessage} onSubmit={submitPassword} />
+    )
+  }
+
+  if (errorMessage) {
+    return (
+      <>
+        <ErrorMessage message={errorMessage} />
+        <ReturnHome />
+      </>
+    )
   }
 
   if (isDownloading && filesInfo) {
@@ -250,10 +261,8 @@ export default function Downloader({
     return <ReadyToDownload filesInfo={filesInfo} onStart={startDownload} />
   }
 
-  if (isPasswordRequired) {
-    return (
-      <PasswordEntry errorMessage={errorMessage} onSubmit={submitPassword} />
-    )
+  if (!isConnected) {
+    return <ConnectingToUploader />
   }
 
   return <Loading text="Uh oh... Something went wrong." />
