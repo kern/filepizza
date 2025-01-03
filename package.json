@@ -7,8 +7,10 @@
   "homepage": "https://github.com/kern/filepizza",
   "scripts": {
     "dev": "next",
+    "dev:code": "NEXT_PUBLIC_RETRIEVE_CODE_MODE=true next",
     "dev:full": "docker compose up redis coturn -d && COTURN_ENABLED=true REDIS_URL=redis://localhost:6379 next",
     "build": "next build",
+    "build:code": "NEXT_PUBLIC_RETRIEVE_CODE_MODE=true next build",
     "start": "next start",
     "start:peerjs": "./bin/peerjs.js",
     "lint:check": "eslint 'src/**/*.ts[x]'",
@@ -33,6 +35,7 @@
     "url": "https://github.com/kern/filepizza/issues"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@tanstack/react-query": "^5.55.2",
     "autoprefixer": "^10.4.20",
     "debug": "^4.3.6",

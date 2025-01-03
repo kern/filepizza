@@ -1,7 +1,11 @@
 import 'server-only'
 import config from './config'
 import { Redis, getRedisClient } from './redisClient'
-import { generateShortSlug, generateLongSlug } from './slugs'
+import {
+  generateShortSlug,
+  generateLongSlug,
+  generateRetrieveCode,
+} from './slugs'
 import crypto from 'crypto'
 import { z } from 'zod'
 
@@ -10,6 +14,7 @@ export type Channel = {
   longSlug: string
   shortSlug: string
   uploaderPeerID: string
+  retrieveCode: string
 }
 
 const ChannelSchema = z.object({
@@ -17,6 +22,7 @@ const ChannelSchema = z.object({
   longSlug: z.string(),
   shortSlug: z.string(),
   uploaderPeerID: z.string(),
+  retrieveCode: z.string(),
 })
 
 export interface ChannelRepo {
@@ -32,6 +38,10 @@ function getShortSlugKey(shortSlug: string): string {
 
 function getLongSlugKey(longSlug: string): string {
   return `long:${longSlug}`
+}
+
+function getRetrieveCodeKey(retrieveCode: string): string {
+  return `retrieve:${retrieveCode}`
 }
 
 async function generateShortSlugUntilUnique(
@@ -60,6 +70,20 @@ async function generateLongSlugUntilUnique(
   }
 
   throw new Error('max attempts reached generating long slug')
+}
+
+async function generateRetrieveCodeUntilUnique(
+  checkExists: (key: string) => Promise<boolean>,
+): Promise<string> {
+  for (let i = 0; i < config.retrieveCodeSlug.maxAttempts; i++) {
+    const code = generateRetrieveCode()
+    const exists = await checkExists(getRetrieveCodeKey(code))
+    if (!exists) {
+      return code
+    }
+  }
+
+  throw new Error('max attempts reached generating retrieve code')
 }
 
 function serializeChannel(channel: Channel): string {
@@ -110,12 +134,16 @@ export class MemoryChannelRepo implements ChannelRepo {
     const longSlug = await generateLongSlugUntilUnique(async (key) =>
       this.channels.has(key),
     )
+    const retrieveCode = await generateRetrieveCodeUntilUnique(async (key) =>
+      this.channels.has(key),
+    )
 
     const channel: Channel = {
       secret: crypto.randomUUID(),
       longSlug,
       shortSlug,
       uploaderPeerID,
+      retrieveCode,
     }
 
     const expiresAt = Date.now() + ttl * 1000
@@ -123,13 +151,15 @@ export class MemoryChannelRepo implements ChannelRepo {
 
     const shortKey = getShortSlugKey(shortSlug)
     const longKey = getLongSlugKey(longSlug)
+    const retrieveCodeKey = getRetrieveCodeKey(retrieveCode)
 
     this.channels.set(shortKey, storedChannel)
     this.channels.set(longKey, storedChannel)
+    this.channels.set(retrieveCodeKey, storedChannel)
 
     this.setChannelTimeout(shortKey, ttl)
     this.setChannelTimeout(longKey, ttl)
-
+    this.setChannelTimeout(retrieveCodeKey, ttl)
     return channel
   }
 
@@ -143,6 +173,14 @@ export class MemoryChannelRepo implements ChannelRepo {
       return scrubSecret
         ? { ...shortChannel.channel, secret: undefined }
         : shortChannel.channel
+    }
+
+    const retrieveCodeKey = getRetrieveCodeKey(slug)
+    const retrieveCodeChannel = this.channels.get(retrieveCodeKey)
+    if (retrieveCodeChannel) {
+      return scrubSecret
+        ? { ...retrieveCodeChannel.channel, secret: undefined }
+        : retrieveCodeChannel.channel
     }
 
     const longKey = getLongSlugKey(slug)
@@ -171,13 +209,15 @@ export class MemoryChannelRepo implements ChannelRepo {
 
     const shortKey = getShortSlugKey(channel.shortSlug)
     const longKey = getLongSlugKey(channel.longSlug)
+    const retrieveCodeKey = getRetrieveCodeKey(channel.retrieveCode)
 
     this.channels.set(longKey, storedChannel)
     this.channels.set(shortKey, storedChannel)
+    this.channels.set(retrieveCodeKey, storedChannel)
 
     this.setChannelTimeout(shortKey, ttl)
     this.setChannelTimeout(longKey, ttl)
-
+    this.setChannelTimeout(retrieveCodeKey, ttl)
     return true
   }
 
@@ -189,6 +229,7 @@ export class MemoryChannelRepo implements ChannelRepo {
 
     const shortKey = getShortSlugKey(channel.shortSlug)
     const longKey = getLongSlugKey(channel.longSlug)
+    const retrieveCodeKey = getRetrieveCodeKey(channel.retrieveCode)
 
     // Clear timeouts
     const shortTimeout = this.timeouts.get(shortKey)
@@ -203,8 +244,15 @@ export class MemoryChannelRepo implements ChannelRepo {
       this.timeouts.delete(longKey)
     }
 
+    const retrieveCodeTimeout = this.timeouts.get(retrieveCodeKey)
+    if (retrieveCodeTimeout) {
+      clearTimeout(retrieveCodeTimeout)
+      this.timeouts.delete(retrieveCodeKey)
+    }
+
     this.channels.delete(longKey)
     this.channels.delete(shortKey)
+    this.channels.delete(retrieveCodeKey)
   }
 }
 
@@ -225,18 +273,22 @@ export class RedisChannelRepo implements ChannelRepo {
     const longSlug = await generateLongSlugUntilUnique(
       async (key) => (await this.client.get(key)) !== null,
     )
+    const retrieveCode = await generateRetrieveCodeUntilUnique(
+      async (key) => (await this.client.get(key)) !== null,
+    )
 
     const channel: Channel = {
       secret: crypto.randomUUID(),
       longSlug,
       shortSlug,
       uploaderPeerID,
+      retrieveCode,
     }
     const channelStr = serializeChannel(channel)
 
     await this.client.setex(getLongSlugKey(longSlug), ttl, channelStr)
     await this.client.setex(getShortSlugKey(shortSlug), ttl, channelStr)
-
+    await this.client.setex(getRetrieveCodeKey(retrieveCode), ttl, channelStr)
     return channel
   }
 
@@ -247,6 +299,13 @@ export class RedisChannelRepo implements ChannelRepo {
     const shortChannelStr = await this.client.get(getShortSlugKey(slug))
     if (shortChannelStr) {
       return deserializeChannel(shortChannelStr, scrubSecret)
+    }
+
+    const retrieveCodeChannelStr = await this.client.get(
+      getRetrieveCodeKey(slug),
+    )
+    if (retrieveCodeChannelStr) {
+      return deserializeChannel(retrieveCodeChannelStr, scrubSecret)
     }
 
     const longChannelStr = await this.client.get(getLongSlugKey(slug))
@@ -269,7 +328,7 @@ export class RedisChannelRepo implements ChannelRepo {
 
     await this.client.expire(getLongSlugKey(channel.longSlug), ttl)
     await this.client.expire(getShortSlugKey(channel.shortSlug), ttl)
-
+    await this.client.expire(getRetrieveCodeKey(channel.retrieveCode), ttl)
     return true
   }
 
@@ -281,6 +340,7 @@ export class RedisChannelRepo implements ChannelRepo {
 
     await this.client.del(getLongSlugKey(channel.longSlug))
     await this.client.del(getShortSlugKey(channel.shortSlug))
+    await this.client.del(getRetrieveCodeKey(channel.retrieveCode))
   }
 }
 

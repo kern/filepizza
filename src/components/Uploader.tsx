@@ -12,6 +12,8 @@ import { CopyableInput } from './CopyableInput'
 import { ConnectionListItem } from './ConnectionListItem'
 import { ErrorMessage } from './ErrorMessage'
 import { setRotating } from '../hooks/useRotatingSpinner'
+import config from '../config'
+import { RetrieveCodeBox } from './RetrieveCodeBox'
 
 const QR_CODE_SIZE = 128
 
@@ -25,8 +27,15 @@ export default function Uploader({
   onStop: () => void
 }): JSX.Element {
   const { peer, stop } = useWebRTCPeer()
-  const { isLoading, error, longSlug, shortSlug, longURL, shortURL } =
-    useUploaderChannel(peer.id)
+  const {
+    isLoading,
+    error,
+    longSlug,
+    shortSlug,
+    longURL,
+    shortURL,
+    retrieveCode,
+  } = useUploaderChannel(peer.id)
   const connections = useUploaderConnections(peer, files, password)
 
   const handleStop = useCallback(() => {
@@ -56,10 +65,15 @@ export default function Uploader({
         <div className="flex-none mr-4">
           <QRCode value={shortURL ?? ''} size={QR_CODE_SIZE} />
         </div>
-        <div className="flex-auto flex flex-col justify-center space-y-2">
-          <CopyableInput label="Long URL" value={longURL ?? ''} />
-          <CopyableInput label="Short URL" value={shortURL ?? ''} />
-        </div>
+        {!config.retrieveCodeMode && (
+          <div className="flex-auto flex flex-col justify-center space-y-2">
+            <CopyableInput label="Long URL" value={longURL ?? ''} />
+            <CopyableInput label="Short URL" value={shortURL ?? ''} />
+          </div>
+        )}
+        {config.retrieveCodeMode && retrieveCode && (
+          <RetrieveCodeBox retrieveCode={retrieveCode} />
+        )}
       </div>
       <div className="mt-6 pt-4 border-t border-stone-200 dark:border-stone-700 w-full">
         <div className="flex justify-between items-center mb-2">
