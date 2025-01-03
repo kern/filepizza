@@ -20,6 +20,7 @@ export function useUploaderChannel(
   shortSlug: string | undefined
   longURL: string | undefined
   shortURL: string | undefined
+  retrieveCode: string | undefined
 } {
   const { isLoading, error, data } = useQuery({
     queryKey: ['uploaderChannel', uploaderPeerID],
@@ -56,6 +57,7 @@ export function useUploaderChannel(
   const secret = data?.secret
   const longSlug = data?.longSlug
   const shortSlug = data?.shortSlug
+  const retrieveCode = data?.retrieveCode
   const longURL = longSlug ? generateURL(longSlug) : undefined
   const shortURL = shortSlug ? generateURL(shortSlug) : undefined
 
@@ -130,5 +132,6 @@ export function useUploaderChannel(
     shortSlug,
     longURL,
     shortURL,
+    retrieveCode,
   }
 }
