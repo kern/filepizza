@@ -45,14 +45,7 @@ function generateRandomWords(
 }
 
 export const generateShortSlug = (): string => {
-  let result = ''
-  for (let i = 0; i < config.shortSlug.numChars; i++) {
-    result +=
-      config.shortSlug.chars[
-        Math.floor(Math.random() * config.shortSlug.chars.length)
-      ]
-  }
-  return result
+  return generateRandomWord(config.shortSlug.chars, config.shortSlug.numChars)
 }
 
 export const generateLongSlug = async (): Promise<string> => {
@@ -61,4 +54,19 @@ export const generateLongSlug = async (): Promise<string> => {
     config.longSlug.numWords,
   )
   return parts.join('/')
+}
+
+export const generateRetrieveCode = (): string => {
+  return generateRandomWord(
+    config.retrieveCodeSlug.chars,
+    config.retrieveCodeSlug.numChars,
+  )
+}
+
+const generateRandomWord = (wordList: string, wordLength: number): string => {
+  let result = ''
+  for (let i = 0; i < wordLength; i++) {
+    result += wordList[Math.floor(Math.random() * wordList.length)]
+  }
+  return result
 }

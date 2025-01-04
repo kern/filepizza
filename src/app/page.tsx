@@ -1,6 +1,7 @@
 'use client'
 
 import React, { JSX, useCallback, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import WebRTCPeerProvider from '../components/WebRTCProvider'
 import DropZone from '../components/DropZone'
 import UploadFileList from '../components/UploadFileList'
@@ -16,6 +17,8 @@ import { getFileName } from '../fs'
 import TitleText from '../components/TitleText'
 import { pluralize } from '../utils/pluralize'
 import TermsAcceptance from '../components/TermsAcceptance'
+import DownloadZone from '../components/DownloadZone'
+import config from '../config'
 
 function PageWrapper({ children }: { children: React.ReactNode }): JSX.Element {
   return (
@@ -32,12 +35,18 @@ function InitialState({
 }: {
   onDrop: (files: UploadedFile[]) => void
 }): JSX.Element {
+  const router = useRouter()
+  const handleComplete = (code: string) => {
+    router.push(`/download/${code}`)
+  }
+
   return (
     <PageWrapper>
       <div className="flex flex-col items-center space-y-1 max-w-md">
         <TitleText>Peer-to-peer file transfers in your browser.</TitleText>
       </div>
       <DropZone onDrop={onDrop} />
+      {config.retrieveCodeMode && <DownloadZone onComplete={handleComplete} />}
       <TermsAcceptance />
     </PageWrapper>
   )
