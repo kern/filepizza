@@ -1,7 +1,7 @@
 import { createZipStream } from '../zip-stream'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-if (typeof window !== 'undefined') require('web-streams-polyfill/ponyfill')
+if (typeof window !== 'undefined') require('web-streams-polyfill/polyfill')
 
 const streamSaver =
   // eslint-disable-next-line @typescript-eslint/no-require-imports
