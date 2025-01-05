@@ -14,11 +14,11 @@ services:
       - 3478:3478/udp
       - 5349:5349
       - 5349:5349/udp
-      - 49152-65535:49152-65535/udp
+      - 60000-60128:60000-60128/udp
     environment:
       - DETECT_EXTERNAL_IP=yes
       - DETECT_RELAY_IP=yes
-    command: -n --log-file=stdout --redis-userdb="ip=redis connect_timeout=30"
+    command: -n --log-file=stdout --redis-userdb="ip=redis connect_timeout=30" --min-port=60000 --max-port=60128
     networks:
       - filepizza
   filepizza:
