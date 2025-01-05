@@ -209,7 +209,7 @@ export class MemoryChannelRepo implements ChannelRepo {
 }
 
 export class RedisChannelRepo implements ChannelRepo {
-  client: Redis.Redis
+  client: Redis
 
   constructor() {
     this.client = getRedisClient()

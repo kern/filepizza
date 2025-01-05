@@ -2,11 +2,13 @@ import Redis from 'ioredis'
 
 export { Redis }
 
-let redisClient: Redis.Redis | null = null
+let redisClient: Redis | null = null
 
-export function getRedisClient(): Redis.Redis {
+export function getRedisClient(): Redis {
   if (!redisClient) {
-    redisClient = new Redis(process.env.REDIS_URL)
+    redisClient = process.env.REDIS_URL
+      ? new Redis(process.env.REDIS_URL)
+      : new Redis()
   }
   return redisClient
 }
