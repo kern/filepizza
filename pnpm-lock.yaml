@@ -7,7 +7,7 @@ settings:
 dependencies:
   '@tanstack/react-query':
     specifier: ^5.55.2
-    version: 5.66.0(react@19.0.0)
+    version: 5.66.9(react@19.0.0)
   autoprefixer:
     specifier: ^10.4.20
     version: 10.4.20(postcss@8.5.1)
@@ -585,16 +585,16 @@ packages:
       tslib: 2.8.1
     dev: false
 
-  /@tanstack/query-core@5.66.0:
-    resolution: {integrity: sha512-J+JeBtthiKxrpzUu7rfIPDzhscXF2p5zE/hVdrqkACBP8Yu0M96mwJ5m/8cPPYQE9aRNvXztXHlNwIh4FEeMZw==}
+  /@tanstack/query-core@5.66.4:
+    resolution: {integrity: sha512-skM/gzNX4shPkqmdTCSoHtJAPMTtmIJNS0hE+xwTTUVYwezArCT34NMermABmBVUg5Ls5aiUXEDXfqwR1oVkcA==}
     dev: false
 
-  /@tanstack/react-query@5.66.0(react@19.0.0):
-    resolution: {integrity: sha512-z3sYixFQJe8hndFnXgWu7C79ctL+pI0KAelYyW+khaNJ1m22lWrhJU2QrsTcRKMuVPtoZvfBYrTStIdKo+x0Xw==}
+  /@tanstack/react-query@5.66.9(react@19.0.0):
+    resolution: {integrity: sha512-NRI02PHJsP5y2gAuWKP+awamTIBFBSKMnO6UVzi03GTclmHHHInH5UzVgzi5tpu4+FmGfsdT7Umqegobtsp23A==}
     peerDependencies:
       react: ^18 || ^19
     dependencies:
-      '@tanstack/query-core': 5.66.0
+      '@tanstack/query-core': 5.66.4
       react: 19.0.0
     dev: false
 
