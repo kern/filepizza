@@ -19,7 +19,7 @@ dependencies:
     version: 4.21.2
   ioredis:
     specifier: ^5.4.2
-    version: 5.5.0
+    version: 5.6.0
   next:
     specifier: ^15.1.3
     version: 15.1.7(react-dom@19.0.0)(react@19.0.0)
@@ -2376,8 +2376,8 @@ packages:
       side-channel: 1.1.0
     dev: true
 
-  /ioredis@5.5.0:
-    resolution: {integrity: sha512-7CutT89g23FfSa8MDoIFs2GYYa0PaNiW/OrT+nRyjRXHDZd17HmIgy+reOQ/yhh72NznNjGuS8kbCAcA4Ro4mw==}
+  /ioredis@5.6.0:
+    resolution: {integrity: sha512-tBZlIIWbndeWBWCXWZiqtOF/yxf6yZX3tAlTJ7nfo5jhd6dctNxF7QnYlZLZ1a0o0pDoen7CgZqO+zjNaFbJAg==}
     engines: {node: '>=12.22.0'}
     dependencies:
       '@ioredis/commands': 1.2.0
