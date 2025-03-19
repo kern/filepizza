@@ -53,7 +53,7 @@ export default function Uploader({
   return (
     <>
       <div className="flex w-full items-center">
-        <div className="flex-none mr-4">
+        <div className="flex-none mr-4 bg-white p-2">
           <QRCode value={shortURL ?? ''} size={QR_CODE_SIZE} />
         </div>
         <div className="flex-auto flex flex-col justify-center space-y-2">
