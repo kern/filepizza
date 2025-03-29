@@ -86,6 +86,7 @@ export function useDownloader(uploaderPeerID: string): {
             break
           case MessageType.Info:
             setFilesInfo(message.files)
+            setIsPasswordRequired(false)
             break
           case MessageType.Chunk:
             processChunk.current?.(message)
@@ -126,6 +127,7 @@ export function useDownloader(uploaderPeerID: string): {
     conn.on('error', handleError)
     conn.on('close', handleClose)
     peer.on('error', handleError)
+
 
     return () => {
       console.log('[Downloader] cleaning up connection')
