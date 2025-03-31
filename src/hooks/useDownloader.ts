@@ -128,7 +128,6 @@ export function useDownloader(uploaderPeerID: string): {
     conn.on('close', handleClose)
     peer.on('error', handleError)
 
-
     return () => {
       console.log('[Downloader] cleaning up connection')
       if (conn.open) {
