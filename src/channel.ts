@@ -38,7 +38,7 @@ async function generateShortSlugUntilUnique(
   checkExists: (key: string) => Promise<boolean>,
 ): Promise<string> {
   for (let i = 0; i < config.shortSlug.maxAttempts; i++) {
-    const slug = generateShortSlug()
+    const slug = await generateShortSlug()
     const exists = await checkExists(getShortSlugKey(slug))
     if (!exists) {
       return slug
