@@ -96,7 +96,7 @@ devDependencies:
     version: 2.31.0(@typescript-eslint/parser@8.29.0)(eslint-import-resolver-typescript@3.10.0)(eslint@9.23.0)
   eslint-plugin-react:
     specifier: ^7.37.3
-    version: 7.37.4(eslint@9.23.0)
+    version: 7.37.5(eslint@9.23.0)
   husky:
     specifier: ^9.0.0
     version: 9.1.7
@@ -476,8 +476,8 @@ packages:
     engines: {node: '>= 10'}
     dev: false
 
-  /@napi-rs/wasm-runtime@0.2.7:
-    resolution: {integrity: sha512-5yximcFK5FNompXfJFoWanu5l8v1hNGqNHh9du1xETp9HWk/B/PzvchX55WYOPaIeNglG8++68AAiauBAtbnzw==}
+  /@napi-rs/wasm-runtime@0.2.8:
+    resolution: {integrity: sha512-OBlgKdX7gin7OIq4fadsjpg+cp2ZphvAIKucHsNfTdJiqdOmOEwQd/bHi0VwNrcw5xpBJyUw6cK/QilCqy1BSg==}
     requiresBuild: true
     dependencies:
       '@emnapi/core': 1.4.0
@@ -948,7 +948,7 @@ packages:
     cpu: [wasm32]
     requiresBuild: true
     dependencies:
-      '@napi-rs/wasm-runtime': 0.2.7
+      '@napi-rs/wasm-runtime': 0.2.8
     dev: true
     optional: true
 
@@ -1839,7 +1839,7 @@ packages:
       eslint-import-resolver-typescript: 3.10.0(eslint-plugin-import@2.31.0)(eslint@9.23.0)
       eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.29.0)(eslint-import-resolver-typescript@3.10.0)(eslint@9.23.0)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.23.0)
-      eslint-plugin-react: 7.37.4(eslint@9.23.0)
+      eslint-plugin-react: 7.37.5(eslint@9.23.0)
       eslint-plugin-react-hooks: 5.2.0(eslint@9.23.0)
       typescript: 5.8.2
     transitivePeerDependencies:
@@ -1984,8 +1984,8 @@ packages:
       eslint: 9.23.0
     dev: true
 
-  /eslint-plugin-react@7.37.4(eslint@9.23.0):
-    resolution: {integrity: sha512-BGP0jRmfYyvOyvMoRX/uoUeW+GqNj9y16bPQzqAHf3AYII/tDs+jMN0dBVkl88/OZwNGwrVFxE7riHsXVfy/LQ==}
+  /eslint-plugin-react@7.37.5(eslint@9.23.0):
+    resolution: {integrity: sha512-Qteup0SqU15kdocexFNAJMvCJEfa2xUKNV4CC1xsVMrIIqEy3SQ/rqyxCWNzfrd3/ldy6HMlD2e0JDVpDg2qIA==}
     engines: {node: '>=4'}
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9.7
@@ -2001,7 +2001,7 @@ packages:
       hasown: 2.0.2
       jsx-ast-utils: 3.3.5
       minimatch: 3.1.2
-      object.entries: 1.1.8
+      object.entries: 1.1.9
       object.fromentries: 2.0.8
       object.values: 1.2.1
       prop-types: 15.8.1
@@ -3339,11 +3339,12 @@ packages:
       object-keys: 1.1.1
     dev: true
 
-  /object.entries@1.1.8:
-    resolution: {integrity: sha512-cmopxi8VwRIAw/fkijJohSfpef5PdN0pMQJN6VC/ZKvn0LIknWD8KtgY6KlQdEc4tIjcQ3HxSMmnvtzIscdaYQ==}
+  /object.entries@1.1.9:
+    resolution: {integrity: sha512-8u/hfXFRBD1O0hPUjioLhoWFHRmt6tKA4/vZPyckBr18l1KE9uHrFaFaUi8MDRTpi4uak2goyPTSNJLXX2k2Hw==}
     engines: {node: '>= 0.4'}
     dependencies:
       call-bind: 1.0.8
+      call-bound: 1.0.4
       define-properties: 1.2.1
       es-object-atoms: 1.1.1
     dev: true
