@@ -14,7 +14,7 @@ const turnsPort = process.env.TURNS_PORT || 5349
 export async function POST(): Promise<NextResponse> {
   if (!process.env.COTURN_ENABLED) {
     return NextResponse.json({
-      iceServers: [{ urls: 'stun:${stunHost}:${stunPort}' }],
+      iceServers: [{ urls: `stun:${stunHost}:${stunPort}` }],
     })
   }
 
