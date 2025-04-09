@@ -7,7 +7,7 @@ settings:
 dependencies:
   '@tanstack/react-query':
     specifier: ^5.55.2
-    version: 5.71.1(react@19.1.0)
+    version: 5.72.2(react@19.1.0)
   autoprefixer:
     specifier: ^10.4.20
     version: 10.4.21(postcss@8.5.3)
@@ -476,8 +476,8 @@ packages:
     engines: {node: '>= 10'}
     dev: false
 
-  /@napi-rs/wasm-runtime@0.2.7:
-    resolution: {integrity: sha512-5yximcFK5FNompXfJFoWanu5l8v1hNGqNHh9du1xETp9HWk/B/PzvchX55WYOPaIeNglG8++68AAiauBAtbnzw==}
+  /@napi-rs/wasm-runtime@0.2.8:
+    resolution: {integrity: sha512-OBlgKdX7gin7OIq4fadsjpg+cp2ZphvAIKucHsNfTdJiqdOmOEwQd/bHi0VwNrcw5xpBJyUw6cK/QilCqy1BSg==}
     requiresBuild: true
     dependencies:
       '@emnapi/core': 1.4.0
@@ -616,16 +616,16 @@ packages:
       tslib: 2.8.1
     dev: false
 
-  /@tanstack/query-core@5.71.1:
-    resolution: {integrity: sha512-4+ZswCHOfJX+ikhXNoocamTUmJcHtB+Ljjz/oJkC7/eKB5IrzEwR4vEwZUENiPi+wISucJHR5TUbuuJ26w3kdQ==}
+  /@tanstack/query-core@5.72.2:
+    resolution: {integrity: sha512-fxl9/0yk3mD/FwTmVEf1/H6N5B975H0luT+icKyX566w6uJG0x6o+Yl+I38wJRCaogiMkstByt+seXfDbWDAcA==}
     dev: false
 
-  /@tanstack/react-query@5.71.1(react@19.1.0):
-    resolution: {integrity: sha512-6BTkaSIGT58MroI4kIGXNdx/NhirXPU+75AJObLq+WBa39WmoxhzSk0YX+hqWJ/bvqZJFxslbEU4qIHaRZq+8Q==}
+  /@tanstack/react-query@5.72.2(react@19.1.0):
+    resolution: {integrity: sha512-SVNHzyBUYiis+XiCl+8yiPZmMYei2AKYY94wM/zpvB5l1jxqOo82FQTziSJ4pBi96jtYqvYrTMxWynmbQh3XKw==}
     peerDependencies:
       react: ^18 || ^19
     dependencies:
-      '@tanstack/query-core': 5.71.1
+      '@tanstack/query-core': 5.72.2
       react: 19.1.0
     dev: false
 
@@ -948,7 +948,7 @@ packages:
     cpu: [wasm32]
     requiresBuild: true
     dependencies:
-      '@napi-rs/wasm-runtime': 0.2.7
+      '@napi-rs/wasm-runtime': 0.2.8
     dev: true
     optional: true
 
