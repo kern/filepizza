@@ -86,6 +86,7 @@ export function useDownloader(uploaderPeerID: string): {
             break
           case MessageType.Info:
             setFilesInfo(message.files)
+            setIsPasswordRequired(false)
             break
           case MessageType.Chunk:
             processChunk.current?.(message)
