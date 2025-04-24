@@ -2,7 +2,7 @@ services:
   redis:
     image: redis:latest
     ports:
-      - 6379:6379
+      - 127.0.0.1:6379:6379
     networks:
       - filepizza
     volumes:
@@ -14,27 +14,33 @@ services:
       - 3478:3478/udp
       - 5349:5349
       - 5349:5349/udp
-      # Relay Ports
-      # - 49152-65535:49152-65535/udp
+      - 60000-60128:60000-60128/udp
     environment:
       - DETECT_EXTERNAL_IP=yes
       - DETECT_RELAY_IP=yes
-    command: -n --log-file=stdout --redis-userdb="ip=redis connect_timeout=30"
+      - EXTERNAL_IP=${EXTERNAL_IP:-}
+    command: -n --log-file=stdout --redis-userdb="ip=redis connect_timeout=30" --min-port=60000 --max-port=60128
     networks:
       - filepizza
   filepizza:
     build: .
     image: kern/filepizza:latest
     ports:
-      - 8080:8080
+      - 127.0.0.1:8080:80
     environment:
-      - PORT=8080
+      - PORT=80
       - REDIS_URL=redis://redis:6379
-      - API_ORIGINS=https://example.com,https://app.example.com:3000,http://localhost:8081
+      - COTURN_ENABLED=true
+      - TURN_REALM=https://${HOST_DOMAIN}
+      - TURN_HOST=${HOST_DOMAIN}
+      - API_ORIGINS=${API_ORIGINS}
+      - CLOUDFLARE_TUNNEL=true
     networks:
       - filepizza
     depends_on:
       - redis
+    env_file:
+      - .env
 
 networks:
   filepizza:

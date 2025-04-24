@@ -30,7 +30,9 @@ services:
       - PORT=80
       - REDIS_URL=redis://redis:6379
       - COTURN_ENABLED=true
-      # - API_ORIGINS=https://example.com,https://app.example.com:3000
+      # - TURN_REALM=https://emaily.re
+      # - TURN_HOST=https://emaily.re
+      # - API_ORIGINS=https://emaily.re,https://texlyre.github.io
     networks:
       - filepizza
     depends_on:
