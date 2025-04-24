@@ -30,7 +30,7 @@ services:
     environment:
       - PORT=8080
       - REDIS_URL=redis://redis:6379
-      - API_ORIGINS=https://example.com,https://app.example.com:3000,http://localhost:8081
+      - API_ORIGINS=http://localhost:8081
     networks:
       - filepizza
     depends_on:

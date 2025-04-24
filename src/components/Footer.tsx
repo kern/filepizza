@@ -61,6 +61,14 @@ export function Footer(): JSX.Element {
               Fork us
             </FooterLink>
           </p>
+          <p className="text-stone-600 dark:text-stone-400">
+            Made deployable with Cloudflare by{' '}
+            <FooterLink href="https://abawi.me">Fares Abawi</FooterLink>{' '}
+            &middot;{' '}
+            <FooterLink href="https://github.com/TeXlyre/filepizza">
+              Cloudflare fork
+            </FooterLink>
+          </p>
         </div>
       </footer>
     </>

@@ -32,7 +32,7 @@ export default function SharedLinkField({
         onChange={handleChange}
       />
       <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
-        You can paste either a full URL or just the slug. When shared, multiple uploaders can provide the same files, making downloads more reliable.
+        You can paste either a full URL or just the slug. When shared, multiple uploaders can provide the same files, making download links easily accessible.
       </p>
     </div>
   )

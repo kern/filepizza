@@ -1,10 +1,12 @@
-<a href="https://xkcd.com/949/"><img src="http://imgs.xkcd.com/comics/file_transfer.png" alt="XKCD 949" width="30%" align="right" /></a> <img src="public/images/wordmark.png" alt="FilePizza wordmark" width="50%" /> <h3>Peer-to-peer file transfers in your browser</h3>
+<a href="https://xkcd.com/949/"><img src="http://imgs.xkcd.com/comics/file_transfer.png" alt="XKCD 949" width="30%" align="right" /></a> <img src="public/images/wordmark.png" alt="FilePizza wordmark" width="50%" /> <h3>Peer-to-peer file transfers in your browser *deployed with Cloudflare*</h3>
 
 *Cooked up by [Alex Kern](https://kern.io) & [Neeraj Baid](https://github.com/neerajbaid) while eating Sliver @ UC Berkeley.*
 
+*Made deployable by [Fares Abawi](https://abawi.me) using Cloudflare Tunnel.*
+
 Using [WebRTC](http://www.webrtc.org), FilePizza eliminates the initial upload step required by other web-based file sharing services. Because data is never stored in an intermediary server, the transfer is fast, private, and secure.
 
-A hosted instance of FilePizza is available at [file.pizza](https://file.pizza).
+A hosted instance of the Cloudflare deployed FilePizza is available at [filepizza.emaily.re](https://filepizza.emaily.re).
 
 ## What's new with FilePizza v2
 
@@ -30,10 +32,26 @@ $ pnpm start
 ## Running with Docker
 
 ```
-$ pnpm docker:build
-$ pnpm docker:up
-$ pnpm docker:down
+$ pnpm docker:local:build
+$ pnpm docker:local:up
+$ pnpm docker:local:down
 ```
+
+## Deployment with Cloudflare Tunnel
+
+1. Create a Cloudflare account and add your domain.
+2. Get the Global API token from Cloudflare.
+3. Copy the envfile to `.env` and fill in the required values including the `CLOUDFLARE_API_KEY` and `HOST_DOMAIN` (the link to your cloudflared domain or sub-domain).
+4. Run the following command to build the docker file:
+   ```bash
+   pnpm run docker:build
+   ```
+5. Run the following command to start the cloudflare deployment:
+   ```bash
+   pnpm run deploy:full
+   ```
+6. On the first usage, you will be directed to the Cloudflare login page. After logging in, you will have to authorize the domain you specified in the `.env` file `HOST_DOMAIN`.
+7. After the authorization, you will be redirected to the FilePizza app. You can now use the app with your custom domain.
 
 ## Stack
 
