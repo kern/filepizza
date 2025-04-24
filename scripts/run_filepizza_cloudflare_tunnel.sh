@@ -184,6 +184,12 @@ if [ ! -f "$CREDS_FILE" ]; then
     exit 1
 fi
 
+# Copy the tunnel ID JSON file to filepizza.json
+cp "$CREDENTIALS_DIR/$TUNNEL_ID.json" "$CREDENTIALS_DIR/filepizza.json"
+
+# Run the tunnel with the configuration
+echo -e "${GREEN}Setup complete! Running tunnel...${NC}"
+
 # Run the tunnel with the configuration
 echo -e "${GREEN}Setup complete! Running tunnel...${NC}"
 echo -e "${YELLOW}Your FilePizza server is now accessible at: https://$HOSTNAME${NC}"
