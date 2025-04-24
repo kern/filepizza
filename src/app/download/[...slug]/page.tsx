@@ -4,6 +4,7 @@ import { getOrCreateChannelRepo } from '../../../channel'
 import Spinner from '../../../components/Spinner'
 import Wordmark from '../../../components/Wordmark'
 import Downloader from '../../../components/Downloader'
+import MultiDownloader from '../../../components/MultiDownloader'
 import WebRTCPeerProvider from '../../../components/WebRTCProvider'
 import ReportTermsViolationButton from '../../../components/ReportTermsViolationButton'
 
@@ -33,7 +34,14 @@ export default async function DownloadPage({
       <Spinner direction="down" />
       <Wordmark />
       <WebRTCPeerProvider>
-        <Downloader uploaderPeerID={channel.uploaderPeerID} />
+        {channel.additionalUploaders && channel.additionalUploaders.length > 0 ? (
+          <MultiDownloader
+            primaryUploaderID={channel.uploaderPeerID}
+            additionalUploaders={channel.additionalUploaders}
+          />
+        ) : (
+          <Downloader uploaderPeerID={channel.uploaderPeerID} />
+        )}
         <ReportTermsViolationButton
           uploaderPeerID={channel.uploaderPeerID}
           slug={slug}
