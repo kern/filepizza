@@ -37,10 +37,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:kern/filepizza.git"
+    "url": "git@github.com:TeXlyre/filepizza.git"
   },
   "bugs": {
-    "url": "https://github.com/kern/filepizza/issues"
+    "url": "https://github.com/TeXlyre/filepizza/issues"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.55.2",
