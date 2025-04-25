@@ -1,5 +1,6 @@
 import React from 'react'
 import Footer from '../components/Footer'
+import { ApiToast } from '../components/ApiToast'
 import '../styles.css'
 import { ThemeProvider } from '../components/ThemeProvider'
 import { ModeToggle } from '../components/ModeToggle'
@@ -40,6 +41,7 @@ export default function RootLayout({
               <main>{children}</main>
               <Footer />
               <ModeToggle />
+              <ApiToast />
             </FilePizzaQueryClientProvider>
           </ThemeProvider>
         </body>
