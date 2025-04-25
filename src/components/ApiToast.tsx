@@ -23,17 +23,17 @@ export function ApiToast(): JSX.Element {
 
   const apiLinks: ApiLinkType[] = [
     {
-      href: 'https://texlyre.github.io/filepizza-api',
+      href: 'https://texlyre.github.io/filepizza-client',
       imageSrc: '/images/api_demo.png',
       alt: 'API Demo'
     },
     {
-      href: 'https://github.com/TeXlyre/filepizza-api',
+      href: 'https://github.com/TeXlyre/filepizza-client',
       imageSrc: '/images/api_github.png',
       alt: 'API GitHub'
     },
     {
-      href: 'https://www.npmjs.com/package/filepizza-api',
+      href: 'https://www.npmjs.com/package/filepizza-client',
       imageSrc: '/images/api_npm.png',
       alt: 'API NPM'
     }
