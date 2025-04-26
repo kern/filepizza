@@ -8,6 +8,15 @@ Using [WebRTC](http://www.webrtc.org), FilePizza eliminates the initial upload s
 
 A hosted instance of the Cloudflare deployed FilePizza is available at [filepizza.emaily.re](https://filepizza.emaily.re).
 
+## API requirements
+
+To use the FilePizza in your own apps, we created an unofficial [filepizza-client](https://github.com/TeXlyre/filepizza-client) API which is designed to work with this FilePizza fork. 
+
+You'd first need to install this package [locally](#running-with-docker) or [remotely (deployed with Cloudflare Tunnel)](#deployment-with-cloudflare-tunnel). 
+The [filepizza-client](https://github.com/TeXlyre/filepizza-client) API runs by default on `http://localhost:8081` which is automatically configured in the `docker-compose.yml`. 
+
+For hosting the API and this package remotely, you'd have to modify the `API_ORIGINS` variable in the `.env` file (a copy of the provided `envfile`) to include the domain or sub-domain where the API is hosted.
+
 ## What's new with FilePizza v2
 
 * A new UI with dark mode support, now built on modern browser technologies.
