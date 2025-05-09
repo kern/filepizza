@@ -30,7 +30,7 @@ CLOUDFLARE_TOKEN="$API_KEY"
 TUNNEL_NAME="filepizza"
 HTTP_SERVICE_URL="http://localhost:8080"
 HOSTNAME="$HOST_DOMAIN"
-CREDENTIALS_DIR=~/.cloudflared
+CREDENTIALS_DIR=~/.cloudflared/filepizza
 CONFIG_FILE="$CREDENTIALS_DIR/config.yml"
 
 # Color codes for better readability
@@ -69,7 +69,7 @@ if ! command -v cloudflared &> /dev/null; then
         fi
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         # macOS
-        brew install cloudflare/cloudflare/cloudflared
+        brew install cloudflare
     else
         echo -e "${RED}Unsupported OS. Please install cloudflared manually from: https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation${NC}"
         exit 1
@@ -78,12 +78,15 @@ if ! command -v cloudflared &> /dev/null; then
     echo -e "${GREEN}cloudflared installed successfully!${NC}"
 fi
 
+# Make sure credentials directory exists
+mkdir -p $CREDENTIALS_DIR
+
 # Authenticate with Cloudflare if needed
 if [ ! -f $CREDENTIALS_DIR/cert.pem ]; then
     echo -e "${YELLOW}Authenticating with Cloudflare...${NC}"
     echo -e "${YELLOW}This will open a browser window. Please log in and authorize cloudflared.${NC}"
-    cloudflared tunnel login
-
+    TUNNEL_ORIGIN_CERT="$CREDENTIALS_DIR"/cert.pem cloudflared tunnel login
+    mv ~/.cloudflared/cert.pem $CREDENTIALS_DIR/cert.pem
     if [ ! -f $CREDENTIALS_DIR/cert.pem ]; then
         echo -e "${RED}Authentication failed. cert.pem not found.${NC}"
         exit 1
@@ -93,12 +96,9 @@ else
     echo -e "${GREEN}Using existing Cloudflare credentials${NC}"
 fi
 
-# Make sure credentials directory exists
-mkdir -p $CREDENTIALS_DIR
-
 # Check if tunnel exists
 echo -e "${YELLOW}Checking if tunnel already exists: $TUNNEL_NAME...${NC}"
-EXISTING_TUNNEL=$(cloudflared tunnel list | grep $TUNNEL_NAME | awk '{print $1}')
+EXISTING_TUNNEL=$(TUNNEL_ORIGIN_CERT="$CREDENTIALS_DIR"/cert.pem cloudflared tunnel list | grep $TUNNEL_NAME | awk '{print $1}')
 
 if [ -n "$EXISTING_TUNNEL" ]; then
     echo -e "${GREEN}Tunnel already exists with ID: $EXISTING_TUNNEL${NC}"
@@ -107,11 +107,11 @@ if [ -n "$EXISTING_TUNNEL" ]; then
     # Delete existing tunnel if credentials file is missing
     if [ ! -f "$CREDENTIALS_DIR/$TUNNEL_ID.json" ]; then
         echo -e "${YELLOW}Credentials file missing. Recreating tunnel...${NC}"
-        cloudflared tunnel delete $TUNNEL_ID
+        TUNNEL_ORIGIN_CERT="$CREDENTIALS_DIR"/cert.pem cloudflared tunnel delete $TUNNEL_ID
 
         # Create new tunnel
         echo -e "${YELLOW}Creating new tunnel: $TUNNEL_NAME...${NC}"
-        TUNNEL_OUTPUT=$(cloudflared tunnel create $TUNNEL_NAME)
+        TUNNEL_OUTPUT=$(TUNNEL_ORIGIN_CERT="$CREDENTIALS_DIR"/cert.pem cloudflared tunnel create $TUNNEL_NAME)
         echo "$TUNNEL_OUTPUT"
         TUNNEL_ID=$(echo "$TUNNEL_OUTPUT" | grep -i "created tunnel" | grep -o "[a-f0-9]\{8\}-[a-f0-9]\{4\}-[a-f0-9]\{4\}-[a-f0-9]\{4\}-[a-f0-9]\{12\}")
 
@@ -128,12 +128,12 @@ if [ -n "$EXISTING_TUNNEL" ]; then
 
         # Route DNS
         echo -e "${YELLOW}Routing tunnel to your domain: $HOSTNAME...${NC}"
-        cloudflared tunnel route dns $TUNNEL_ID $HOSTNAME
+        TUNNEL_ORIGIN_CERT="$CREDENTIALS_DIR"/cert.pem cloudflared tunnel route dns $TUNNEL_ID $HOSTNAME
     fi
 else
     # Create new tunnel
     echo -e "${YELLOW}Creating new tunnel: $TUNNEL_NAME...${NC}"
-    TUNNEL_OUTPUT=$(cloudflared tunnel create $TUNNEL_NAME)
+    TUNNEL_OUTPUT=$(TUNNEL_ORIGIN_CERT="$CREDENTIALS_DIR"/cert.pem cloudflared tunnel create $TUNNEL_NAME)
     echo "$TUNNEL_OUTPUT"
     TUNNEL_ID=$(echo "$TUNNEL_OUTPUT" | grep -i "created tunnel" | grep -o "[a-f0-9]\{8\}-[a-f0-9]\{4\}-[a-f0-9]\{4\}-[a-f0-9]\{4\}-[a-f0-9]\{12\}")
 
@@ -150,7 +150,7 @@ else
 
     # Route DNS
     echo -e "${YELLOW}Routing tunnel to your domain: $HOSTNAME...${NC}"
-    cloudflared tunnel route dns $TUNNEL_ID $HOSTNAME
+    TUNNEL_ORIGIN_CERT="$CREDENTIALS_DIR"/cert.pem cloudflared tunnel route dns $TUNNEL_ID $HOSTNAME
 fi
 
 # Create config file
@@ -176,4 +176,4 @@ fi
 echo -e "${GREEN}Starting tunnel to $HOSTNAME...${NC}"
 echo -e "${YELLOW}Your FilePizza server is now accessible at: https://$HOSTNAME${NC}"
 echo -e "${YELLOW}Press Ctrl+C to stop the tunnel${NC}"
-cloudflared tunnel --config="$CONFIG_FILE" run
+TUNNEL_ORIGIN_CERT="$CREDENTIALS_DIR"/cert.pem cloudflared tunnel --config="$CONFIG_FILE" run
