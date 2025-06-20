@@ -4,7 +4,7 @@ TURN_SECRET=your_secure_turn_secret
 NODE_ENV=production
 
 # Host Configuration
-HOST_DOMAIN=ywebrtc.example.com
+HOST_DOMAIN=filepizza.example.com
 
 # CORS Configuration
 API_ORIGINS=https://filepizza.example.com,https://myapp.example.com,http://localhost:8081
