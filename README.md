@@ -46,21 +46,84 @@ $ pnpm docker:local:up
 $ pnpm docker:local:down
 ```
 
-## Deployment with Cloudflare Tunnel
+### Deployment with Cloudflare Tunnel
 
-1. Create a Cloudflare account and add your domain.
-2. Get the Global API token from Cloudflare.
-3. Copy the envfile to `.env` and fill in the required values including the `CLOUDFLARE_API_KEY` and `HOST_DOMAIN` (the link to your cloudflared domain or sub-domain).
-4. Run the following command to build the docker file:
+You can deploy FilePizza using Cloudflare Tunnel for easy hosting without port forwarding or complex network configuration.
+
+#### Prerequisites
+
+1. A Cloudflare account with your domain added
+2. Cloudflare Global API token
+3. Docker and Docker Compose installed
+
+#### Setup
+
+1. **Get your Cloudflare API token**: Go to Cloudflare dashboard → My Profile → API Tokens → Global API Key
+
+2. **Configure environment**: Copy the `envfile` to `.env` and fill in your details:
    ```bash
-   pnpm run docker:build
+   cp envfile .env
+   # Edit .env with your values
    ```
-5. Run the following command to start the cloudflare deployment:
+
+3. **Build and deploy**:
    ```bash
-   pnpm run deploy:full
+   npm run docker:build
+   npm run deploy:full
    ```
-6. On the first usage, you will be directed to the Cloudflare login page. After logging in, you will have to authorize the domain you specified in the `.env` file `HOST_DOMAIN`.
-7. After the authorization, you will be redirected to the FilePizza app. You can now use the app with your custom domain.
+
+4. **Manual deployment** (if you prefer):
+   ```bash
+   # Build the Docker image
+   npm run docker:build
+   
+   # Start the application stack
+   npm run docker:up
+   
+   # Set up and start Cloudflare tunnel
+   npm run tunnel:setup
+   npm run tunnel:start
+   ```
+
+#### Usage
+
+Once deployed, your FilePizza instance will be available at `https://your-domain.com`. Users can access the web interface to share files peer-to-peer.
+
+#### CORS Configuration
+
+FilePizza supports CORS configuration through the `API_ORIGINS` environment variable for external API access:
+
+```bash
+# Allow specific origins
+API_ORIGINS=https://myapp.com,https://myapp.dev,https://localhost:3000
+
+# Allow all origins (not recommended for production)
+API_ORIGINS=*
+
+# No external API access (if not specified)
+# API_ORIGINS=
+```
+
+**Important**: Always specify the exact origins that should be allowed to access your FilePizza API in production environments for security.
+
+#### Environment Variables
+
+Create a `.env` file based on `envfile`:
+
+- `HOST_DOMAIN`: Your domain/subdomain for FilePizza
+- `CLOUDFLARE_API_KEY`: Your Cloudflare Global API token
+- `API_ORIGINS`: Comma-separated list of allowed origins for CORS
+- `EXTERNAL_IP`: Your external IP (for TURN server)
+- `TURN_SECRET`: Secret for TURN server authentication
+- `NODE_ENV`: Environment (production/development)
+
+#### Manual Tunnel Setup
+
+If you need to set up the tunnel manually:
+
+```bash
+./scripts/run_filepizza_cloudflare_tunnel.sh "your-api-key" "your-domain.com"
+```
 
 ## Stack
 
