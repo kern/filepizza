@@ -4,8 +4,10 @@ TURN_SECRET=your_secure_turn_secret
 NODE_ENV=production
 
 # Host Configuration
-HOST_DOMAIN=filepizza.emaily.re
-API_ORIGINS=https://filepizza.emaily.re,https://emaily.re,https://texlyre.github.io
+HOST_DOMAIN=ywebrtc.example.com
+
+# CORS Configuration
+API_ORIGINS=https://filepizza.example.com,https://myapp.example.com,http://localhost:8081
 
 # Cloudflare Tunnel Configuration
 CLOUDFLARE_API_KEY=your_cloudflare_api_key
