@@ -18,8 +18,8 @@ export default function ProgressBar({
       <div
         className={`h-full ${
           isComplete
-            ? 'bg-gradient-to-b from-green-500 to-green-600'
-            : 'bg-gradient-to-b from-blue-500 to-blue-600'
+            ? 'bg-linear-to-b from-green-500 to-green-600'
+            : 'bg-linear-to-b from-blue-500 to-blue-600'
         } transition-all duration-300 ease-in-out`}
         style={{ width: `${percentage}%` }}
       />
