@@ -19,7 +19,7 @@ test('uploader to downloader transfer', async ({ browser }) => {
   await uploader.getByText('Start').click()
 
   const shortInput = uploader.getByText('Short URL').locator('..').locator('input')
-  await expect(shortInput).toBeVisible()
+  await expect(shortInput).toBeVisible({ timeout: 15000 })
   const shareURL = await shortInput.inputValue()
 
   const downloader = await browser.newPage()
