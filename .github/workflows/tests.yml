@@ -16,4 +16,6 @@ jobs:
       - run: pnpm lint:check
       - run: pnpm format:check
       - run: pnpm type:check
+      - run: pnpm test
       - run: pnpm build
+      - run: pnpm test:e2e
