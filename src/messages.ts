@@ -6,6 +6,7 @@ export enum MessageType {
   Start = 'Start',
   Chunk = 'Chunk',
   Pause = 'Pause',
+  Ack = 'Ack',
   Done = 'Done',
   Error = 'Error',
   PasswordRequired = 'PasswordRequired',
@@ -48,6 +49,12 @@ export const ChunkMessage = z.object({
   final: z.boolean(),
 })
 
+export const AckMessage = z.object({
+  type: z.literal(MessageType.Ack),
+  fileName: z.string(),
+  offset: z.number(),
+})
+
 export const DoneMessage = z.object({
   type: z.literal(MessageType.Done),
 })
@@ -80,6 +87,7 @@ export const Message = z.discriminatedUnion('type', [
   InfoMessage,
   StartMessage,
   ChunkMessage,
+  AckMessage,
   DoneMessage,
   ErrorMessage,
   PasswordRequiredMessage,

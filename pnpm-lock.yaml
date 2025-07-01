@@ -75,6 +75,9 @@ importers:
         specifier: ^3.23.8
         version: 3.25.67
     devDependencies:
+      '@eslint/js':
+        specifier: ^9.30.0
+        version: 9.30.0
       '@types/debug':
         specifier: ^4.1.12
         version: 4.1.12
