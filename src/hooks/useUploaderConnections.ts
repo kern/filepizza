@@ -9,8 +9,28 @@ import { decodeMessage, Message, MessageType } from '../messages'
 import { getFileName } from '../fs'
 import { setRotating } from './useRotatingSpinner'
 
-// TODO(@kern): Test for better values
-const MAX_CHUNK_SIZE = 256 * 1024 // 256 KB
+const MIN_CHUNK_SIZE = 128 * 1024 // 128 KB
+const MAX_CHUNK_SIZE_CAP = 1024 * 1024 // 1 MB
+
+function calculateChunkSize(totalTransferSize: number): number {
+  const MIN_TRANSFER = 1 * 1024 * 1024 // 1 MB
+  const MAX_TRANSFER = 1 * 1024 * 1024 * 1024 // 1 GB
+
+  if (totalTransferSize <= MIN_TRANSFER) {
+    return MIN_CHUNK_SIZE
+  }
+
+  if (totalTransferSize >= MAX_TRANSFER) {
+    return MAX_CHUNK_SIZE_CAP
+  }
+
+  const ratio =
+    (totalTransferSize - MIN_TRANSFER) / (MAX_TRANSFER - MIN_TRANSFER)
+
+  return (
+    MIN_CHUNK_SIZE + Math.round(ratio * (MAX_CHUNK_SIZE_CAP - MIN_CHUNK_SIZE))
+  )
+}
 
 function validateOffset(
   files: UploadedFile[],
@@ -31,6 +51,8 @@ export function useUploaderConnections(
   files: UploadedFile[],
   password: string,
 ): Array<UploaderConnection> {
+  const totalTransferSize = files.reduce((sum, f) => sum + f.size, 0)
+  const MAX_CHUNK_SIZE = calculateChunkSize(totalTransferSize)
   const [connections, setConnections] = useState<Array<UploaderConnection>>([])
 
   useEffect(() => {
@@ -237,33 +259,10 @@ export function useUploaderConnections(
                     final,
                   }
                   conn.send(request)
-
-                  updateConnection((draft) => {
-                    offset = end
-                    if (final) {
-                      console.log(
-                        '[UploaderConnections] completed file',
-                        fileName,
-                        '- file',
-                        draft.completedFiles + 1,
-                        'of',
-                        draft.totalFiles,
-                      )
-                      return {
-                        ...draft,
-                        status: UploaderConnectionStatus.Ready,
-                        completedFiles: draft.completedFiles + 1,
-                        currentFileProgress: 0,
-                      }
-                    } else {
-                      sendNextChunkAsync()
-                      return {
-                        ...draft,
-                        uploadingOffset: end,
-                        currentFileProgress: end / file.size,
-                      }
-                    }
-                  })
+                  offset = end
+                  if (!final) {
+                    sendNextChunkAsync()
+                  }
                 }, 0)
               }
 
@@ -306,6 +305,36 @@ export function useUploaderConnections(
                   status: UploaderConnectionStatus.Paused,
                 }
               })
+              break
+            }
+
+            case MessageType.Ack: {
+              const { fileName: ackFileName, offset: ackOffset } = message
+              try {
+                const ackFile = validateOffset(files, ackFileName, ackOffset)
+                updateConnection((draft) => {
+                  if (draft.uploadingFileName !== ackFileName) {
+                    return draft
+                  }
+
+                  const completed = ackOffset >= ackFile.size
+                  return {
+                    ...draft,
+                    uploadingOffset: ackOffset,
+                    currentFileProgress: Math.min(ackOffset / ackFile.size, 1),
+                    ...(completed
+                      ? {
+                          status: UploaderConnectionStatus.Ready,
+                          completedFiles: draft.completedFiles + 1,
+                          uploadingFileName: undefined,
+                        }
+                      : {}),
+                  }
+                })
+              } catch (err) {
+                console.error('[UploaderConnections] error handling ack:', err)
+              }
+
               break
             }
 

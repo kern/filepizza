@@ -207,8 +207,14 @@ export function useDownloader(uploaderPeerID: string): {
         console.error('[Downloader] no stream found for', message.fileName)
         return
       }
-      setBytesDownloaded((bd) => bd + (message.bytes as ArrayBuffer).byteLength)
+      const chunkSize = (message.bytes as ArrayBuffer).byteLength
+      setBytesDownloaded((bd) => bd + chunkSize)
       fileStream.enqueue(new Uint8Array(message.bytes as ArrayBuffer))
+      dataConnection.send({
+        type: MessageType.Ack,
+        fileName: message.fileName,
+        offset: message.offset + chunkSize,
+      } as z.infer<typeof Message>)
       if (message.final) {
         console.log('[Downloader] finished receiving', message.fileName)
         fileStream.close()
