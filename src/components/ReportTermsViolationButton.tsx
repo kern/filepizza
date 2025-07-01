@@ -128,7 +128,7 @@ export default function ReportTermsViolationButton({
               <button
                 disabled={isReporting}
                 onClick={handleReport}
-                className={`px-4 py-2 bg-gradient-to-b from-red-500 to-red-600 text-white rounded-md border border-red-600 shadow-sm text-shadow disabled:opacity-50 disabled:cursor-not-allowed enabled:hover:from-red-500 enabled:hover:to-red-700 enabled:hover:shadow-md transition-all duration-200`}
+                className={`px-4 py-2 bg-linear-to-b from-red-500 to-red-600 text-white rounded-md border border-red-600 shadow-sm text-shadow disabled:opacity-50 disabled:cursor-not-allowed enabled:hover:from-red-500 enabled:hover:to-red-700 enabled:hover:shadow-md transition-all duration-200`}
                 aria-label="Confirm report"
               >
                 {isReporting ? 'Reporting...' : 'Report'}
