@@ -20,3 +20,9 @@ jobs:
       - run: pnpm test
       - run: pnpm build
       - run: pnpm test:e2e
+      - name: Upload Playwright results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: test-results
