@@ -58,7 +58,7 @@ importers:
         version: 19.1.0(react@19.1.0)
       react-qr-code:
         specifier: ^2.0.15
-        version: 2.0.16(react@19.1.0)
+        version: 2.0.18(react@19.1.0)
       streamsaver:
         specifier: ^2.0.6
         version: 2.0.6
@@ -2902,8 +2902,8 @@ packages:
   react-is@17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
 
-  react-qr-code@2.0.16:
-    resolution: {integrity: sha512-8f54aTOo7DxYr1LB47pMeclV5SL/zSbJxkXHIS2a+QnAIa4XDVIdmzYRC+CBCJeDLSCeFHn8gHtltwvwZGJD/w==}
+  react-qr-code@2.0.18:
+    resolution: {integrity: sha512-v1Jqz7urLMhkO6jkgJuBYhnqvXagzceg3qJUWayuCK/c6LTIonpWbwxR1f1APGd4xrW/QcQEovNrAojbUz65Tg==}
     peerDependencies:
       react: '*'
 
@@ -6464,7 +6464,7 @@ snapshots:
 
   react-is@17.0.2: {}
 
-  react-qr-code@2.0.16(react@19.1.0):
+  react-qr-code@2.0.18(react@19.1.0):
     dependencies:
       prop-types: 15.8.1
       qr.js: 0.0.0
