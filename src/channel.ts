@@ -10,6 +10,8 @@ export type Channel = {
   longSlug: string
   shortSlug: string
   uploaderPeerID: string
+  sharedSlug?: string
+  additionalUploaders?: string[]
 }
 
 const ChannelSchema = z.object({
@@ -17,10 +19,12 @@ const ChannelSchema = z.object({
   longSlug: z.string(),
   shortSlug: z.string(),
   uploaderPeerID: z.string(),
+  sharedSlug: z.string().optional(),
+  additionalUploaders: z.array(z.string()).optional()
 })
 
 export interface ChannelRepo {
-  createChannel(uploaderPeerID: string, ttl?: number): Promise<Channel>
+  createChannel(uploaderPeerID: string, ttl?: number, sharedSlug?: string): Promise<Channel>
   fetchChannel(slug: string): Promise<Channel | null>
   renewChannel(slug: string, secret: string, ttl?: number): Promise<boolean>
   destroyChannel(slug: string): Promise<void>
@@ -85,13 +89,11 @@ export class MemoryChannelRepo implements ChannelRepo {
   private timeouts: Map<string, NodeJS.Timeout> = new Map()
 
   private setChannelTimeout(slug: string, ttl: number) {
-    // Clear any existing timeout
     const existingTimeout = this.timeouts.get(slug)
     if (existingTimeout) {
       clearTimeout(existingTimeout)
     }
 
-    // Set new timeout to remove channel when expired
     const timeout = setTimeout(() => {
       this.channels.delete(slug)
       this.timeouts.delete(slug)
@@ -103,19 +105,61 @@ export class MemoryChannelRepo implements ChannelRepo {
   async createChannel(
     uploaderPeerID: string,
     ttl: number = config.channel.ttl,
+    sharedSlug?: string,
   ): Promise<Channel> {
     const shortSlug = await generateShortSlugUntilUnique(async (key) =>
       this.channels.has(key),
     )
+
     const longSlug = await generateLongSlugUntilUnique(async (key) =>
       this.channels.has(key),
     )
+
+    if (sharedSlug) {
+      const sharedKey = getLongSlugKey(sharedSlug)
+      const existingStoredChannel = this.channels.get(sharedKey)
+
+      if (existingStoredChannel) {
+        const updatedChannel: Channel = {
+          secret: crypto.randomUUID(),
+          longSlug,
+          shortSlug,
+          uploaderPeerID,
+          sharedSlug
+        }
+
+        const expiresAt = Date.now() + ttl * 1000
+        const storedChannel = { channel: updatedChannel, expiresAt }
+
+        const shortKey = getShortSlugKey(shortSlug)
+        const longKey = getLongSlugKey(longSlug)
+        this.channels.set(shortKey, storedChannel)
+        this.channels.set(longKey, storedChannel)
+
+        const existingChannel = {...existingStoredChannel.channel}
+        existingChannel.additionalUploaders = [
+          ...(existingChannel.additionalUploaders || []),
+          uploaderPeerID
+        ]
+        this.channels.set(sharedKey, {
+          channel: existingChannel,
+          expiresAt: expiresAt
+        })
+
+        this.setChannelTimeout(shortKey, ttl)
+        this.setChannelTimeout(longKey, ttl)
+        this.setChannelTimeout(sharedKey, ttl)
+
+        return updatedChannel
+      }
+    }
 
     const channel: Channel = {
       secret: crypto.randomUUID(),
       longSlug,
       shortSlug,
       uploaderPeerID,
+      sharedSlug
     }
 
     const expiresAt = Date.now() + ttl * 1000
@@ -126,6 +170,12 @@ export class MemoryChannelRepo implements ChannelRepo {
 
     this.channels.set(shortKey, storedChannel)
     this.channels.set(longKey, storedChannel)
+
+    if (sharedSlug) {
+      const sharedKey = getLongSlugKey(sharedSlug)
+      this.channels.set(sharedKey, storedChannel)
+      this.setChannelTimeout(sharedKey, ttl)
+    }
 
     this.setChannelTimeout(shortKey, ttl)
     this.setChannelTimeout(longKey, ttl)
@@ -175,6 +225,12 @@ export class MemoryChannelRepo implements ChannelRepo {
     this.channels.set(longKey, storedChannel)
     this.channels.set(shortKey, storedChannel)
 
+    if (channel.sharedSlug) {
+      const sharedKey = getLongSlugKey(channel.sharedSlug)
+      this.channels.set(sharedKey, storedChannel)
+      this.setChannelTimeout(sharedKey, ttl)
+    }
+
     this.setChannelTimeout(shortKey, ttl)
     this.setChannelTimeout(longKey, ttl)
 
@@ -190,7 +246,6 @@ export class MemoryChannelRepo implements ChannelRepo {
     const shortKey = getShortSlugKey(channel.shortSlug)
     const longKey = getLongSlugKey(channel.longSlug)
 
-    // Clear timeouts
     const shortTimeout = this.timeouts.get(shortKey)
     if (shortTimeout) {
       clearTimeout(shortTimeout)
@@ -201,6 +256,16 @@ export class MemoryChannelRepo implements ChannelRepo {
     if (longTimeout) {
       clearTimeout(longTimeout)
       this.timeouts.delete(longKey)
+    }
+
+    if (channel.sharedSlug) {
+      const sharedKey = getLongSlugKey(channel.sharedSlug)
+      const sharedTimeout = this.timeouts.get(sharedKey)
+      if (sharedTimeout) {
+        clearTimeout(sharedTimeout)
+        this.timeouts.delete(sharedKey)
+      }
+      this.channels.delete(sharedKey)
     }
 
     this.channels.delete(longKey)
@@ -218,24 +283,62 @@ export class RedisChannelRepo implements ChannelRepo {
   async createChannel(
     uploaderPeerID: string,
     ttl: number = config.channel.ttl,
+    sharedSlug?: string,
   ): Promise<Channel> {
     const shortSlug = await generateShortSlugUntilUnique(
       async (key) => (await this.client.get(key)) !== null,
     )
+
     const longSlug = await generateLongSlugUntilUnique(
       async (key) => (await this.client.get(key)) !== null,
     )
+
+    if (sharedSlug) {
+      const existingChannelStr = await this.client.get(getLongSlugKey(sharedSlug))
+      if (existingChannelStr) {
+        const existingChannel = deserializeChannel(existingChannelStr)
+
+        const updatedChannel: Channel = {
+          secret: crypto.randomUUID(),
+          longSlug,
+          shortSlug,
+          uploaderPeerID,
+          sharedSlug
+        }
+        const channelStr = serializeChannel(updatedChannel)
+
+        await this.client.setex(getLongSlugKey(longSlug), ttl, channelStr)
+        await this.client.setex(getShortSlugKey(shortSlug), ttl, channelStr)
+
+        const updatedSharedChannel = {
+          ...existingChannel,
+          additionalUploaders: [
+            ...(existingChannel.additionalUploaders || []),
+            uploaderPeerID
+          ]
+        }
+        const updatedSharedStr = serializeChannel(updatedSharedChannel)
+        await this.client.setex(getLongSlugKey(sharedSlug), ttl, updatedSharedStr)
+
+        return updatedChannel
+      }
+    }
 
     const channel: Channel = {
       secret: crypto.randomUUID(),
       longSlug,
       shortSlug,
       uploaderPeerID,
+      sharedSlug
     }
     const channelStr = serializeChannel(channel)
 
     await this.client.setex(getLongSlugKey(longSlug), ttl, channelStr)
     await this.client.setex(getShortSlugKey(shortSlug), ttl, channelStr)
+
+    if (sharedSlug) {
+      await this.client.setex(getLongSlugKey(sharedSlug), ttl, channelStr)
+    }
 
     return channel
   }
@@ -270,6 +373,10 @@ export class RedisChannelRepo implements ChannelRepo {
     await this.client.expire(getLongSlugKey(channel.longSlug), ttl)
     await this.client.expire(getShortSlugKey(channel.shortSlug), ttl)
 
+    if (channel.sharedSlug) {
+      await this.client.expire(getLongSlugKey(channel.sharedSlug), ttl)
+    }
+
     return true
   }
 
@@ -281,6 +388,10 @@ export class RedisChannelRepo implements ChannelRepo {
 
     await this.client.del(getLongSlugKey(channel.longSlug))
     await this.client.del(getShortSlugKey(channel.shortSlug))
+
+    if (channel.sharedSlug) {
+      await this.client.del(getLongSlugKey(channel.sharedSlug))
+    }
   }
 }
 
