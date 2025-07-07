@@ -32,3 +32,26 @@ export async function setTurnCredentials(
 
   await redis.setex(key, ttl, hmacKey)
 }
+
+export async function setTurnCredentials2(
+  username: string,
+  password: string,
+  ttl: number,
+): Promise<void> {
+  if (!process.env.COTURN_ENABLED) {
+    return
+  }
+
+  const realm = process.env.TURN_REALM || 'file.pizza'
+
+  if (!realm) {
+    throw new Error('TURN_REALM environment variable not set')
+  }
+
+  const redis = getRedisClient()
+
+  const hmacKey = password
+  const key = `turn/realm/${realm}/user/${username}/key`
+
+  await redis.setex(key, ttl, hmacKey)
+}
