@@ -10,7 +10,11 @@ import { getFileName } from '../fs'
 import { setRotating } from './useRotatingSpinner'
 
 // TODO(@kern): Test for better values
-const MAX_CHUNK_SIZE = 256 * 1024 // 256 KB
+export const MAX_CHUNK_SIZE = 256 * 1024 // 256 KB
+
+export function isFinalChunk(offset: number, fileSize: number): boolean {
+  return offset + MAX_CHUNK_SIZE >= fileSize
+}
 
 function validateOffset(
   files: UploadedFile[],
@@ -227,8 +231,7 @@ export function useUploaderConnections(
               const sendNextChunkAsync = () => {
                 sendChunkTimeout = setTimeout(() => {
                   const end = Math.min(file.size, offset + MAX_CHUNK_SIZE)
-                  const chunkSize = end - offset
-                  const final = chunkSize < MAX_CHUNK_SIZE
+                  const final = isFinalChunk(offset, file.size)
                   const request: Message = {
                     type: MessageType.Chunk,
                     fileName,
