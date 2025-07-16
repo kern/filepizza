@@ -1,6 +1,6 @@
 'use client'
 
-import React, { JSX, useCallback, useState } from 'react'
+import React, { JSX, useCallback, useState, useRef } from 'react'
 import WebRTCPeerProvider from '../components/WebRTCProvider'
 import DropZone from '../components/DropZone'
 import UploadFileList from '../components/UploadFileList'
@@ -59,6 +59,7 @@ function ConfirmUploadState({
   onCancel,
   onStart,
   onRemoveFile,
+  onAddMoreFiles,
 }: {
   uploadedFiles: UploadedFile[]
   password: string
@@ -66,8 +67,26 @@ function ConfirmUploadState({
   onCancel: () => void
   onStart: () => void
   onRemoveFile: (index: number) => void
+  onAddMoreFiles: (files: File[]) => void
 }): JSX.Element {
   const fileListData = useUploaderFileListData(uploadedFiles)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleAddMoreClick = useCallback(() => {
+    fileInputRef.current?.click()
+  }, [])
+
+  const handleFileInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files) {
+        const files = Array.from(e.target.files) as UploadedFile[]
+        onAddMoreFiles(files)
+        e.target.value = ''
+      }
+    },
+    [onAddMoreFiles],
+  )
+
   return (
     <PageWrapper>
       <TitleText>
@@ -75,6 +94,21 @@ function ConfirmUploadState({
         {pluralize(uploadedFiles.length, 'file', 'files')}.
       </TitleText>
       <UploadFileList files={fileListData} onRemove={onRemoveFile} />
+      <div className="flex justify-center w-full">
+        <button
+          onClick={handleAddMoreClick}
+          className="px-4 py-2 text-sm transition-colors bg-transparent border rounded-md text-stone-700 dark:text-stone-300 border-stone-400 dark:border-stone-600 hover:bg-stone-100 dark:hover:bg-stone-800"
+        >
+          Add more files
+        </button>
+      </div>
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        onChange={handleFileInputChange}
+        multiple
+      />
       <PasswordField value={password} onChange={onChangePassword} />
       <div className="flex space-x-4">
         <CancelButton onClick={onCancel} />
@@ -113,7 +147,7 @@ export default function UploadPage(): JSX.Element {
   const [uploading, setUploading] = useState(false)
 
   const handleDrop = useCallback((files: UploadedFile[]): void => {
-    setUploadedFiles(files)
+    setUploadedFiles((currentFiles) => [...currentFiles, ...files])
   }, [])
 
   const handleChangePassword = useCallback((pw: string) => {
@@ -137,6 +171,13 @@ export default function UploadPage(): JSX.Element {
     setUploadedFiles((fs) => fs.filter((_, i) => i !== index))
   }, [])
 
+  const handleAddMoreFiles = useCallback((files: File[]) => {
+    setUploadedFiles((currentFiles) => [
+      ...currentFiles,
+      ...(files as UploadedFile[]),
+    ])
+  }, [])
+
   if (!uploadedFiles.length) {
     return <InitialState onDrop={handleDrop} />
   }
@@ -150,6 +191,7 @@ export default function UploadPage(): JSX.Element {
         onCancel={handleCancel}
         onStart={handleStart}
         onRemoveFile={handleRemoveFile}
+        onAddMoreFiles={handleAddMoreFiles}
       />
     )
   }
