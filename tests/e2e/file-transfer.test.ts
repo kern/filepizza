@@ -82,7 +82,8 @@ for (const testCase of testCases) {
       verifyPreciseProgress(monitor.uploadChunks, testCase.expectedChunks, 'upload')
       verifyPreciseProgress(monitor.downloadChunks, testCase.expectedChunks, 'download')
 
-      // Verify final completion shows exactly 100%
+      // Verify final completion shows exactly 100% on both sides
+      await expect(uploaderPage.locator('#progress-percentage')).toHaveText('100%')
       await expect(downloaderPage.locator('#progress-percentage')).toHaveText('100%')
 
     } finally {
