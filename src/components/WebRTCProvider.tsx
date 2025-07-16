@@ -30,7 +30,11 @@ export const useWebRTCPeer = (): WebRTCPeerValue => {
 let globalPeer: Peer | null = null
 
 async function getOrCreateGlobalPeer(): Promise<Peer> {
+  console.log('[WebRTCProvider] getOrCreateGlobalPeer called')
+
   if (!globalPeer) {
+    console.log('[WebRTCProvider] Creating new global peer')
+
     const response = await fetch('/api/ice', {
       method: 'POST',
     })
@@ -44,12 +48,21 @@ async function getOrCreateGlobalPeer(): Promise<Peer> {
       },
     }
 
+    console.log('[WebRTCProvider] About to fetch /api/peerjs-servers')
+
     try {
       const peerServersResponse = await fetch('/api/peerjs-servers')
+      console.log('[WebRTCProvider] Response status:', peerServersResponse.status)
+
       if (peerServersResponse.ok) {
-        const { servers } = await peerServersResponse.json()
-        if (servers && servers.length > 0) {
-          const serverUrl = new URL(servers[0])
+        const data = await peerServersResponse.json()
+        console.log('[WebRTCProvider] Response data:', data)
+
+        if (data.servers && data.servers.length > 0) {
+          const serverUrlString = data.servers[0]
+          console.log('[WebRTCProvider] Using server:', serverUrlString)
+
+          const serverUrl = new URL(serverUrlString)
           peerConfig = {
             ...peerConfig,
             host: serverUrl.hostname,
@@ -57,17 +70,18 @@ async function getOrCreateGlobalPeer(): Promise<Peer> {
             path: serverUrl.pathname,
             secure: serverUrl.protocol === 'https:',
           }
-          console.log('[WebRTCProvider] Using custom PeerJS server:', peerConfig)
+          console.log('[WebRTCProvider] Final config:', peerConfig)
         } else {
-          console.log('[WebRTCProvider] No custom PeerJS servers configured, using default')
+          console.log('[WebRTCProvider] No servers found, using default')
         }
       } else {
-        console.log('[WebRTCProvider] Failed to fetch PeerJS servers, using default')
+        console.log('[WebRTCProvider] Bad response:', peerServersResponse.status)
       }
     } catch (error) {
-      console.log('[WebRTCProvider] Error fetching PeerJS servers, using default:', error)
+      console.error('[WebRTCProvider] Fetch error:', error)
     }
 
+    console.log('[WebRTCProvider] Creating Peer with config:', peerConfig)
     globalPeer = new Peer(peerConfig)
   }
 
