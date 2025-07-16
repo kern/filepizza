@@ -37,12 +37,34 @@ async function getOrCreateGlobalPeer(): Promise<Peer> {
     const { iceServers } = await response.json()
     console.log('[WebRTCProvider] ICE servers:', iceServers)
 
-    globalPeer = new Peer({
+    let peerConfig: any = {
       debug: 3,
       config: {
         iceServers,
       },
-    })
+    }
+
+    try {
+      const peerServersResponse = await fetch('/api/peerjs-servers')
+      if (peerServersResponse.ok) {
+        const { servers } = await peerServersResponse.json()
+        if (servers && servers.length > 0) {
+          const serverUrl = new URL(servers[0])
+          peerConfig = {
+            ...peerConfig,
+            host: serverUrl.hostname,
+            port: serverUrl.port ? parseInt(serverUrl.port) : (serverUrl.protocol === 'https:' ? 443 : 80),
+            path: serverUrl.pathname,
+            secure: serverUrl.protocol === 'https:',
+          }
+          console.log('[WebRTCProvider] Using custom PeerJS server:', peerConfig)
+        }
+      }
+    } catch (error) {
+      console.log('[WebRTCProvider] No custom PeerJS servers configured, using default')
+    }
+
+    globalPeer = new Peer(peerConfig)
   }
 
   if (globalPeer.id) {

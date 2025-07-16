@@ -2,7 +2,7 @@ services:
   redis:
     image: redis:latest
     ports:
-      - 127.0.0.1:6379:6379
+      - 127.0.0.1:${REDIS_PORT:-6379}:6379
     networks:
       - filepizza
     volumes:
@@ -29,12 +29,13 @@ services:
       - 127.0.0.1:8080:80
     environment:
       - PORT=80
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=redis://redis:${REDIS_PORT:-6379}
       - COTURN_ENABLED=true
       - TURN_REALM=https://${HOST_DOMAIN}
       - TURN_HOST=${HOST_DOMAIN}
       - API_ORIGINS=${API_ORIGINS}
       - CLOUDFLARE_TUNNEL=true
+      - PEERJS_SERVERS=${PEERJS_SERVERS:-}
     networks:
       - filepizza
     depends_on:

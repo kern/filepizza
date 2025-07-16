@@ -2,7 +2,7 @@ services:
   redis:
     image: redis:latest
     ports:
-      - 6379:6379
+      - ${REDIS_PORT:-6379}:6379
     networks:
       - filepizza
     volumes:
@@ -29,8 +29,9 @@ services:
       - 8080:8080
     environment:
       - PORT=8080
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=redis://redis:${REDIS_PORT:-6379}
       - API_ORIGINS=http://localhost:8081
+      - PEERJS_SERVERS=${PEERJS_SERVERS:-}
     networks:
       - filepizza
     depends_on:

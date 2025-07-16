@@ -2,7 +2,7 @@ services:
   redis:
     image: redis:latest
     ports:
-      - 127.0.0.1:6379:6379
+      - 127.0.0.1:${REDIS_PORT:-6379}:6379
     networks:
       - filepizza
     volumes:
@@ -28,11 +28,12 @@ services:
       - 0.0.0.0:80:80
     environment:
       - PORT=80
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=redis://redis:${REDIS_PORT:-6379}
+      - PEERJS_SERVERS=${PEERJS_SERVERS:-}
       - COTURN_ENABLED=true
-      # - TURN_REALM=https://emaily.re
-      # - TURN_HOST=https://emaily.re
-      # - API_ORIGINS=https://emaily.re,https://texlyre.github.io
+      - TURN_REALM=https://${HOST_DOMAIN}
+      - TURN_HOST=${HOST_DOMAIN}
+      - API_ORIGINS=${API_ORIGINS}
     networks:
       - filepizza
     depends_on:

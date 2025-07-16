@@ -6,6 +6,10 @@ NODE_ENV=production
 # Host Configuration
 HOST_DOMAIN=filepizza.example.com
 
+# PeerJS URL and Redis PORT
+# REDIS_PORT=6379
+# PEERJS_SERVERS=peerjs.mydomain:9000
+
 # CORS Configuration
 API_ORIGINS=https://filepizza.example.com,https://myapp.example.com,http://localhost:8081
 
