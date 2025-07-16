@@ -58,10 +58,14 @@ async function getOrCreateGlobalPeer(): Promise<Peer> {
             secure: serverUrl.protocol === 'https:',
           }
           console.log('[WebRTCProvider] Using custom PeerJS server:', peerConfig)
+        } else {
+          console.log('[WebRTCProvider] No custom PeerJS servers configured, using default')
         }
+      } else {
+        console.log('[WebRTCProvider] Failed to fetch PeerJS servers, using default')
       }
     } catch (error) {
-      console.log('[WebRTCProvider] No custom PeerJS servers configured, using default')
+      console.log('[WebRTCProvider] Error fetching PeerJS servers, using default:', error)
     }
 
     globalPeer = new Peer(peerConfig)

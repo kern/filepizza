@@ -3,20 +3,17 @@ const express = require('express')
 const { ExpressPeerServer } = require('peer')
 
 const app = express();
-const server = app.listen(9000);
-
-const peerServers = process.env.PEERJS_SERVERS
-  ? process.env.PEERJS_SERVERS.split(',').map(url => url.trim())
-  : [];
-
-if (peerServers.length > 0) {
-  app.use('/api/peerjs-servers', (req, res) => {
-    res.json({ servers: peerServers });
-  });
-}
+const port = process.env.PEERJS_PORT || 9000;
+const server = app.listen(port);
 
 const peerServer = ExpressPeerServer(server, {
-  path: '/filepizza'
+  path: process.env.PEERJS_PATH || '/myapp',
+  key: process.env.PEERJS_KEY || 'peerjs',
+  proxied: process.env.PEERJS_PROXIED === 'true',
+  allow_discovery: process.env.PEERJS_ALLOW_DISCOVERY === 'true',
+  concurrent_limit: parseInt(process.env.PEERJS_CONCURRENT_LIMIT || '5000')
 })
 
 app.use('/peerjs', peerServer)
+
+console.log(`PeerJS server running on port ${port} with path ${process.env.PEERJS_PATH || '/myapp'}`)
