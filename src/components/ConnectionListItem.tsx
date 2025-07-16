@@ -61,8 +61,8 @@ export function ConnectionListItem({
       </div>
       <ProgressBar
         value={
-          conn.completedFiles === conn.totalFiles 
-            ? 1 
+          conn.completedFiles === conn.totalFiles
+            ? 1
             : (conn.completedFiles + conn.currentFileProgress) / conn.totalFiles
         }
         max={1}

@@ -208,7 +208,7 @@ export function useDownloader(uploaderPeerID: string): {
         console.error('[Downloader] no stream found for', message.fileName)
         return
       }
-      
+
       // Track chunks for e2e testing
       if (!chunkCountByFile[message.fileName]) {
         chunkCountByFile[message.fileName] = 0
@@ -217,11 +217,11 @@ export function useDownloader(uploaderPeerID: string): {
       console.log(
         `[Downloader] received chunk ${chunkCountByFile[message.fileName]} for ${message.fileName} (${message.offset}-${message.offset + (message.bytes as ArrayBuffer).byteLength}) final=${message.final}`,
       )
-      
+
       const chunkSize = (message.bytes as ArrayBuffer).byteLength
       setBytesDownloaded((bd) => bd + chunkSize)
       fileStream.enqueue(new Uint8Array(message.bytes as ArrayBuffer))
-      
+
       // Send acknowledgment to uploader
       const ackMessage: Message = {
         type: MessageType.ChunkAck,
@@ -230,10 +230,14 @@ export function useDownloader(uploaderPeerID: string): {
         bytesReceived: chunkSize,
       }
       dataConnection.send(ackMessage)
-      console.log(`[Downloader] sent ack for chunk ${chunkCountByFile[message.fileName]} (${message.offset}, ${chunkSize} bytes)`)
-      
+      console.log(
+        `[Downloader] sent ack for chunk ${chunkCountByFile[message.fileName]} (${message.offset}, ${chunkSize} bytes)`,
+      )
+
       if (message.final) {
-        console.log(`[Downloader] finished receiving ${message.fileName} after ${chunkCountByFile[message.fileName]} chunks`)
+        console.log(
+          `[Downloader] finished receiving ${message.fileName} after ${chunkCountByFile[message.fileName]} chunks`,
+        )
         fileStream.close()
         startNextFileOrFinish()
       }

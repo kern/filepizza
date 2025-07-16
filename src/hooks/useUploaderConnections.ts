@@ -5,7 +5,12 @@ import {
   UploaderConnection,
   UploaderConnectionStatus,
 } from '../types'
-import { decodeMessage, Message, MessageType, ChunkAckMessage } from '../messages'
+import {
+  decodeMessage,
+  Message,
+  MessageType,
+  ChunkAckMessage,
+} from '../messages'
 import { z } from 'zod'
 import { getFileName } from '../fs'
 import { setRotating } from './useRotatingSpinner'
@@ -331,13 +336,15 @@ export function useUploaderConnections(
                 'bytes',
                 ackMessage.bytesReceived,
               )
-              
+
               updateConnection((draft) => {
                 const currentAcked = draft.acknowledgedBytes || 0
                 const newAcked = currentAcked + ackMessage.bytesReceived
-                
+
                 // Find the file to calculate progress
-                const file = files.find(f => getFileName(f) === ackMessage.fileName)
+                const file = files.find(
+                  (f) => getFileName(f) === ackMessage.fileName,
+                )
                 if (file) {
                   const acknowledgedProgress = newAcked / file.size
                   return {
@@ -346,7 +353,7 @@ export function useUploaderConnections(
                     currentFileProgress: acknowledgedProgress,
                   }
                 }
-                
+
                 return {
                   ...draft,
                   acknowledgedBytes: newAcked,
