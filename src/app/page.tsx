@@ -14,6 +14,7 @@ import CancelButton from '../components/CancelButton'
 import { useMemo } from 'react'
 import { getFileName } from '../fs'
 import TitleText from '../components/TitleText'
+import SubtitleText from '../components/SubtitleText'
 import { pluralize } from '../utils/pluralize'
 import TermsAcceptance from '../components/TermsAcceptance'
 import AddFilesButton from '../components/AddFilesButton'
@@ -37,6 +38,10 @@ function InitialState({
     <PageWrapper>
       <div className="flex flex-col items-center space-y-1 max-w-md">
         <TitleText>Peer-to-peer file transfers in your browser.</TitleText>
+        <SubtitleText>
+          Leave this tab open—FilePizza is peer to peer and never stores your
+          files.
+        </SubtitleText>
       </div>
       <DropZone onDrop={onDrop} />
       <TermsAcceptance />
