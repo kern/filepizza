@@ -66,6 +66,33 @@ export async function uploadFile(
   )
 }
 
+export async function addFile(
+  page: Page,
+  testFile: TestFile,
+): Promise<void> {
+  await page.evaluate(
+    ({ testContent, testFileName }) => {
+      const input = document.querySelector(
+        '#add-files-input',
+      ) as HTMLInputElement
+      if (input) {
+        const file = new File([testContent], testFileName, {
+          type: 'text/plain',
+        })
+        const dataTransfer = new DataTransfer()
+        dataTransfer.items.add(file)
+        input.files = dataTransfer.files
+
+        const event = new Event('change', { bubbles: true })
+        input.dispatchEvent(event)
+      }
+    },
+    { testContent: testFile.content, testFileName: testFile.name },
+  )
+
+  await expect(page.getByText(testFile.name)).toBeVisible({ timeout: 5000 })
+}
+
 export async function startUpload(page: Page): Promise<string> {
   // Start sharing
   await page.locator('#start-button').click()
