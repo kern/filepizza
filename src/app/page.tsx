@@ -16,6 +16,7 @@ import { getFileName } from '../fs'
 import TitleText from '../components/TitleText'
 import { pluralize } from '../utils/pluralize'
 import TermsAcceptance from '../components/TermsAcceptance'
+import AddFilesButton from '../components/AddFilesButton'
 
 function PageWrapper({ children }: { children: React.ReactNode }): JSX.Element {
   return (
@@ -59,6 +60,7 @@ function ConfirmUploadState({
   onCancel,
   onStart,
   onRemoveFile,
+  onAddFiles,
 }: {
   uploadedFiles: UploadedFile[]
   password: string
@@ -66,6 +68,7 @@ function ConfirmUploadState({
   onCancel: () => void
   onStart: () => void
   onRemoveFile: (index: number) => void
+  onAddFiles: (files: UploadedFile[]) => void
 }): JSX.Element {
   const fileListData = useUploaderFileListData(uploadedFiles)
   return (
@@ -75,6 +78,9 @@ function ConfirmUploadState({
         {pluralize(uploadedFiles.length, 'file', 'files')}.
       </TitleText>
       <UploadFileList files={fileListData} onRemove={onRemoveFile} />
+      <div className="flex justify-end w-full">
+        <AddFilesButton onAdd={onAddFiles} />
+      </div>
       <PasswordField value={password} onChange={onChangePassword} />
       <div className="flex space-x-4">
         <CancelButton onClick={onCancel} />
@@ -137,6 +143,10 @@ export default function UploadPage(): JSX.Element {
     setUploadedFiles((fs) => fs.filter((_, i) => i !== index))
   }, [])
 
+  const handleAddFiles = useCallback((files: UploadedFile[]) => {
+    setUploadedFiles((fs) => [...fs, ...files])
+  }, [])
+
   if (!uploadedFiles.length) {
     return <InitialState onDrop={handleDrop} />
   }
@@ -150,6 +160,7 @@ export default function UploadPage(): JSX.Element {
         onCancel={handleCancel}
         onStart={handleStart}
         onRemoveFile={handleRemoveFile}
+        onAddFiles={handleAddFiles}
       />
     )
   }
