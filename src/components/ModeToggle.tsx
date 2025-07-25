@@ -10,7 +10,7 @@ function LightModeIcon(): JSX.Element {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className="w-4 h-4 block dark:hidden"
+      className="w-4 h-4 block dark:block"
     >
       <path
         strokeLinecap="round"
@@ -49,8 +49,7 @@ export function ModeToggle(): JSX.Element {
       className="fixed top-4 right-4 border rounded-md w-6 h-6 flex items-center justify-center"
     >
       <span className="sr-only">Toggle mode</span>
-      <LightModeIcon />
-      <DarkModeIcon />
+      {(resolvedTheme === 'dark') ? <LightModeIcon /> : <DarkModeIcon />}
     </button>
   )
 }
