@@ -57,7 +57,7 @@
     "tailwindcss": "^4.1.11",
     "web-streams-polyfill": "^4.0.0",
     "webrtcsupport": "^2.2.0",
-    "zod": "^3.23.8"
+    "zod": "^4.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.0",
