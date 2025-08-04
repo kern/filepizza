@@ -36,7 +36,7 @@ export default function AddFilesButton({
         id="add-files-button"
         type="button"
         onClick={handleClick}
-        className="block cursor-pointer relative py-3 px-6 text-base font-bold text-stone-700 dark:text-stone-200 bg-white dark:bg-stone-800 border-2 border-stone-700 dark:border-stone-700 rounded-lg transition-all duration-300 ease-in-out outline-none hover:shadow-md active:shadow-inner focus:shadow-outline"
+        className="text-sm underline text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition-colors duration-200"
       >
         Add more files
       </button>
