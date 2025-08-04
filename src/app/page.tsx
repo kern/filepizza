@@ -38,10 +38,6 @@ function InitialState({
     <PageWrapper>
       <div className="flex flex-col items-center space-y-1 max-w-md">
         <TitleText>Peer-to-peer file transfers in your browser.</TitleText>
-        <SubtitleText>
-          Leave this tab open—FilePizza is peer to peer and never stores your
-          files.
-        </SubtitleText>
       </div>
       <DropZone onDrop={onDrop} />
       <TermsAcceptance />
@@ -110,6 +106,9 @@ function UploadingState({
       <TitleText>
         You are uploading {pluralize(uploadedFiles.length, 'file', 'files')}.
       </TitleText>
+      <SubtitleText>
+        Leave this tab open. FilePizza does not store files.
+      </SubtitleText>
       <UploadFileList files={fileListData} />
       <WebRTCPeerProvider>
         <Uploader files={uploadedFiles} password={password} onStop={onStop} />

@@ -1,5 +1,11 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --animate-spin-slow: spin 16s linear infinite;
+}
+
 html {
   height: 100dvh;
 }
