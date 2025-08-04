@@ -76,12 +76,10 @@ function ConfirmUploadState({
     <PageWrapper>
       <TitleText>
         You are about to start uploading{' '}
-        {pluralize(uploadedFiles.length, 'file', 'files')}.
+        {pluralize(uploadedFiles.length, 'file', 'files')}.{' '}
+        <AddFilesButton onAdd={onAddFiles} />
       </TitleText>
       <UploadFileList files={fileListData} onRemove={onRemoveFile} />
-      <div className="flex justify-end w-full">
-        <AddFilesButton onAdd={onAddFiles} />
-      </div>
       <PasswordField value={password} onChange={onChangePassword} />
       <div className="flex space-x-4">
         <CancelButton onClick={onCancel} />
