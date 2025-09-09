@@ -135,6 +135,16 @@ If you need to set up the tunnel manually:
 * View Transitions
 * Redis (optional)
 
+## Configuration
+
+The server can be customized with the following environment variables:
+
+- `REDIS_URL` – Connection string for a Redis instance used to store channel metadata. If not set, FilePizza falls back to in-memory storage.
+- `COTURN_ENABLED` – When set to `true`, enables TURN support for connecting peers behind NAT.
+- `TURN_HOST` – Hostname or IP address of the TURN server. Defaults to `127.0.0.1`.
+- `TURN_REALM` – Realm used when generating TURN credentials. Defaults to `file.pizza`.
+- `STUN_SERVER` – STUN server URL to use when `COTURN_ENABLED` is disabled. Defaults to `stun:stun.l.google.com:19302`.
+
 ## FAQ
 
 **How are my files sent?** Your files are sent directly from your browser to the downloader's browser. They never pass through our servers. FilePizza uses WebRTC to send files. This requires that the uploader leave their browser window open until the transfer is complete.

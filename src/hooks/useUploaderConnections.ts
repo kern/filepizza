@@ -5,12 +5,22 @@ import {
   UploaderConnection,
   UploaderConnectionStatus,
 } from '../types'
-import { decodeMessage, Message, MessageType } from '../messages'
+import {
+  decodeMessage,
+  Message,
+  MessageType,
+  ChunkAckMessage,
+} from '../messages'
+import { z } from 'zod'
 import { getFileName } from '../fs'
 import { setRotating } from './useRotatingSpinner'
 
 // TODO(@kern): Test for better values
-const MAX_CHUNK_SIZE = 256 * 1024 // 256 KB
+export const MAX_CHUNK_SIZE = 256 * 1024 // 256 KB
+
+export function isFinalChunk(offset: number, fileSize: number): boolean {
+  return offset + MAX_CHUNK_SIZE >= fileSize
+}
 
 function validateOffset(
   files: UploadedFile[],
@@ -68,6 +78,7 @@ export function useUploaderConnections(
         completedFiles: 0,
         totalFiles: files.length,
         currentFileProgress: 0,
+        acknowledgedBytes: 0,
       }
 
       setConnections((conns) => {
@@ -224,11 +235,16 @@ export function useUploaderConnections(
               )
               const file = validateOffset(files, fileName, offset)
 
+              let chunkCount = 0
               const sendNextChunkAsync = () => {
                 sendChunkTimeout = setTimeout(() => {
                   const end = Math.min(file.size, offset + MAX_CHUNK_SIZE)
-                  const chunkSize = end - offset
-                  const final = chunkSize < MAX_CHUNK_SIZE
+                  const final = isFinalChunk(offset, file.size)
+                  chunkCount++
+                  // Log for e2e testing
+                  console.log(
+                    `[UploaderConnections] sending chunk ${chunkCount} for ${fileName} (${offset}-${end}/${file.size}) final=${final}`,
+                  )
                   const request: Message = {
                     type: MessageType.Chunk,
                     fileName,
@@ -282,7 +298,8 @@ export function useUploaderConnections(
                   status: UploaderConnectionStatus.Uploading,
                   uploadingFileName: fileName,
                   uploadingOffset: offset,
-                  currentFileProgress: offset / file.size,
+                  acknowledgedBytes: 0, // Reset acknowledged bytes for new file
+                  currentFileProgress: 0, // Progress based on acks, not sends
                 }
               })
 
@@ -304,6 +321,42 @@ export function useUploaderConnections(
                 return {
                   ...draft,
                   status: UploaderConnectionStatus.Paused,
+                }
+              })
+              break
+            }
+
+            case MessageType.ChunkAck: {
+              const ackMessage = message as z.infer<typeof ChunkAckMessage>
+              console.log(
+                '[UploaderConnections] received chunk ack:',
+                ackMessage.fileName,
+                'offset',
+                ackMessage.offset,
+                'bytes',
+                ackMessage.bytesReceived,
+              )
+
+              updateConnection((draft) => {
+                const currentAcked = draft.acknowledgedBytes || 0
+                const newAcked = currentAcked + ackMessage.bytesReceived
+
+                // Find the file to calculate progress
+                const file = files.find(
+                  (f) => getFileName(f) === ackMessage.fileName,
+                )
+                if (file) {
+                  const acknowledgedProgress = newAcked / file.size
+                  return {
+                    ...draft,
+                    acknowledgedBytes: newAcked,
+                    currentFileProgress: acknowledgedProgress,
+                  }
+                }
+
+                return {
+                  ...draft,
+                  acknowledgedBytes: newAcked,
                 }
               })
               break
