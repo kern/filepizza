@@ -201,16 +201,43 @@ export function useDownloader(uploaderPeerID: string): {
       nextFileIndex++
     }
 
+    let chunkCountByFile: Record<string, number> = {}
     processChunk.current = (message: z.infer<typeof ChunkMessage>) => {
       const fileStream = fileStreamByPath[message.fileName]
       if (!fileStream) {
         console.error('[Downloader] no stream found for', message.fileName)
         return
       }
-      setBytesDownloaded((bd) => bd + (message.bytes as ArrayBuffer).byteLength)
+
+      // Track chunks for e2e testing
+      if (!chunkCountByFile[message.fileName]) {
+        chunkCountByFile[message.fileName] = 0
+      }
+      chunkCountByFile[message.fileName]++
+      console.log(
+        `[Downloader] received chunk ${chunkCountByFile[message.fileName]} for ${message.fileName} (${message.offset}-${message.offset + (message.bytes as ArrayBuffer).byteLength}) final=${message.final}`,
+      )
+
+      const chunkSize = (message.bytes as ArrayBuffer).byteLength
+      setBytesDownloaded((bd) => bd + chunkSize)
       fileStream.enqueue(new Uint8Array(message.bytes as ArrayBuffer))
+
+      // Send acknowledgment to uploader
+      const ackMessage: Message = {
+        type: MessageType.ChunkAck,
+        fileName: message.fileName,
+        offset: message.offset,
+        bytesReceived: chunkSize,
+      }
+      dataConnection.send(ackMessage)
+      console.log(
+        `[Downloader] sent ack for chunk ${chunkCountByFile[message.fileName]} (${message.offset}, ${chunkSize} bytes)`,
+      )
+
       if (message.final) {
-        console.log('[Downloader] finished receiving', message.fileName)
+        console.log(
+          `[Downloader] finished receiving ${message.fileName} after ${chunkCountByFile[message.fileName]} chunks`,
+        )
         fileStream.close()
         startNextFileOrFinish()
       }

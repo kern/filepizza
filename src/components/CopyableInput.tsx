@@ -16,7 +16,8 @@ export function CopyableInput({
       <InputLabel>{label}</InputLabel>
       <div className="flex w-full">
         <input
-          className="flex-grow px-3 py-2 text-xs border border-r-0 rounded-l text-stone-900 dark:text-stone-100 bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-600"
+          id={`copyable-input-${label.toLowerCase().replace(/\s+/g, '-')}`}
+          className="grow px-3 py-2 text-xs border border-r-0 rounded-l text-stone-900 dark:text-stone-100 bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-600"
           value={value}
           readOnly
         />

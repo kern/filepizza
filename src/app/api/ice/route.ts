@@ -3,11 +3,12 @@ import crypto from 'crypto'
 import { setTurnCredentials } from '../../../coturn'
 
 const turnHost = process.env.TURN_HOST || '127.0.0.1'
+const stunServer = process.env.STUN_SERVER || 'stun:stun.l.google.com:19302'
 
 export async function POST(): Promise<NextResponse> {
   if (!process.env.COTURN_ENABLED) {
     return NextResponse.json({
-      iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+      iceServers: [{ urls: stunServer }],
     })
   }
 
@@ -21,7 +22,7 @@ export async function POST(): Promise<NextResponse> {
 
   return NextResponse.json({
     iceServers: [
-      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: stunServer },
       {
         urls: [`turn:${turnHost}:3478`, `turns:${turnHost}:5349`],
         username,
