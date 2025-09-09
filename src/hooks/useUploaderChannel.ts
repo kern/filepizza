@@ -13,6 +13,7 @@ function generateURL(slug: string): string {
 export function useUploaderChannel(
   uploaderPeerID: string,
   renewInterval = 60_000,
+  sharedSlug?: string
 ): {
   isLoading: boolean
   error: Error | null
@@ -20,18 +21,22 @@ export function useUploaderChannel(
   shortSlug: string | undefined
   longURL: string | undefined
   shortURL: string | undefined
+  sharedSlug: string | undefined
+  sharedURL: string | undefined
+  additionalUploaders: string[] | undefined
 } {
   const { isLoading, error, data } = useQuery({
-    queryKey: ['uploaderChannel', uploaderPeerID],
+    queryKey: ['uploaderChannel', uploaderPeerID, sharedSlug],
     queryFn: async () => {
       console.log(
         '[UploaderChannel] creating new channel for peer',
         uploaderPeerID,
+        sharedSlug ? `with shared slug ${sharedSlug}` : ''
       )
       const response = await fetch('/api/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uploaderPeerID }),
+        body: JSON.stringify({ uploaderPeerID, sharedSlug }),
       })
       if (!response.ok) {
         console.error(
@@ -44,6 +49,8 @@ export function useUploaderChannel(
       console.log('[UploaderChannel] channel created successfully:', {
         longSlug: data.longSlug,
         shortSlug: data.shortSlug,
+        sharedSlug: data.sharedSlug,
+        additionalUploaders: data.additionalUploaders
       })
       return data
     },
@@ -56,8 +63,11 @@ export function useUploaderChannel(
   const secret = data?.secret
   const longSlug = data?.longSlug
   const shortSlug = data?.shortSlug
+  const returnedSharedSlug = data?.sharedSlug
   const longURL = longSlug ? generateURL(longSlug) : undefined
   const shortURL = shortSlug ? generateURL(shortSlug) : undefined
+  const sharedURL = returnedSharedSlug ? generateURL(returnedSharedSlug) : undefined
+  const additionalUploaders = data?.additionalUploaders
 
   const renewMutation = useMutation({
     mutationFn: async ({ secret: s }: { secret: string }) => {
@@ -130,5 +140,8 @@ export function useUploaderChannel(
     shortSlug,
     longURL,
     shortURL,
+    sharedSlug: returnedSharedSlug,
+    sharedURL,
+    additionalUploaders
   }
 }

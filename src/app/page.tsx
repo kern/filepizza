@@ -1,18 +1,18 @@
 'use client'
 
-import React, { JSX, useCallback, useState } from 'react'
+import React, { JSX, useCallback, useState, useMemo } from 'react'
+import { getFileName } from '../fs'
+import { UploadedFile } from '../types'
 import WebRTCPeerProvider from '../components/WebRTCProvider'
 import DropZone from '../components/DropZone'
 import UploadFileList from '../components/UploadFileList'
 import Uploader from '../components/Uploader'
 import PasswordField from '../components/PasswordField'
+import SharedLinkField from '../components/SharedLinkField'
 import StartButton from '../components/StartButton'
-import { UploadedFile } from '../types'
 import Spinner from '../components/Spinner'
 import Wordmark from '../components/Wordmark'
 import CancelButton from '../components/CancelButton'
-import { useMemo } from 'react'
-import { getFileName } from '../fs'
 import TitleText from '../components/TitleText'
 import SubtitleText from '../components/SubtitleText'
 import { pluralize } from '../utils/pluralize'
@@ -54,10 +54,24 @@ function useUploaderFileListData(uploadedFiles: UploadedFile[]) {
   }, [uploadedFiles])
 }
 
+function extractSlugFromLink(link: string): string | undefined {
+  if (!link) return undefined
+
+  try {
+    const url = new URL(link)
+    const pathParts = url.pathname.split('/')
+    return pathParts[pathParts.length - 1]
+  } catch {
+    return link.trim() ? link.trim() : undefined
+  }
+}
+
 function ConfirmUploadState({
   uploadedFiles,
   password,
+  sharedLink,
   onChangePassword,
+  onChangeSharedLink,
   onCancel,
   onStart,
   onRemoveFile,
@@ -65,7 +79,9 @@ function ConfirmUploadState({
 }: {
   uploadedFiles: UploadedFile[]
   password: string
+  sharedLink: string
   onChangePassword: (pw: string) => void
+  onChangeSharedLink: (link: string) => void
   onCancel: () => void
   onStart: () => void
   onRemoveFile: (index: number) => void
@@ -81,6 +97,7 @@ function ConfirmUploadState({
       </TitleText>
       <UploadFileList files={fileListData} onRemove={onRemoveFile} />
       <PasswordField value={password} onChange={onChangePassword} />
+      <SharedLinkField value={sharedLink} onChange={onChangeSharedLink} />
       <div className="flex space-x-4">
         <CancelButton onClick={onCancel} />
         <StartButton onClick={onStart} />
@@ -92,13 +109,17 @@ function ConfirmUploadState({
 function UploadingState({
   uploadedFiles,
   password,
+  sharedLink,
   onStop,
 }: {
   uploadedFiles: UploadedFile[]
   password: string
+  sharedLink: string
   onStop: () => void
 }): JSX.Element {
   const fileListData = useUploaderFileListData(uploadedFiles)
+  const sharedSlug = extractSlugFromLink(sharedLink)
+
   return (
     <PageWrapper>
       <TitleText>
@@ -109,7 +130,7 @@ function UploadingState({
       </SubtitleText>
       <UploadFileList files={fileListData} />
       <WebRTCPeerProvider>
-        <Uploader files={uploadedFiles} password={password} onStop={onStop} />
+        <Uploader files={uploadedFiles} password={password} sharedSlug={sharedSlug} onStop={onStop} />
       </WebRTCPeerProvider>
     </PageWrapper>
   )
@@ -118,6 +139,7 @@ function UploadingState({
 export default function UploadPage(): JSX.Element {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
   const [password, setPassword] = useState('')
+  const [sharedLink, setSharedLink] = useState('')
   const [uploading, setUploading] = useState(false)
 
   const handleDrop = useCallback((files: UploadedFile[]): void => {
@@ -126,6 +148,10 @@ export default function UploadPage(): JSX.Element {
 
   const handleChangePassword = useCallback((pw: string) => {
     setPassword(pw)
+  }, [])
+
+  const handleChangeSharedLink = useCallback((link: string) => {
+    setSharedLink(link)
   }, [])
 
   const handleStart = useCallback(() => {
@@ -158,7 +184,9 @@ export default function UploadPage(): JSX.Element {
       <ConfirmUploadState
         uploadedFiles={uploadedFiles}
         password={password}
+        sharedLink={sharedLink}
         onChangePassword={handleChangePassword}
+        onChangeSharedLink={handleChangeSharedLink}
         onCancel={handleCancel}
         onStart={handleStart}
         onRemoveFile={handleRemoveFile}
@@ -171,6 +199,7 @@ export default function UploadPage(): JSX.Element {
     <UploadingState
       uploadedFiles={uploadedFiles}
       password={password}
+      sharedLink={sharedLink}
       onStop={handleStop}
     />
   )
