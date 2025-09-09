@@ -1,5 +1,6 @@
 .DS_Store
 .next
+.idea
 node_modules
 dist
 tsconfig.tsbuildinfo
