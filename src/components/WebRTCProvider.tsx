@@ -11,6 +11,10 @@ import React, {
 import Loading from './Loading'
 import Peer from 'peerjs'
 import { ErrorMessage } from './ErrorMessage'
+import {
+  isWebRTCSupported,
+  getWebRTCErrorMessage,
+} from '../utils/webrtc-detection'
 
 export type WebRTCPeerValue = {
   peer: Peer
@@ -70,6 +74,9 @@ export default function WebRTCPeerProvider({
   const [isStopped, setIsStopped] = useState(false)
   const [error, setError] = useState<Error | null>(null)
 
+  // Check WebRTC support early
+  const webrtcSupported = isWebRTCSupported()
+
   const stop = useCallback(() => {
     console.log('[WebRTCProvider] Stopping peer')
     globalPeer?.destroy()
@@ -79,8 +86,12 @@ export default function WebRTCPeerProvider({
   }, [])
 
   useEffect(() => {
+    if (!webrtcSupported) {
+      setError(new Error(getWebRTCErrorMessage()))
+      return
+    }
     getOrCreateGlobalPeer().then(setPeerValue).catch(setError)
-  }, [])
+  }, [webrtcSupported])
 
   const value = useMemo(() => ({ peer: peerValue!, stop }), [peerValue, stop])
 
