@@ -4,10 +4,7 @@ import { setTurnCredentials } from '../../../coturn'
 
 const turnHost = process.env.TURN_HOST || '127.0.0.1'
 const stunServer = process.env.STUN_SERVER || 'stun:stun.l.google.com:19302'
-
-// PATCH(gingermuffin):
-// Create host and path to local peerjs 
-const peerjsHost = process.env.PEERJS_HOST || '127.0.0.1'
+const peerjsHost = process.env.PEERJS_HOST || '0.peerjs.com'
 const peerjsPath = process.env.PEERJS_PATH || '/'
 
 export async function POST(): Promise<NextResponse> {
