@@ -34,13 +34,17 @@ async function getOrCreateGlobalPeer(): Promise<Peer> {
     const response = await fetch('/api/ice', {
       method: 'POST',
     })
-    const { iceServers } = await response.json()
+    const { host, path, iceServers } = await response.json()
     console.log('[WebRTCProvider] ICE servers:', iceServers)
+    console.log('[WebRTCProvider] host:', host)
+    console.log('[WebRTCProvider] path:', path)
 
     globalPeer = new Peer({
       debug: 3,
       config: {
         iceServers,
+        host,
+        path,
       },
     })
   }

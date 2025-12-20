@@ -4,10 +4,14 @@ import { setTurnCredentials } from '../../../coturn'
 
 const turnHost = process.env.TURN_HOST || '127.0.0.1'
 const stunServer = process.env.STUN_SERVER || 'stun:stun.l.google.com:19302'
+const peerjsHost = process.env.PEERJS_HOST || '0.peerjs.com'
+const peerjsPath = process.env.PEERJS_PATH || '/'
 
 export async function POST(): Promise<NextResponse> {
   if (!process.env.COTURN_ENABLED) {
     return NextResponse.json({
+      host: peerjsHost, 
+      path: peerjsPath,
       iceServers: [{ urls: stunServer }],
     })
   }
@@ -21,6 +25,8 @@ export async function POST(): Promise<NextResponse> {
   await setTurnCredentials(username, password, ttl)
 
   return NextResponse.json({
+    host: peerjsHost, 
+    path: peerjsPath,
     iceServers: [
       { urls: stunServer },
       {
