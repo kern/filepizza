@@ -10,7 +10,7 @@ const peerjsPath = process.env.PEERJS_PATH || '/'
 export async function POST(): Promise<NextResponse> {
   if (!process.env.COTURN_ENABLED) {
     return NextResponse.json({
-      host: peerjsHost, 
+      host: peerjsHost,
       path: peerjsPath,
       iceServers: [{ urls: stunServer }],
     })
@@ -25,7 +25,7 @@ export async function POST(): Promise<NextResponse> {
   await setTurnCredentials(username, password, ttl)
 
   return NextResponse.json({
-    host: peerjsHost, 
+    host: peerjsHost,
     path: peerjsPath,
     iceServers: [
       { urls: stunServer },

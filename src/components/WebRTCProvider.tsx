@@ -41,10 +41,10 @@ async function getOrCreateGlobalPeer(): Promise<Peer> {
 
     globalPeer = new Peer({
       debug: 3,
+      host,
+      path,
       config: {
         iceServers,
-        host,
-        path,
       },
     })
   }
