@@ -37,7 +37,7 @@ importers:
         version: 0.3.4(next@15.5.9(@babel/core@7.28.0)(@playwright/test@1.54.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       nodemon:
         specifier: ^3.0.0
-        version: 3.1.10
+        version: 3.1.11
       peer:
         specifier: ^1.0.0
         version: 1.0.2
@@ -2690,8 +2690,8 @@ packages:
   node-releases@2.0.19:
     resolution: {integrity: sha512-xxOWJsBKtzAq7DY0J+DTzuz58K8e7sJbdgwkbMWQe8UYB6ekmsQ45q0M/tJDsGaZmbC+l7n57UV8Hl5tHxO9uw==}
 
-  nodemon@3.1.10:
-    resolution: {integrity: sha512-WDjw3pJ0/0jMFmyNDp3gvY2YizjLmmOUQo6DEBY+JgdvW/yQ9mEeSw6H5ythl5Ny2ytb7f9C2nIbjSxMNzbJXw==}
+  nodemon@3.1.11:
+    resolution: {integrity: sha512-is96t8F/1//UHAjNPHpbsNY46ELPpftGUoSVNXwUfMk/qdjSylYrWSu1XavVTBOn526kFiOR733ATgNBCQyH0g==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -3049,11 +3049,6 @@ packages:
 
   semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
-    hasBin: true
-
-  semver@7.7.2:
-    resolution: {integrity: sha512-RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA==}
-    engines: {node: '>=10'}
     hasBin: true
 
   semver@7.7.3:
@@ -6190,7 +6185,7 @@ snapshots:
 
   make-dir@4.0.0:
     dependencies:
-      semver: 7.7.2
+      semver: 7.7.3
 
   math-intrinsics@1.1.0: {}
 
@@ -6308,14 +6303,14 @@ snapshots:
 
   node-releases@2.0.19: {}
 
-  nodemon@3.1.10:
+  nodemon@3.1.11:
     dependencies:
       chokidar: 3.6.0
       debug: 4.4.1(supports-color@5.5.0)
       ignore-by-default: 1.0.1
       minimatch: 3.1.2
       pstree.remy: 1.1.8
-      semver: 7.7.2
+      semver: 7.7.3
       simple-update-notifier: 2.0.0
       supports-color: 5.5.0
       touch: 3.1.1
@@ -6707,8 +6702,6 @@ snapshots:
 
   semver@6.3.1: {}
 
-  semver@7.7.2: {}
-
   semver@7.7.3: {}
 
   send@0.19.0:
@@ -6859,7 +6852,7 @@ snapshots:
 
   simple-update-notifier@2.0.0:
     dependencies:
-      semver: 7.7.2
+      semver: 7.7.3
 
   slice-ansi@7.1.2:
     dependencies:
