@@ -72,3 +72,6 @@ The server can be customized with the following environment variables:
 ## License & Acknowledgements
 
 FilePizza is released under the [BSD 3-Clause license](https://github.com/kern/filepizza/blob/main/LICENSE). A huge thanks to [iblowyourdesign](https://dribbble.com/iblowyourdesign) for the pizza illustration.
+
+
+tther is change in readme md
