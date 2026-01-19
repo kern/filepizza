@@ -44,11 +44,15 @@ export function streamDownloadMultipleFiles(
   })
 
   const readableZipStream = createZipStream({
-    start(ctrl) {
-      for (const file of files) {
-        ctrl.enqueue(file as unknown as ArrayBufferView)
+    start(controller) {
+      const zipController = controller as unknown as {
+        enqueue: (file: DownloadFileStream) => void
+        close: () => void
       }
-      ctrl.close()
+      for (const file of files) {
+        zipController.enqueue(file)
+      }
+      zipController.close()
     },
     async pull(_ctrl) {
       // Gets executed everytime zip-stream asks for more data
