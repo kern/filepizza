@@ -8,7 +8,7 @@ jobs:
     name: Docker build, tag, and push
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Docker build, tag, and push
       uses: pangzineng/Github-Action-One-Click-Docker@master
       env:
