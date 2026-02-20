@@ -18,15 +18,17 @@ const QR_CODE_SIZE = 128
 export default function Uploader({
   files,
   password,
+  sharedSlug,
   onStop,
 }: {
   files: UploadedFile[]
   password: string
+  sharedSlug?: string
   onStop: () => void
 }): JSX.Element {
   const { peer, stop } = useWebRTCPeer()
-  const { isLoading, error, longSlug, shortSlug, longURL, shortURL } =
-    useUploaderChannel(peer.id)
+  const { isLoading, error, longSlug, shortSlug, longURL, shortURL, sharedURL } =
+    useUploaderChannel(peer.id, 60000, sharedSlug)
   const connections = useUploaderConnections(peer, files, password)
 
   const handleStop = useCallback(() => {
@@ -59,6 +61,16 @@ export default function Uploader({
         <div className="flex-auto flex flex-col justify-center space-y-2">
           <CopyableInput label="Long URL" value={longURL ?? ''} />
           <CopyableInput label="Short URL" value={shortURL ?? ''} />
+          {sharedURL && (
+            <>
+              <CopyableInput label="Shared URL" value={sharedURL} />
+              {sharedSlug && (
+                <div className="text-xs text-green-600 dark:text-green-400">
+                  This upload is part of a collaborative shared link. Multiple uploaders can serve the same files.
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
       <div className="mt-6 pt-4 border-t border-stone-200 dark:border-stone-700 w-full">
