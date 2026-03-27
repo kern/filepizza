@@ -54,8 +54,8 @@ The server can be customized with the following environment variables:
 - `TURN_HOST` – Hostname or IP address of the TURN server. Defaults to `127.0.0.1`.
 - `TURN_REALM` – Realm used when generating TURN credentials. Defaults to `file.pizza`.
 - `STUN_SERVER` – STUN server URL to use when `COTURN_ENABLED` is disabled. Defaults to `stun:stun.l.google.com:19302`.
-- `PEERJS_HOST` – Hostname or IP address to the self-hosted PeerJS server. Defaults to `0.peerjs.com`.
-- `PEERJS_PATH` – Path to self-hosted PeerJS server. Defaults to `/`.
+- `PEERJS_HOST` – Hostname or IP address of the PeerJS server. Defaults to the same host as the application (built-in PeerJS server).
+- `PEERJS_PATH` – Path to the PeerJS server. Defaults to `/peerjs`.
 
 ## FAQ
 
@@ -65,10 +65,4 @@ The server can be customized with the following environment variables:
 
 **How big can my files be?** As big as your browser can handle.
 
-**What happens when I close my browser?** The URLs for your files will no longer work. If a downloader has completed the transfer, that downloader will continue to seed to incomplete downloaders, but no new downloads may be initiated.
-
-**Are my files encrypted?** Yes, all WebRTC communications are automatically encrypted using public-key cryptography because of DTLS. You can add an optional password to your upload for an extra layer of security.
-
-## License & Acknowledgements
-
-FilePizza is released under the [BSD 3-Clause license](https://github.com/kern/filepizza/blob/main/LICENSE). A huge thanks to [iblowyourdesign](https://dribbble.com/iblowyourdesign) for the pizza illustration.
+**What happens when I close my browser?** The URLs for your files will no longer work.
