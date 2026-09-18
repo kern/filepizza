@@ -9,13 +9,16 @@ import React, {
   useMemo,
 } from 'react'
 import Loading from './Loading'
-import Peer from 'peerjs'
+import Peer, { PeerError } from 'peerjs'
 import { ErrorMessage } from './ErrorMessage'
 
 export type WebRTCPeerValue = {
   peer: Peer
   stop: () => void
 }
+
+export const WEBRTC_UNSUPPORTED_MESSAGE =
+  'WebRTC is disabled or not supported in this browser. Enable WebRTC (in Firefox: set media.peerconnection.enabled to true) and reload the page.'
 
 const WebRTCContext = React.createContext<WebRTCPeerValue | null>(null)
 
@@ -27,9 +30,34 @@ export const useWebRTCPeer = (): WebRTCPeerValue => {
   return value
 }
 
+/** True when the browser exposes RTCPeerConnection (false if WebRTC is disabled). */
+export function isWebRTCSupported(): boolean {
+  return (
+    typeof window !== 'undefined' && typeof window.RTCPeerConnection === 'function'
+  )
+}
+
+function peerErrorMessage(err: unknown): string {
+  const type =
+    err && typeof err === 'object' && 'type' in err
+      ? String((err as PeerError<string>).type)
+      : ''
+  if (type === 'browser-incompatible') {
+    return WEBRTC_UNSUPPORTED_MESSAGE
+  }
+  if (err instanceof Error && err.message) {
+    return err.message
+  }
+  return WEBRTC_UNSUPPORTED_MESSAGE
+}
+
 let globalPeer: Peer | null = null
 
 async function getOrCreateGlobalPeer(): Promise<Peer> {
+  if (!isWebRTCSupported()) {
+    throw new Error(WEBRTC_UNSUPPORTED_MESSAGE)
+  }
+
   if (!globalPeer) {
     const response = await fetch('/api/ice', {
       method: 'POST',
@@ -53,13 +81,20 @@ async function getOrCreateGlobalPeer(): Promise<Peer> {
     return globalPeer
   }
 
-  await new Promise<void>((resolve) => {
-    const listener = (id: string) => {
+  await new Promise<void>((resolve, reject) => {
+    const onOpen = (id: string) => {
       console.log('[WebRTCProvider] Peer ID:', id)
-      globalPeer?.off('open', listener)
+      globalPeer?.off('open', onOpen)
+      globalPeer?.off('error', onError)
       resolve()
     }
-    globalPeer?.on('open', listener)
+    const onError = (err: unknown) => {
+      globalPeer?.off('open', onOpen)
+      globalPeer?.off('error', onError)
+      reject(new Error(peerErrorMessage(err)))
+    }
+    globalPeer?.on('open', onOpen)
+    globalPeer?.on('error', onError)
   })
 
   return globalPeer
