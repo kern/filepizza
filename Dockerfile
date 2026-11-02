@@ -1,5 +1,8 @@
+# Pin the Node.js version so builds are reproducible. Bump deliberately for security releases.
+ARG NODE_VERSION=24.22.1
+
 # Stage 1: Dependencies
-FROM node:lts-alpine AS deps
+FROM node:${NODE_VERSION}-alpine AS deps
 RUN apk add --no-cache pnpm
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
@@ -7,7 +10,7 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 # Stage 2: Builder
-FROM node:lts-alpine AS builder
+FROM node:${NODE_VERSION}-alpine AS builder
 RUN apk add --no-cache pnpm
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
@@ -16,7 +19,7 @@ COPY . .
 RUN pnpm build
 
 # Stage 3: Runner
-FROM node:lts-alpine AS runner
+FROM node:${NODE_VERSION}-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
