@@ -24,6 +24,7 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "type:check": "tsc --noEmit",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "ci": "pnpm lint:check && pnpm format:check && pnpm type:check && pnpm test && pnpm build && pnpm test:e2e && pnpm docker:build"
