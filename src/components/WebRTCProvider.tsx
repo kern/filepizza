@@ -9,11 +9,54 @@ import React, {
   useMemo,
 } from 'react'
 import Loading from './Loading'
-import Peer from 'peerjs'
+import Peer, { type PeerOptions } from 'peerjs'
+import type { UploaderTransport } from '../types'
 import { ErrorMessage } from './ErrorMessage'
 
+type ConnectionEvents = {
+  data: [unknown]
+  close: []
+  open: []
+  error: [Error]
+}
+
+export interface DownloadTransport extends UploaderTransport {
+  on<Event extends keyof ConnectionEvents>(
+    event: Event,
+    listener: (...args: ConnectionEvents[Event]) => void,
+  ): void
+  off<Event extends keyof ConnectionEvents>(
+    event: Event,
+    listener: (...args: ConnectionEvents[Event]) => void,
+  ): void
+  once(event: 'open', listener: () => void): void
+}
+
+type PeerEvents = {
+  connection: [UploaderTransport]
+  open: [string]
+  error: [Error]
+}
+
+export interface WebRTCPeer {
+  readonly id: string
+  connect(
+    id: string,
+    options?: Parameters<Peer['connect']>[1],
+  ): DownloadTransport
+  on<Event extends keyof PeerEvents>(
+    event: Event,
+    listener: (...args: PeerEvents[Event]) => void,
+  ): void
+  off<Event extends keyof PeerEvents>(
+    event: Event,
+    listener: (...args: PeerEvents[Event]) => void,
+  ): void
+  destroy(): void
+}
+
 export type WebRTCPeerValue = {
-  peer: Peer
+  peer: WebRTCPeer
   stop: () => void
 }
 
@@ -27,64 +70,76 @@ export const useWebRTCPeer = (): WebRTCPeerValue => {
   return value
 }
 
-let globalPeer: Peer | null = null
+export function createPeerService(
+  request: typeof fetch,
+  createPeer: (options: PeerOptions) => WebRTCPeer,
+) {
+  let peer: WebRTCPeer | null = null
 
-async function getOrCreateGlobalPeer(): Promise<Peer> {
-  if (!globalPeer) {
-    const response = await fetch('/api/ice', {
-      method: 'POST',
-    })
-    const { host, path, iceServers } = await response.json()
-    console.log('[WebRTCProvider] ICE servers:', iceServers)
-    console.log('[WebRTCProvider] host:', host)
-    console.log('[WebRTCProvider] path:', path)
+  return {
+    current: () => peer,
+    async get(): Promise<WebRTCPeer> {
+      if (!peer) {
+        const response = await request('/api/ice', { method: 'POST' })
+        const { host, path, iceServers } = await response.json()
+        console.log('[WebRTCProvider] ICE servers:', iceServers)
+        console.log('[WebRTCProvider] host:', host)
+        console.log('[WebRTCProvider] path:', path)
+        peer = createPeer({ debug: 3, host, path, config: { iceServers } })
+      }
 
-    globalPeer = new Peer({
-      debug: 3,
-      host,
-      path,
-      config: {
-        iceServers,
-      },
-    })
+      const currentPeer = peer
+      if (!currentPeer.id) {
+        await new Promise<void>((resolve) => {
+          const listener = (id: string) => {
+            console.log('[WebRTCProvider] Peer ID:', id)
+            currentPeer.off('open', listener)
+            resolve()
+          }
+          currentPeer.on('open', listener)
+        })
+      }
+      return currentPeer
+    },
+    stop() {
+      peer?.destroy()
+      peer = null
+    },
   }
-
-  if (globalPeer.id) {
-    return globalPeer
-  }
-
-  await new Promise<void>((resolve) => {
-    const listener = (id: string) => {
-      console.log('[WebRTCProvider] Peer ID:', id)
-      globalPeer?.off('open', listener)
-      resolve()
-    }
-    globalPeer?.on('open', listener)
-  })
-
-  return globalPeer
 }
+
+const browserPeerService = createPeerService(
+  (input, init) => fetch(input, init),
+  (options) => new Peer(options),
+)
+
+export const WebRTCPeerServiceContext = React.createContext(browserPeerService)
 
 export default function WebRTCPeerProvider({
   children,
+  service: serviceOverride,
 }: {
   children?: React.ReactNode
+  service?: ReturnType<typeof createPeerService>
 }): JSX.Element {
-  const [peerValue, setPeerValue] = useState<Peer | null>(globalPeer)
+  const defaultService = useContext(WebRTCPeerServiceContext)
+  const service = serviceOverride ?? defaultService
+  const [peerValue, setPeerValue] = useState<WebRTCPeer | null>(() =>
+    service.current(),
+  )
   const [isStopped, setIsStopped] = useState(false)
   const [error, setError] = useState<Error | null>(null)
 
   const stop = useCallback(() => {
     console.log('[WebRTCProvider] Stopping peer')
-    globalPeer?.destroy()
-    globalPeer = null
+    service.stop()
     setPeerValue(null)
     setIsStopped(true)
-  }, [])
+  }, [service])
 
   useEffect(() => {
-    getOrCreateGlobalPeer().then(setPeerValue).catch(setError)
-  }, [])
+    service.get().then(setPeerValue).catch(setError)
+  }, [service])
 
   const value = useMemo(() => ({ peer: peerValue!, stop }), [peerValue, stop])
 

@@ -1,7 +1,9 @@
 import { createZipStream } from '../zip-stream'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-if (typeof window !== 'undefined') require('web-streams-polyfill/polyfill')
+if (typeof window !== 'undefined' && typeof ReadableStream === 'undefined') {
+  require('web-streams-polyfill/polyfill')
+}
 
 const streamSaver =
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -16,11 +18,17 @@ type DownloadFileStream = {
   stream: () => ReadableStream<Uint8Array>
 }
 
+type OpenDestination = (
+  name: string,
+  options: { size: number },
+) => WritableStream<Uint8Array>
+
 export async function streamDownloadSingleFile(
   file: DownloadFileStream,
   filename: string,
+  openDestination: OpenDestination = streamSaver.createWriteStream,
 ): Promise<void> {
-  const fileStream = streamSaver.createWriteStream(filename, {
+  const fileStream = openDestination(filename, {
     size: file.size,
   })
 
@@ -37,9 +45,10 @@ export async function streamDownloadSingleFile(
 export function streamDownloadMultipleFiles(
   files: Array<DownloadFileStream>,
   filename: string,
+  openDestination: OpenDestination = streamSaver.createWriteStream,
 ): Promise<void> {
   const totalSize = files.reduce((acc, file) => acc + file.size, 0)
-  const fileStream = streamSaver.createWriteStream(filename, {
+  const fileStream = openDestination(filename, {
     size: totalSize,
   })
 
@@ -49,9 +58,6 @@ export function streamDownloadMultipleFiles(
         ctrl.enqueue(file as unknown as ArrayBufferView)
       }
       ctrl.close()
-    },
-    async pull(_ctrl) {
-      // Gets executed everytime zip-stream asks for more data
     },
   })
 

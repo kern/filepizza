@@ -87,6 +87,9 @@ export function createZipStream(
           'Cannot enqueue a chunk into a readable stream that is closed or has been requested to be closed',
         )
 
+      if (!fileLike.directory && !fileLike.stream)
+        throw new TypeError('File entries must provide a readable stream')
+
       let name = fileLike.name.trim()
       const date = new Date(
         typeof fileLike.lastModified === 'undefined'
@@ -101,7 +104,6 @@ export function createZipStream(
       filenames.push(name)
 
       const zipObject = (files[name] = {
-        level: 0,
         ctrl,
         directory: !!fileLike.directory,
         nameBuf,
@@ -114,9 +116,6 @@ export function createZipStream(
 
           zipObject.offset = offset
           zipObject.header = header
-          if (zipObject.level !== 0 && !zipObject.directory) {
-            header.view.setUint16(4, 0x0800)
-          }
           header.view.setUint32(0, 0x14000808)
           header.view.setUint16(
             6,
@@ -220,11 +219,9 @@ export function createZipStream(
     if (activeZipObject.directory)
       return activeZipObject.writeFooter(activeZipObject.writeHeader())
     if (activeZipObject.reader) return pump(activeZipObject)
-    if (activeZipObject.fileLike.stream) {
-      activeZipObject.crc = new Crc32()
-      activeZipObject.reader = activeZipObject.fileLike.stream().getReader()
-      activeZipObject.writeHeader()
-    } else next()
+    activeZipObject.crc = new Crc32()
+    activeZipObject.reader = activeZipObject.fileLike.stream().getReader()
+    activeZipObject.writeHeader()
   }
   return new ReadableStream({
     start: (c) => {

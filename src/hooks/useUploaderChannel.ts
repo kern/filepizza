@@ -2,17 +2,13 @@ import { useQuery, useMutation } from '@tanstack/react-query'
 import { useEffect } from 'react'
 
 function generateURL(slug: string): string {
-  const hostPrefix =
-    window.location.protocol +
-    '//' +
-    window.location.hostname +
-    (window.location.port ? ':' + window.location.port : '')
-  return `${hostPrefix}/download/${slug}`
+  return `${window.location.origin}/download/${slug}`
 }
 
 export function useUploaderChannel(
   uploaderPeerID: string,
   renewInterval = 60_000,
+  request: typeof fetch = fetch,
 ): {
   isLoading: boolean
   error: Error | null
@@ -28,7 +24,7 @@ export function useUploaderChannel(
         '[UploaderChannel] creating new channel for peer',
         uploaderPeerID,
       )
-      const response = await fetch('/api/create', {
+      const response = await request('/api/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ uploaderPeerID }),
@@ -62,7 +58,7 @@ export function useUploaderChannel(
   const renewMutation = useMutation({
     mutationFn: async ({ secret: s }: { secret: string }) => {
       console.log('[UploaderChannel] renewing channel for slug', shortSlug)
-      const response = await fetch('/api/renew', {
+      const response = await request('/api/renew', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ slug: shortSlug, secret: s }),

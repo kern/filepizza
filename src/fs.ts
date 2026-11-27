@@ -79,5 +79,5 @@ export const formatSize = (bytes: number): string => {
 }
 
 export const getFileName = (file: UploadedFile): string => {
-  return file.name ?? file.entryFullPath ?? ''
+  return file.name || file.entryFullPath || ''
 }

@@ -204,8 +204,10 @@ export function PasswordEntry({
 
 export default function Downloader({
   uploaderPeerID,
+  downloadOptions,
 }: {
   uploaderPeerID: string
+  downloadOptions?: Parameters<typeof useDownloader>[1]
 }): JSX.Element {
   const {
     filesInfo,
@@ -219,7 +221,7 @@ export default function Downloader({
     stopDownload,
     totalSize,
     bytesDownloaded,
-  } = useDownloader(uploaderPeerID)
+  } = useDownloader(uploaderPeerID, downloadOptions)
 
   if (isDone && filesInfo) {
     return (

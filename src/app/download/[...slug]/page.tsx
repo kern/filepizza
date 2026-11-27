@@ -7,21 +7,13 @@ import Downloader from '../../../components/Downloader'
 import WebRTCPeerProvider from '../../../components/WebRTCProvider'
 import ReportTermsViolationButton from '../../../components/ReportTermsViolationButton'
 
-const normalizeSlug = (rawSlug: string | string[]): string => {
-  if (typeof rawSlug === 'string') {
-    return rawSlug
-  } else {
-    return rawSlug.join('/')
-  }
-}
-
 export default async function DownloadPage({
   params,
 }: {
   params: Promise<{ slug: string[] }>
 }): Promise<JSX.Element> {
-  const { slug: slugRaw } = await params
-  const slug = normalizeSlug(slugRaw)
+  const { slug: segments } = await params
+  const slug = segments.join('/')
   const channel = await getOrCreateChannelRepo().fetchChannel(slug)
 
   if (!channel) {
