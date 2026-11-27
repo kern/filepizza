@@ -65,7 +65,7 @@ The server can be customized with the following environment variables:
 
 **How big can my files be?** As big as your browser can handle.
 
-**What happens when I close my browser?** The URLs for your files will no longer work. If a downloader has completed the transfer, that downloader will continue to seed to incomplete downloaders, but no new downloads may be initiated.
+**What happens when I close my browser?** Keep your browser page open until every recipient finishes downloading. After you close it, the share link stops working. Recipients can still use any files they downloaded in full.
 
 **Are my files encrypted?** Yes, all WebRTC communications are automatically encrypted using public-key cryptography because of DTLS. You can add an optional password to your upload for an extra layer of security.
 
