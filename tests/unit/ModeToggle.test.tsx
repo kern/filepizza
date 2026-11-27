@@ -1,16 +1,28 @@
-/// <reference types="@testing-library/jest-dom" />
-import React from 'react'
 import { render, fireEvent } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
+import { afterEach, describe, it, expect } from 'vitest'
 import { ModeToggle } from '../../src/components/ModeToggle'
-
-const setTheme = vi.fn()
-vi.mock('next-themes', () => ({ useTheme: () => ({ setTheme, resolvedTheme: 'light' }) }))
+import { ThemeProvider } from '../../src/components/ThemeProvider'
 
 describe('ModeToggle', () => {
-  it('toggles theme', () => {
-    const { getByRole } = render(<ModeToggle />)
-    fireEvent.click(getByRole('button'))
-    expect(setTheme).toHaveBeenCalledWith('dark')
+  afterEach(() => {
+    localStorage.removeItem('test-mode')
+  })
+
+  it('toggles the active theme in both directions', () => {
+    const { getByRole } = render(
+      <ThemeProvider
+        defaultTheme="light"
+        enableSystem={false}
+        storageKey="test-mode"
+      >
+        <ModeToggle />
+      </ThemeProvider>,
+    )
+    const button = getByRole('button', { name: 'Toggle mode' })
+
+    fireEvent.click(button)
+    expect(document.documentElement).toHaveAttribute('data-theme', 'dark')
+    fireEvent.click(button)
+    expect(document.documentElement).toHaveAttribute('data-theme', 'light')
   })
 })

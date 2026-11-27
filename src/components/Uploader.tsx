@@ -19,14 +19,19 @@ export default function Uploader({
   files,
   password,
   onStop,
+  request,
 }: {
   files: UploadedFile[]
   password: string
   onStop: () => void
+  request?: typeof fetch
 }): JSX.Element {
   const { peer, stop } = useWebRTCPeer()
-  const { isLoading, error, longSlug, shortSlug, longURL, shortURL } =
-    useUploaderChannel(peer.id)
+  const { isLoading, error, longURL, shortURL } = useUploaderChannel(
+    peer.id,
+    undefined,
+    request,
+  )
   const connections = useUploaderConnections(peer, files, password)
 
   const handleStop = useCallback(() => {
@@ -42,23 +47,23 @@ export default function Uploader({
     setRotating(activeDownloaders > 0)
   }, [activeDownloaders])
 
-  if (isLoading || !longSlug || !shortSlug) {
-    return <Loading text="Creating channel..." />
-  }
-
   if (error) {
     return <ErrorMessage message={error.message} />
+  }
+
+  if (isLoading || !longURL || !shortURL) {
+    return <Loading text="Creating channel..." />
   }
 
   return (
     <>
       <div className="flex w-full items-center">
         <div className="flex-none mr-4 bg-white p-2">
-          <QRCode value={shortURL ?? ''} size={QR_CODE_SIZE} />
+          <QRCode value={shortURL} size={QR_CODE_SIZE} />
         </div>
         <div className="flex-auto flex flex-col justify-center space-y-2">
-          <CopyableInput label="Long URL" value={longURL ?? ''} />
-          <CopyableInput label="Short URL" value={shortURL ?? ''} />
+          <CopyableInput label="Long URL" value={longURL} />
+          <CopyableInput label="Short URL" value={shortURL} />
         </div>
       </div>
       <div className="mt-6 pt-4 border-t border-stone-200 dark:border-stone-700 w-full">

@@ -11,3 +11,17 @@ describe('TermsAcceptance', () => {
     expect(getByText('FilePizza Terms')).toBeInTheDocument()
   })
 })
+
+it('keeps the dialog open on content clicks and closes with either dismissal', () => {
+  const { getByRole, queryByRole } = render(<TermsAcceptance />)
+  const open = getByRole('button', { name: 'View upload terms' })
+  fireEvent.click(open)
+  fireEvent.click(getByRole('heading', { name: 'FilePizza Terms' }))
+  expect(getByRole('dialog')).toBeInTheDocument()
+  fireEvent.click(getByRole('button', { name: 'Got it!' }))
+  expect(queryByRole('dialog')).toBeNull()
+
+  fireEvent.click(open)
+  fireEvent.click(getByRole('dialog'))
+  expect(queryByRole('dialog')).toBeNull()
+})

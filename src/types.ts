@@ -1,4 +1,4 @@
-import type { DataConnection } from 'peerjs'
+import type { Message } from './messages'
 
 export type UploadedFile = File & { entryFullPath?: string }
 
@@ -13,9 +13,21 @@ export enum UploaderConnectionStatus {
   Closed = 'CLOSED',
 }
 
+export interface UploaderTransport {
+  readonly peer: string
+  readonly open: boolean
+  readonly metadata?: { type?: string }
+  send(message: Message): void
+  close(): void
+  on(event: 'data', listener: (data: unknown) => void): void
+  on(event: 'close', listener: () => void): void
+  off(event: 'data', listener: (data: unknown) => void): void
+  off(event: 'close', listener: () => void): void
+}
+
 export type UploaderConnection = {
   status: UploaderConnectionStatus
-  dataConnection: DataConnection
+  dataConnection: UploaderTransport
   browserName?: string
   browserVersion?: string
   osName?: string

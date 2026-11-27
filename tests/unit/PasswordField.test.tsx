@@ -10,9 +10,22 @@ describe('PasswordField', () => {
     const { getByPlaceholderText } = render(
       <PasswordField value="" onChange={(v) => (val = v)} />,
     )
-    fireEvent.change(getByPlaceholderText('Enter a secret password for this slice of FilePizza...'), {
-      target: { value: 'a' },
-    })
+    fireEvent.change(
+      getByPlaceholderText(
+        'Enter a secret password for this slice of FilePizza...',
+      ),
+      {
+        target: { value: 'a' },
+      },
+    )
     expect(val).toBe('a')
   })
+})
+
+it('shows the required label and invalid styling', () => {
+  const { getByText, getByPlaceholderText } = render(
+    <PasswordField value="wrong" onChange={() => {}} isRequired isInvalid />,
+  )
+  expect(getByText('Password')).toHaveClass('text-red-500')
+  expect(getByPlaceholderText(/secret password/)).toHaveClass('border-red-500')
 })

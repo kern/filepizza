@@ -1,6 +1,6 @@
 import 'server-only'
 import config from './config'
-import { Redis, getRedisClient } from './redisClient'
+import { getRedisClient } from './redisClient'
 import { generateShortSlug, generateLongSlug } from './slugs'
 import crypto from 'crypto'
 import { z } from 'zod'
@@ -208,12 +208,15 @@ export class MemoryChannelRepo implements ChannelRepo {
   }
 }
 
-export class RedisChannelRepo implements ChannelRepo {
-  client: Redis
+interface ChannelStore {
+  get(key: string): Promise<string | null>
+  setex(key: string, ttl: number, value: string): Promise<unknown>
+  expire(key: string, ttl: number): Promise<unknown>
+  del(key: string): Promise<unknown>
+}
 
-  constructor() {
-    this.client = getRedisClient()
-  }
+export class RedisChannelRepo implements ChannelRepo {
+  constructor(readonly client: ChannelStore = getRedisClient()) {}
 
   async createChannel(
     uploaderPeerID: string,

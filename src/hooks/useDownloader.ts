@@ -1,8 +1,10 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { useWebRTCPeer } from '../components/WebRTCProvider'
+import {
+  useWebRTCPeer,
+  type DownloadTransport,
+} from '../components/WebRTCProvider'
 import { z } from 'zod'
 import { ChunkMessage, decodeMessage, Message, MessageType } from '../messages'
-import { DataConnection } from 'peerjs'
 import {
   streamDownloadSingleFile,
   streamDownloadMultipleFiles,
@@ -23,7 +25,18 @@ const cleanErrorMessage = (errorMessage: string): string =>
 
 const getZipFilename = (): string => `filepizza-download-${Date.now()}.zip`
 
-export function useDownloader(uploaderPeerID: string): {
+export function useDownloader(
+  uploaderPeerID: string,
+  {
+    downloadSingle = streamDownloadSingleFile,
+    downloadMultiple = streamDownloadMultipleFiles,
+    location = globalThis.location,
+  }: {
+    downloadSingle?: typeof streamDownloadSingleFile
+    downloadMultiple?: typeof streamDownloadMultipleFiles
+    location?: Pick<Location, 'href'>
+  } = {},
+): {
   filesInfo: Array<{ fileName: string; size: number; type: string }> | null
   isConnected: boolean
   isPasswordRequired: boolean
@@ -37,9 +50,8 @@ export function useDownloader(uploaderPeerID: string): {
   bytesDownloaded: number
 } {
   const { peer } = useWebRTCPeer()
-  const [dataConnection, setDataConnection] = useState<DataConnection | null>(
-    null,
-  )
+  const [dataConnection, setDataConnection] =
+    useState<DownloadTransport | null>(null)
   const [filesInfo, setFilesInfo] = useState<Array<{
     fileName: string
     size: number
@@ -56,7 +68,6 @@ export function useDownloader(uploaderPeerID: string): {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!peer) return
     console.log('[Downloader] connecting to uploader', uploaderPeerID)
     const conn = peer.connect(uploaderPeerID, { reliable: true })
     setDataConnection(conn)
@@ -87,6 +98,7 @@ export function useDownloader(uploaderPeerID: string): {
           case MessageType.Info:
             setFilesInfo(message.files)
             setIsPasswordRequired(false)
+            setErrorMessage(null)
             break
           case MessageType.Chunk:
             processChunk.current?.(message)
@@ -99,7 +111,7 @@ export function useDownloader(uploaderPeerID: string): {
             break
           case MessageType.Report:
             console.log('[Downloader] received report message, redirecting')
-            window.location.href = '/reported'
+            location.href = '/reported'
             break
         }
       } catch (err) {
@@ -144,7 +156,7 @@ export function useDownloader(uploaderPeerID: string): {
       conn.off('close', handleClose)
       peer.off('error', handleError)
     }
-  }, [peer])
+  }, [peer, uploaderPeerID, location])
 
   const submitPassword = useCallback(
     (pass: string) => {
@@ -159,7 +171,7 @@ export function useDownloader(uploaderPeerID: string): {
   )
 
   const startDownload = useCallback(() => {
-    if (!filesInfo || !dataConnection) return
+    if (!filesInfo?.length || !dataConnection) return
     console.log('[Downloader] starting download')
     setIsDownloading(true)
 
@@ -172,17 +184,17 @@ export function useDownloader(uploaderPeerID: string): {
       }
     > = {}
     const fileStreams = filesInfo.map((info) => {
-      let enqueue: ((chunk: Uint8Array) => void) | null = null
-      let close: (() => void) | null = null
+      let controller!: ReadableStreamDefaultController<Uint8Array>
       const stream = new ReadableStream<Uint8Array>({
         start(ctrl) {
-          enqueue = (chunk: Uint8Array) => ctrl.enqueue(chunk)
-          close = () => ctrl.close()
+          controller = ctrl
         },
       })
-      if (!enqueue || !close)
-        throw new Error('Failed to initialize stream controllers')
-      fileStreamByPath[info.fileName] = { stream, enqueue, close }
+      fileStreamByPath[info.fileName] = {
+        stream,
+        enqueue: (chunk) => controller.enqueue(chunk),
+        close: () => controller.close(),
+      }
       return stream
     })
 
@@ -251,8 +263,8 @@ export function useDownloader(uploaderPeerID: string): {
 
     const downloadPromise =
       downloads.length > 1
-        ? streamDownloadMultipleFiles(downloads, getZipFilename())
-        : streamDownloadSingleFile(downloads[0], downloads[0].name)
+        ? downloadMultiple(downloads, getZipFilename())
+        : downloadSingle(downloads[0], downloads[0].name)
 
     downloadPromise
       .then(() => {
@@ -265,7 +277,7 @@ export function useDownloader(uploaderPeerID: string): {
       .catch((err) => console.error('[Downloader] download error:', err))
 
     startNextFileOrFinish()
-  }, [dataConnection, filesInfo])
+  }, [dataConnection, filesInfo, downloadSingle, downloadMultiple])
 
   const stopDownload = useCallback(() => {
     // TODO(@kern): Continue here with stop / pause logic

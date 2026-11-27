@@ -9,9 +9,13 @@ import CancelButton from './CancelButton'
 export default function ReportTermsViolationButton({
   uploaderPeerID,
   slug,
+  request = fetch,
+  location = globalThis.location,
 }: {
   uploaderPeerID: string
   slug: string
+  request?: typeof fetch
+  location?: Pick<Location, 'href'>
 }): JSX.Element {
   const { peer } = useWebRTCPeer()
   const [showModal, setShowModal] = useState(false)
@@ -19,7 +23,7 @@ export default function ReportTermsViolationButton({
 
   const reportMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(`/api/destroy`, {
+      const response = await request(`/api/destroy`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ slug }),
@@ -46,19 +50,19 @@ export default function ReportTermsViolationButton({
       // Set a timeout to redirect after 2 seconds even if connection doesn't open
       const timeout = setTimeout(() => {
         conn.close()
-        window.location.href = '/reported'
+        location.href = '/reported'
       }, 2000)
 
       conn.on('open', () => {
         clearTimeout(timeout)
         conn.close()
-        window.location.href = '/reported'
+        location.href = '/reported'
       })
     } catch (error) {
       console.error('Failed to report violation', error)
       setIsReporting(false)
     }
-  }, [peer, uploaderPeerID])
+  }, [peer, uploaderPeerID, reportMutation, location])
 
   return (
     <>

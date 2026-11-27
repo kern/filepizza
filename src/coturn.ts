@@ -21,10 +21,6 @@ export async function setTurnCredentials(
 
   const realm = process.env.TURN_REALM || 'file.pizza'
 
-  if (!realm) {
-    throw new Error('TURN_REALM environment variable not set')
-  }
-
   const redis = getRedisClient()
 
   const hmacKey = generateHMACKey(username, realm, password)

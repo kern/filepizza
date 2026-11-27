@@ -19,13 +19,7 @@ export default function DropZone({
   const handleDragLeave = useCallback((e: DragEvent) => {
     e.preventDefault()
 
-    const currentTarget =
-      e.currentTarget === window ? window.document : e.currentTarget
-    if (
-      e.relatedTarget &&
-      currentTarget instanceof Node &&
-      currentTarget.contains(e.relatedTarget as Node)
-    ) {
+    if (e.relatedTarget instanceof Node && document.contains(e.relatedTarget)) {
       return
     }
 

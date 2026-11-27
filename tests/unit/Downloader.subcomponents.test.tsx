@@ -1,6 +1,5 @@
 /// <reference types="@testing-library/jest-dom" />
-import { vi } from 'vitest'
-vi.mock('next-view-transitions', () => ({ Link: (p: any) => <a {...p}>{p.children}</a> }))
+import { TestRouter } from '../support/providers'
 import React from 'react'
 import { render, fireEvent, waitFor } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
@@ -18,6 +17,7 @@ describe('Downloader subcomponents', () => {
   it('ConnectingToUploader shows troubleshooting', async () => {
     const { getByText } = render(
       <ConnectingToUploader showTroubleshootingAfter={0} />,
+      { wrapper: TestRouter },
     )
     await waitFor(() => {
       expect(getByText('Having trouble connecting?')).toBeInTheDocument()
@@ -27,13 +27,19 @@ describe('Downloader subcomponents', () => {
   it('DownloadComplete lists files', () => {
     const { getByText } = render(
       <DownloadComplete filesInfo={files} bytesDownloaded={1} totalSize={1} />,
+      { wrapper: TestRouter },
     )
     expect(getByText('You downloaded 1 file.')).toBeInTheDocument()
   })
 
   it('DownloadInProgress shows stop button', () => {
     const { getByText } = render(
-      <DownloadInProgress filesInfo={files} bytesDownloaded={0} totalSize={1} onStop={() => {}} />,
+      <DownloadInProgress
+        filesInfo={files}
+        bytesDownloaded={0}
+        totalSize={1}
+        onStop={() => {}}
+      />,
     )
     expect(getByText('Stop Download')).toBeInTheDocument()
   })
@@ -51,7 +57,9 @@ describe('Downloader subcomponents', () => {
       <PasswordEntry errorMessage={null} onSubmit={(v) => (submitted = v)} />,
     )
     fireEvent.change(
-      getByPlaceholderText('Enter a secret password for this slice of FilePizza...'),
+      getByPlaceholderText(
+        'Enter a secret password for this slice of FilePizza...',
+      ),
       { target: { value: 'secret' } },
     )
     fireEvent.submit(getByText('Unlock'))
