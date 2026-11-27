@@ -191,3 +191,42 @@ it('reports transport errors on open connections and closes a connection that op
   pending.connection.accept()
   expect(pending.connection.open).toBe(false)
 })
+
+it('writes and acknowledges chunks in offset order when they arrive out of order', async () => {
+  const { result, connection, receive, chunk, output } = await openDownloader()
+  const messages = () =>
+    connection.messages.map((message) =>
+      message.type === MessageType.ChunkAck
+        ? `ack ${message.fileName} ${message.offset}`
+        : message.type === MessageType.Start
+          ? `start ${message.fileName}`
+          : message.type,
+    )
+  act(() => connection.accept())
+  receive({
+    type: MessageType.Info,
+    files: [{ ...first, size: 5 }, second],
+  })
+  act(result.current.startDownload)
+
+  // The final chunk overtakes the two before it, and one of them is repeated.
+  chunk(first.fileName, 4, [69], true)
+  chunk(first.fileName, 2, [67, 68], false)
+  chunk(first.fileName, 2, [67, 68], false)
+  expect(result.current.bytesDownloaded).toBe(0)
+  expect(messages()).toEqual([MessageType.RequestInfo, 'start a.txt'])
+
+  chunk(first.fileName, 0, [65, 66], false)
+  expect(result.current.bytesDownloaded).toBe(5)
+  expect(messages().slice(2)).toEqual([
+    'ack a.txt 0',
+    'ack a.txt 2',
+    'ack a.txt 4',
+    'start /b.txt',
+  ])
+
+  chunk(second.fileName, 0, [70], true)
+  await waitFor(() => expect(result.current.isDone).toBe(true))
+  // The ZIP stores files uncompressed, so each appears verbatim.
+  expect(Buffer.from(output).includes(Buffer.from('ABCDE'))).toBe(true)
+})
