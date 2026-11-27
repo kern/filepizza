@@ -46,6 +46,41 @@ const requestInfo: Message = {
   mobileModel: '',
 }
 
+// A File whose slices can be read in jsdom, which lacks Blob.arrayBuffer().
+// `read` runs before each slice resolves, so tests can delay or fail a read.
+function testFile(
+  content: string | Uint8Array,
+  name: string,
+  {
+    type = '',
+    read = async () => {},
+  }: { type?: string; read?: (start: number) => Promise<void> } = {},
+): File {
+  const bytes = new Uint8Array(
+    typeof content === 'string' ? new TextEncoder().encode(content) : content,
+  )
+  const file = new File([bytes], name, { type })
+  file.slice = (start = 0, end = bytes.byteLength) => {
+    const blob = new Blob()
+    blob.arrayBuffer = async () => {
+      await read(start)
+      return bytes.slice(start, end).buffer
+    }
+    return blob
+  }
+  return file
+}
+
+function deferred() {
+  let resolve!: () => void
+  let reject!: (error: Error) => void
+  const promise = new Promise<void>((res, rej) => {
+    resolve = res
+    reject = rej
+  })
+  return { promise, resolve, reject }
+}
+
 function setupTransfer(files: File[], password = '') {
   const peer = new EventEmitter<{ connection: [UploaderTransport] }>()
   const location = { href: '/' }
@@ -87,11 +122,14 @@ function setupTransfer(files: File[], password = '') {
     acknowledge: (fileName: string, offset: number, bytesReceived: number) =>
       receive({ type: MessageType.ChunkAck, fileName, offset, bytesReceived }),
     receive,
+    // Reading a slice is asynchronous, so timers have to be run with await.
+    sendNextChunk: () => act(() => vi.advanceTimersToNextTimerAsync()),
+    sendChunks: () => act(() => vi.runAllTimersAsync()),
   }
 }
 
-function largeFile() {
-  return new File([new Uint8Array(fileSize)], fileName)
+function largeFile(read?: (start: number) => Promise<void>) {
+  return testFile(new Uint8Array(fileSize), fileName, { read })
 }
 
 beforeEach(() => {
@@ -104,11 +142,11 @@ afterEach(() => {
 })
 
 describe('useUploaderConnections transfer progress', () => {
-  it('waits for receiver acknowledgments even after queuing the final chunk', () => {
+  it('waits for receiver acknowledgments even after queuing the final chunk', async () => {
     const transfer = setupTransfer([largeFile()])
     transfer.start(fileName)
     for (let chunk = 0; chunk < 3; chunk++) {
-      act(() => vi.advanceTimersToNextTimer())
+      await transfer.sendNextChunk()
     }
 
     expect(
@@ -145,13 +183,13 @@ describe('useUploaderConnections transfer progress', () => {
     expect(transfer.state().status).toBe(UploaderConnectionStatus.Done)
   })
 
-  it('ignores acknowledgments for unsent chunks, other files, and invalid byte ranges', () => {
-    const transfer = setupTransfer([largeFile(), new File([], 'other.bin')])
+  it('ignores acknowledgments for unsent chunks, other files, and invalid byte ranges', async () => {
+    const transfer = setupTransfer([largeFile(), testFile('', 'other.bin')])
     transfer.start(fileName)
     transfer.acknowledge(fileName, 0, MAX_CHUNK_SIZE)
     expect(transfer.state().currentFileProgress).toBe(0)
 
-    act(() => vi.runAllTimers())
+    await transfer.sendChunks()
     transfer.acknowledge('other.bin', 0, 0)
     transfer.acknowledge('unknown.bin', 0, MAX_CHUNK_SIZE)
     transfer.acknowledge(fileName, MAX_CHUNK_SIZE, MAX_CHUNK_SIZE)
@@ -164,17 +202,17 @@ describe('useUploaderConnections transfer progress', () => {
     expect(transfer.state().completedFiles).toBe(0)
   })
 
-  it('starts each file with fresh progress and waits for an empty file acknowledgment', () => {
+  it('starts each file with fresh progress and waits for an empty file acknowledgment', async () => {
     const transfer = setupTransfer([
-      new File(['a'], 'first.txt'),
-      new File([], 'empty.txt'),
+      testFile('a', 'first.txt'),
+      testFile('', 'empty.txt'),
     ])
     transfer.start('first.txt')
-    act(() => vi.runAllTimers())
+    await transfer.sendChunks()
     transfer.acknowledge('first.txt', 0, 1)
 
     transfer.start('empty.txt')
-    act(() => vi.runAllTimers())
+    await transfer.sendChunks()
     expect(transfer.chunks().at(-1)).toMatchObject({
       fileName: 'empty.txt',
       offset: 0,
@@ -198,30 +236,30 @@ describe('useUploaderConnections transfer progress', () => {
     })
   })
 
-  it('rejects start offsets outside the file or between bytes', () => {
+  it('rejects start offsets outside the file or between bytes', async () => {
     const transfer = setupTransfer([largeFile()])
     for (const offset of [-1, 0.5, fileSize + 1]) {
       transfer.start(fileName, offset)
     }
     expect(transfer.logger.error).toHaveBeenCalledTimes(3)
 
-    act(() => vi.runAllTimers())
+    await transfer.sendChunks()
     expect(transfer.chunks()).toHaveLength(0)
     expect(transfer.state().status).toBe(UploaderConnectionStatus.Ready)
   })
 
-  it('starts resumed progress at the requested byte offset', () => {
+  it('starts resumed progress at the requested byte offset', async () => {
     const transfer = setupTransfer([largeFile()])
     transfer.start(fileName)
     transfer.receive({ type: MessageType.Pause })
-    act(() => vi.runAllTimers())
+    await transfer.sendChunks()
     expect(transfer.chunks()).toHaveLength(0)
 
     transfer.start(fileName, 2 * MAX_CHUNK_SIZE)
     expect(transfer.state().currentFileProgress).toBe(
       (2 * MAX_CHUNK_SIZE) / fileSize,
     )
-    act(() => vi.runAllTimers())
+    await transfer.sendChunks()
     expect(transfer.chunks()).toHaveLength(1)
     expect(transfer.chunks()[0]).toMatchObject({
       offset: 2 * MAX_CHUNK_SIZE,
@@ -242,7 +280,7 @@ describe('useUploaderConnections connection lifecycle', () => {
 
   it('provides file information and records the downloader details', () => {
     const transfer = setupTransfer([
-      new File(['a'], 'first.txt', { type: 'text/plain' }),
+      testFile('a', 'first.txt', { type: 'text/plain' }),
     ])
     expect(transfer.connection.messages).toEqual([
       {
@@ -265,7 +303,7 @@ describe('useUploaderConnections connection lifecycle', () => {
     expect(transfer.state().status).toBe(UploaderConnectionStatus.Ready)
   })
 
-  it('handles rejected passwords and allows a correct retry', () => {
+  it('handles rejected passwords and allows a correct retry', async () => {
     const transfer = setupTransfer([largeFile()], 'secret')
     expect(transfer.state().status).toBe(
       UploaderConnectionStatus.Authenticating,
@@ -276,7 +314,7 @@ describe('useUploaderConnections connection lifecycle', () => {
 
     transfer.receive(requestInfo)
     transfer.start(fileName)
-    act(() => vi.runAllTimers())
+    await transfer.sendChunks()
     expect(transfer.chunks()).toHaveLength(0)
 
     transfer.receive({ type: MessageType.UsePassword, password: 'wrong' })
@@ -312,32 +350,32 @@ describe('useUploaderConnections connection lifecycle', () => {
     )
   })
 
-  it('lets a new connection close while a send is scheduled', () => {
+  it('lets a new connection close while a send is scheduled', async () => {
     const transfer = setupTransfer([largeFile()])
     transfer.start(fileName)
     act(() => transfer.connection.close())
-    act(() => vi.runAllTimers())
+    await transfer.sendChunks()
     expect(transfer.state().status).toBe(UploaderConnectionStatus.Closed)
     expect(transfer.chunks()).toHaveLength(0)
   })
 
-  it('stops sending if the transport is already closed when the timer fires', () => {
+  it('stops sending if the transport is already closed when the timer fires', async () => {
     const transfer = setupTransfer([largeFile()])
     transfer.start(fileName)
     transfer.connection.open = false
-    act(() => vi.runAllTimers())
+    await transfer.sendChunks()
     expect(transfer.chunks()).toHaveLength(0)
   })
 
-  it('ignores early Done and allows pausing after the last chunk is queued', () => {
-    const transfer = setupTransfer([new File(['a'], 'first.txt')])
+  it('ignores early Done and allows pausing after the last chunk is queued', async () => {
+    const transfer = setupTransfer([testFile('a', 'first.txt')])
     transfer.receive({ type: MessageType.Pause })
     expect(transfer.state().status).toBe(UploaderConnectionStatus.Ready)
 
     transfer.start('first.txt')
     transfer.receive({ type: MessageType.Done })
     expect(transfer.connection.open).toBe(true)
-    act(() => vi.runAllTimers())
+    await transfer.sendChunks()
     expect(transfer.chunks()).toHaveLength(1)
 
     transfer.receive({ type: MessageType.Pause })
@@ -367,5 +405,107 @@ describe('useUploaderConnections connection lifecycle', () => {
     }
     expect(disconnected.messages).toEqual([])
     expect(reporter.messages).toEqual([])
+  })
+})
+
+describe('useUploaderConnections chunk reads', () => {
+  it('sends ArrayBuffers in offset order when an earlier read is slower', async () => {
+    const content = new Uint8Array(fileSize).map(
+      (_, i) => (i * 31 + (i >> 18)) & 0xff,
+    )
+    const file = testFile(content, fileName, {
+      read: (start) =>
+        new Promise((resolve) => setTimeout(resolve, start === 0 ? 25 : 0)),
+    })
+    const transfer = setupTransfer([file])
+    transfer.start(fileName)
+    await transfer.sendChunks()
+
+    const chunks = transfer.chunks()
+    expect(chunks.map((chunk) => chunk.offset)).toEqual([
+      0,
+      MAX_CHUNK_SIZE,
+      2 * MAX_CHUNK_SIZE,
+    ])
+    const sent = new Uint8Array(fileSize)
+    for (const chunk of chunks) {
+      // A Blob here would make PeerJS pack the message asynchronously.
+      expect(chunk.bytes).toBeInstanceOf(ArrayBuffer)
+      sent.set(new Uint8Array(chunk.bytes as ArrayBuffer), chunk.offset)
+    }
+    expect(Buffer.from(sent).equals(Buffer.from(content))).toBe(true)
+  })
+
+  it('drops an in-flight read when paused, then resumes from the requested offset', async () => {
+    const firstRead = deferred()
+    const read = vi.fn((start: number) =>
+      start === 0 ? firstRead.promise : Promise.resolve(),
+    )
+    const transfer = setupTransfer([largeFile(read)])
+    transfer.start(fileName)
+    await transfer.sendNextChunk()
+    expect(read).toHaveBeenCalledTimes(1)
+
+    transfer.receive({ type: MessageType.Pause })
+    transfer.start(fileName, 2 * MAX_CHUNK_SIZE)
+    await act(async () => firstRead.resolve())
+    await transfer.sendChunks()
+
+    expect(transfer.chunks().map((chunk) => chunk.offset)).toEqual([
+      2 * MAX_CHUNK_SIZE,
+    ])
+  })
+
+  it('does not send a chunk whose read finishes after the connection closes', async () => {
+    const firstRead = deferred()
+    const read = vi.fn(() => firstRead.promise)
+    const transfer = setupTransfer([largeFile(read)])
+    transfer.start(fileName)
+    await transfer.sendNextChunk()
+    act(() => transfer.connection.close())
+    await act(async () => firstRead.resolve())
+    await transfer.sendChunks()
+
+    expect(read).toHaveBeenCalledTimes(1)
+    expect(transfer.chunks()).toHaveLength(0)
+  })
+
+  it('does not send if the transport closes during a read', async () => {
+    const firstRead = deferred()
+    const transfer = setupTransfer([largeFile(() => firstRead.promise)])
+    transfer.start(fileName)
+    await transfer.sendNextChunk()
+    transfer.connection.open = false
+    await act(async () => firstRead.resolve())
+    await transfer.sendChunks()
+
+    expect(transfer.chunks()).toHaveLength(0)
+  })
+
+  it('tells the downloader when the file cannot be read', async () => {
+    const transfer = setupTransfer([
+      largeFile(() => Promise.reject(new Error('NotReadableError'))),
+    ])
+    transfer.start(fileName)
+    await transfer.sendChunks()
+
+    expect(transfer.chunks()).toHaveLength(0)
+    expect(transfer.connection.messages.at(-1)).toEqual({
+      type: MessageType.Error,
+      error: expect.stringContaining(`could not read ${fileName}`),
+    })
+    expect(transfer.logger.error).toHaveBeenCalled()
+  })
+
+  it('stays quiet when a read fails after the transfer was paused', async () => {
+    const firstRead = deferred()
+    const transfer = setupTransfer([largeFile(() => firstRead.promise)])
+    transfer.start(fileName)
+    await transfer.sendNextChunk()
+    transfer.receive({ type: MessageType.Pause })
+    await act(async () => firstRead.reject(new Error('NotReadableError')))
+
+    expect(transfer.connection.messages.at(-1)?.type).toBe(MessageType.Info)
+    expect(transfer.logger.error).not.toHaveBeenCalled()
   })
 })
