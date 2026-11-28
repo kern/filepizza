@@ -1,12 +1,12 @@
 // @vitest-environment node
 
-import type { NextApiRequest, NextApiResponse } from 'next'
+import type { ApiRequest, ApiResponse } from '../../src/routes'
 import { describe, expect, it } from 'vitest'
 import { getBodyKey, routeHandler, throwAPIError } from '../../src/routes'
 import { error, info, warn } from '../../src/log'
 
 function request(method: string, body: object) {
-  return { method, body } as NextApiRequest
+  return { method, body } as ApiRequest
 }
 
 function response() {
@@ -54,7 +54,7 @@ describe('route helpers', () => {
       const result = response()
       await routeHandler<unknown>(test.callback)(
         request(test.method, {}),
-        result as unknown as NextApiResponse,
+        result as unknown as ApiResponse,
       )
       expect(result).toMatchObject({ statusCode: test.code, body: test.body })
     }

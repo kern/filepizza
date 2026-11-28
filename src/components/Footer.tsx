@@ -1,5 +1,3 @@
-'use client'
-
 import React, { JSX, useCallback } from 'react'
 
 const DONATE_HREF =

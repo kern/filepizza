@@ -1,7 +1,9 @@
 .DS_Store
-.next
 node_modules
 dist
 tsconfig.tsbuildinfo
 .env
 coverage/
+.output
+test-results/
+playwright-report/

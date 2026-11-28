@@ -1,5 +1,3 @@
-'use client'
-
 import React, { JSX } from 'react'
 import { useRotatingSpinner } from '../hooks/useRotatingSpinner'
 

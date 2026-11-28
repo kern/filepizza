@@ -1,15 +1,18 @@
 // @vitest-environment node
 
-import { NextRequest } from 'next/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryChannelRepo, RedisChannelRepo } from '../../src/channel'
-import { POST as create } from '../../src/app/api/create/route'
-import { POST as destroy } from '../../src/app/api/destroy/route'
-import { POST as ice } from '../../src/app/api/ice/route'
-import { POST as renew } from '../../src/app/api/renew/route'
+import { POST as createRoute } from '../../src/routes/api.create'
+import { POST as destroyRoute } from '../../src/routes/api.destroy'
+import { POST as ice } from '../../src/routes/api.ice'
+import { POST as renewRoute } from '../../src/routes/api.renew'
+
+const create = (request: Request) => createRoute({ request })
+const destroy = (request: Request) => destroyRoute({ request })
+const renew = (request: Request) => renewRoute({ request })
 
 function post(body: object) {
-  return new NextRequest('http://localhost/api', {
+  return new Request('http://localhost/api', {
     method: 'POST',
     body: JSON.stringify(body),
   })
@@ -171,5 +174,19 @@ describe('channel API', () => {
     expect(config.iceServers).toEqual([
       { urls: expect.stringMatching(/^stun:/) },
     ])
+  })
+})
+
+describe('MemoryChannelRepo timers', () => {
+  it('destroys a channel whose expiry timers are already gone', async () => {
+    const repo = new MemoryChannelRepo()
+    const channel = await repo.createChannel('test-peer', 60)
+    const timeouts = (
+      repo as unknown as { timeouts: Map<string, NodeJS.Timeout> }
+    ).timeouts
+    for (const timeout of timeouts.values()) clearTimeout(timeout)
+    timeouts.clear()
+    await repo.destroyChannel(channel.shortSlug)
+    expect(await repo.fetchChannel(channel.shortSlug)).toBeNull()
   })
 })

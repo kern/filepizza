@@ -1,5 +1,3 @@
-'use client'
-
 import { useTheme } from 'next-themes'
 import { JSX } from 'react'
 function LightModeIcon(): JSX.Element {

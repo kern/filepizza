@@ -55,3 +55,11 @@ it('tracks window drag events and passes dropped files to the uploader', async (
   fireEvent.drop(window, { dataTransfer })
   await waitFor(() => expect(onDrop).toHaveBeenCalledWith([file]))
 })
+
+it('ignores a change event without files', () => {
+  const fn = vi.fn()
+  const { container } = render(<DropZone onDrop={fn} />)
+  const input = container.querySelector('input') as HTMLInputElement
+  fireEvent.change(input, { target: { files: null } })
+  expect(fn).not.toHaveBeenCalled()
+})

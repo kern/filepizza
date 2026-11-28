@@ -1,10 +1,12 @@
 import { EventEmitter } from 'node:events'
 import type { PropsWithChildren } from 'react'
 import {
-  AppRouterContext,
-  type AppRouterInstance,
-} from 'next/dist/shared/lib/app-router-context.shared-runtime'
-import { ViewTransitions } from 'next-view-transitions'
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+  RouterContextProvider,
+} from '@tanstack/react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
   createPeerService,
@@ -70,20 +72,19 @@ export function peerService(peer = new TestPeer()) {
   )
 }
 
-const router: AppRouterInstance = {
-  back() {},
-  forward() {},
-  refresh() {},
-  push() {},
-  replace() {},
-  prefetch() {},
-}
-
 export function TestRouter({ children }: PropsWithChildren) {
+  const rootRoute = createRootRoute()
+  const indexRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/',
+    component: () => <>{children}</>,
+  })
+  const router = createRouter({
+    routeTree: rootRoute.addChildren([indexRoute]),
+    history: createMemoryHistory({ initialEntries: ['/'] }),
+  })
   return (
-    <AppRouterContext.Provider value={router}>
-      <ViewTransitions>{children}</ViewTransitions>
-    </AppRouterContext.Provider>
+    <RouterContextProvider router={router}>{children}</RouterContextProvider>
   )
 }
 

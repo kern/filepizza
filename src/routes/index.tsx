@@ -1,5 +1,4 @@
-'use client'
-
+import { createFileRoute } from '@tanstack/react-router'
 import React, { JSX, useCallback, useState } from 'react'
 import WebRTCPeerProvider from '../components/WebRTCProvider'
 import DropZone from '../components/DropZone'
@@ -115,7 +114,9 @@ function UploadingState({
   )
 }
 
-export default function UploadPage(): JSX.Element {
+export const Route = createFileRoute('/')({ component: UploadPage })
+
+export function UploadPage(): JSX.Element {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
   const [password, setPassword] = useState('')
   const [uploading, setUploading] = useState(false)

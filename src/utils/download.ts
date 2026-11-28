@@ -1,13 +1,11 @@
 import { createZipStream } from '../zip-stream'
 
-// oxlint-disable-next-line @typescript-eslint/no-require-imports
 if (typeof window !== 'undefined' && typeof ReadableStream === 'undefined') {
-  require('web-streams-polyfill/polyfill')
+  await import('web-streams-polyfill/polyfill')
 }
 
 const streamSaver =
-  // oxlint-disable-next-line @typescript-eslint/no-require-imports
-  typeof window !== 'undefined' ? require('streamsaver') : null
+  typeof window !== 'undefined' ? (await import('streamsaver')).default : null
 if (typeof window !== 'undefined') {
   streamSaver.mitm = `${window.location.protocol}//${window.location.host}/stream.html`
 }

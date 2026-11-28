@@ -1,4 +1,3 @@
-import 'server-only'
 import crypto from 'crypto'
 import config from './config'
 

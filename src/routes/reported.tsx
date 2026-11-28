@@ -1,10 +1,15 @@
 import { JSX } from 'react'
-import Spinner from '../../components/Spinner'
-import Wordmark from '../../components/Wordmark'
-import TitleText from '../../components/TitleText'
-import ReturnHome from '../../components/ReturnHome'
+import { createFileRoute } from '@tanstack/react-router'
+import Spinner from '../components/Spinner'
+import Wordmark from '../components/Wordmark'
+import TitleText from '../components/TitleText'
+import ReturnHome from '../components/ReturnHome'
 
-export default function ReportedPage(): JSX.Element {
+export const Route = createFileRoute('/reported')({
+  component: ReportedPage,
+})
+
+export function ReportedPage(): JSX.Element {
   return (
     <div className="flex flex-col items-center space-y-5 py-10 max-w-md mx-auto">
       <Spinner direction="down" />
