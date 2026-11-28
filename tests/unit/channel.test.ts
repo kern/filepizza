@@ -1,15 +1,18 @@
 // @vitest-environment node
 
-import { NextRequest } from 'next/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryChannelRepo, RedisChannelRepo } from '../../src/channel'
-import { POST as create } from '../../src/app/api/create/route'
-import { POST as destroy } from '../../src/app/api/destroy/route'
-import { POST as ice } from '../../src/app/api/ice/route'
-import { POST as renew } from '../../src/app/api/renew/route'
+import { POST as createRoute } from '../../src/routes/api.create'
+import { POST as destroyRoute } from '../../src/routes/api.destroy'
+import { POST as ice } from '../../src/routes/api.ice'
+import { POST as renewRoute } from '../../src/routes/api.renew'
+
+const create = (request: Request) => createRoute({ request })
+const destroy = (request: Request) => destroyRoute({ request })
+const renew = (request: Request) => renewRoute({ request })
 
 function post(body: object) {
-  return new NextRequest('http://localhost/api', {
+  return new Request('http://localhost/api', {
     method: 'POST',
     body: JSON.stringify(body),
   })

@@ -45,20 +45,21 @@ pnpm dev
 
 ## Tech Stack
 
-- **Framework**: Next.js 15 with App Router
+- **Framework**: TanStack Start (TanStack Router + Vite + Nitro)
 - **UI**: React 19 + Tailwind CSS v4
 - **Language**: TypeScript
 - **Testing**: Vitest (unit) + Playwright (E2E)
 - **WebRTC**: PeerJS
 - **State Management**: TanStack Query
-- **Themes**: next-themes with View Transitions
+- **Themes**: next-themes; route navigation uses View Transitions
 - **Storage**: Redis (optional)
 
 ## Project Structure
 
 ```
 src/
-├── app/                    # Next.js App Router pages
+├── routes/                 # TanStack Router file routes (pages + /api handlers)
+├── router.tsx              # Router factory
 ├── components/             # React components
 ├── hooks/                  # Custom React hooks
 ├── utils/                  # Utility functions
@@ -106,7 +107,7 @@ This starts Redis and COTURN containers for testing peer connections behind NAT.
 
 ## Key Dependencies
 
-- `next` - React framework
+- `@tanstack/react-start` - Full-stack React framework
 - `tailwindcss` - CSS framework
 - `@tanstack/react-query` - Server state management
 - `peerjs` - WebRTC abstraction

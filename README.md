@@ -37,7 +37,7 @@ $ pnpm docker:down
 
 ## Stack
 
-* Next.js
+* TanStack Start
 * Tailwind
 * TypeScript
 * React

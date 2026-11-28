@@ -1,20 +1,25 @@
-import { NextApiRequest, NextApiResponse } from 'next'
 import config from './config'
+
+export type ApiRequest = { method?: string; body: Record<string, unknown> }
+export type ApiResponse = {
+  statusCode: number
+  json: (body: unknown) => void
+}
 
 export type APIError = Error & { statusCode?: number }
 
 export type BodyKey = keyof typeof config.bodyKeys
 
-export function throwAPIError(message: string, statusCode = 500): void {
+export function throwAPIError(message: string, statusCode = 500): never {
   const err = new Error(message) as APIError
   err.statusCode = statusCode
   throw err
 }
 
 export function routeHandler<T>(
-  fn: (req: NextApiRequest, res: NextApiResponse) => Promise<T>,
-): (req: NextApiRequest, res: NextApiResponse) => Promise<void> {
-  return async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
+  fn: (req: ApiRequest, res: ApiResponse) => Promise<T>,
+): (req: ApiRequest, res: ApiResponse) => Promise<void> {
+  return async (req: ApiRequest, res: ApiResponse): Promise<void> => {
     if (req.method !== 'POST') {
       res.statusCode = 405
       res.json({ error: 'method not allowed' })
@@ -32,7 +37,7 @@ export function routeHandler<T>(
   }
 }
 
-export function getBodyKey(req: NextApiRequest, key: BodyKey): string {
+export function getBodyKey(req: ApiRequest, key: BodyKey): string {
   const { min, max } = config.bodyKeys[key]
 
   const val = req.body[key]

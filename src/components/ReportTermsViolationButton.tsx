@@ -1,5 +1,3 @@
-'use client'
-
 import { JSX } from 'react'
 import { useWebRTCPeer } from './WebRTCProvider'
 import { useCallback, useState } from 'react'

@@ -19,7 +19,7 @@ RUN npm install -g pnpm@${PNPM_VERSION}
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# Builds standalone output
+# Builds the self-contained Nitro server output into .output
 RUN pnpm build
 
 # Stage 3: Runner
@@ -29,12 +29,10 @@ WORKDIR /app
 ENV NODE_ENV production
 ENV PORT 3000
 
-# Only copy standalone output - no need for node_modules
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+# Only copy the Nitro output (it bundles its server dependencies and public assets)
+COPY --from=builder /app/.output ./.output
 
 USER node
 EXPOSE 3000
-# Uses standalone server
-CMD ["node", "server.js"]
+# Uses the Nitro server
+CMD ["node", ".output/server/index.mjs"]

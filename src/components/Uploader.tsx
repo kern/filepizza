@@ -1,5 +1,3 @@
-'use client'
-
 import React, { JSX, useCallback, useEffect } from 'react'
 import { UploadedFile, UploaderConnectionStatus } from '../types'
 import { useWebRTCPeer } from './WebRTCProvider'

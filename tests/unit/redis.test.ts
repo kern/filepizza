@@ -2,13 +2,14 @@
 
 import { createHash } from 'node:crypto'
 import { createServer, type Socket } from 'node:net'
-import { NextRequest } from 'next/server'
 import { expect, it, vi } from 'vitest'
 import { getRedisClient } from '../../src/redisClient'
 import { getOrCreateChannelRepo, RedisChannelRepo } from '../../src/channel'
 import { setTurnCredentials } from '../../src/coturn'
-import { POST as ice } from '../../src/app/api/ice/route'
-import { POST as destroy } from '../../src/app/api/destroy/route'
+import { POST as ice } from '../../src/routes/api.ice'
+import { POST as destroyRoute } from '../../src/routes/api.destroy'
+
+const destroy = (request: Request) => destroyRoute({ request })
 
 it('stores TURN credentials and reports a Redis channel failure through the API', async () => {
   const commands: string[][] = []
@@ -90,7 +91,7 @@ it('stores TURN credentials and reports a Redis channel failure through the API'
     ])
 
     const response = await destroy(
-      new NextRequest('http://localhost/api/destroy', {
+      new Request('http://localhost/api/destroy', {
         method: 'POST',
         body: JSON.stringify({ slug: 'known-slug' }),
       }),
