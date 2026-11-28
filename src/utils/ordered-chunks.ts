@@ -11,11 +11,6 @@ export function toUint8Array(bytes: unknown): Uint8Array {
   throw new Error('Unsupported chunk payload type')
 }
 
-interface PendingChunk {
-  bytes: Uint8Array
-  final: boolean
-}
-
 /**
  * Buffers incoming chunks by byte offset and flushes contiguous ranges in order.
  *
@@ -26,9 +21,10 @@ interface PendingChunk {
 export class OrderedChunkWriter {
   private nextOffset = 0
   private closed = false
-  private readonly pending = new Map<number, PendingChunk>()
+  private readonly pending = new Map<number, Uint8Array>()
 
   constructor(
+    private readonly fileSize: number,
     private readonly onChunk: (bytes: Uint8Array, offset: number) => void,
     private readonly onComplete: () => void,
   ) {}
@@ -38,21 +34,32 @@ export class OrderedChunkWriter {
    * Stale and duplicate chunks are ignored.
    */
   push(offset: number, bytes: Uint8Array, final: boolean): void {
-    if (this.closed || offset < this.nextOffset || this.pending.has(offset)) {
-      return
+    if (this.closed) return
+
+    const end = offset + bytes.byteLength
+    if (
+      !Number.isSafeInteger(offset) ||
+      offset < 0 ||
+      end > this.fileSize ||
+      final !== (end === this.fileSize) ||
+      (!final && bytes.byteLength === 0)
+    ) {
+      throw new Error('Invalid chunk range or final marker')
     }
 
-    this.pending.set(offset, { bytes, final })
+    if (offset < this.nextOffset || this.pending.has(offset)) return
 
-    let entry: PendingChunk | undefined
+    this.pending.set(offset, bytes)
+
+    let entry: Uint8Array | undefined
     while ((entry = this.pending.get(this.nextOffset))) {
       const entryOffset = this.nextOffset
       this.pending.delete(entryOffset)
-      this.nextOffset += entry.bytes.byteLength
+      this.nextOffset += entry.byteLength
       // Called for empty chunks too: an empty file still needs to be acked.
-      this.onChunk(entry.bytes, entryOffset)
+      this.onChunk(entry, entryOffset)
 
-      if (entry.final) {
+      if (this.nextOffset === this.fileSize) {
         this.closed = true
         this.pending.clear()
         this.onComplete()

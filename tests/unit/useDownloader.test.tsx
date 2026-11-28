@@ -19,12 +19,16 @@ async function openDownloader() {
   await service.get()
   const location = { href: '/' }
   const output: number[] = []
+  const abortReasons: unknown[] = []
   let filename = ''
   const openDestination = (name: string) => {
     filename = name
     return new WritableStream<Uint8Array>({
       write(bytes) {
         output.push(...bytes)
+      },
+      abort(reason) {
+        abortReasons.push(reason)
       },
     })
   }
@@ -70,6 +74,7 @@ async function openDownloader() {
     chunk,
     location,
     output,
+    abortReasons,
     filename: () => filename,
   }
 }
@@ -229,4 +234,65 @@ it('writes and acknowledges chunks in offset order when they arrive out of order
   await waitFor(() => expect(result.current.isDone).toBe(true))
   // The ZIP stores files uncompressed, so each appears verbatim.
   expect(Buffer.from(output).includes(Buffer.from('ABCDE'))).toBe(true)
+})
+
+it('rejects a premature final chunk instead of completing a truncated download', async () => {
+  const { result, connection, receive, chunk, output, abortReasons } =
+    await openDownloader()
+  act(() => connection.accept())
+  receive({ type: MessageType.Info, files: [{ ...first, size: 5 }] })
+  act(result.current.startDownload)
+
+  chunk(first.fileName, 0, [65, 66], false)
+  await waitFor(() => expect(output).toEqual([65, 66]))
+  chunk(first.fileName, 2, [67], true)
+
+  await waitFor(() =>
+    expect(result.current.errorMessage).toBe(
+      'The download could not be completed.',
+    ),
+  )
+  expect(result.current.isDone).toBe(false)
+  expect(result.current.isDownloading).toBe(false)
+  expect(connection.open).toBe(false)
+  expect(output).toEqual([65, 66])
+  expect(abortReasons).toEqual([
+    new Error('Invalid chunk range or final marker'),
+  ])
+  expect(connection.messages.map(({ type }) => type)).not.toContain(
+    MessageType.Done,
+  )
+})
+
+it('aborts the ZIP destination when a later file contains an invalid final chunk', async () => {
+  const { result, connection, receive, chunk, abortReasons } =
+    await openDownloader()
+  act(() => connection.accept())
+  receive({
+    type: MessageType.Info,
+    files: [first, { ...second, size: 2 }],
+  })
+  act(result.current.startDownload)
+
+  chunk(first.fileName, 0, [65, 66], true)
+  expect(connection.messages.at(-1)).toEqual({
+    type: MessageType.Start,
+    fileName: second.fileName,
+    offset: 0,
+  })
+
+  chunk(second.fileName, 0, [67], true)
+  await waitFor(() =>
+    expect(result.current.errorMessage).toBe(
+      'The download could not be completed.',
+    ),
+  )
+  expect(abortReasons).toEqual([
+    new Error('Invalid chunk range or final marker'),
+  ])
+  expect(result.current.isDone).toBe(false)
+  expect(result.current.bytesDownloaded).toBe(2)
+  expect(connection.messages.map(({ type }) => type)).not.toContain(
+    MessageType.Done,
+  )
 })

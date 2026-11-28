@@ -37,10 +37,14 @@ describe('OrderedChunkWriter', () => {
     const received: Uint8Array[] = []
     const offsets: number[] = []
     const onComplete = vi.fn()
-    const writer = new OrderedChunkWriter((chunk, offset) => {
-      received.push(chunk)
-      offsets.push(offset)
-    }, onComplete)
+    const writer = new OrderedChunkWriter(
+      MAX_CHUNK_SIZE * 3 + 128,
+      (chunk, offset) => {
+        received.push(chunk)
+        offsets.push(offset)
+      },
+      onComplete,
+    )
 
     const c0 = new Uint8Array(MAX_CHUNK_SIZE).fill(0x11)
     const c1 = new Uint8Array(MAX_CHUNK_SIZE).fill(0x22)
@@ -72,6 +76,7 @@ describe('OrderedChunkWriter', () => {
     const received: Uint8Array[] = []
     const onComplete = vi.fn()
     const writer = new OrderedChunkWriter(
+      6,
       (chunk) => received.push(chunk),
       onComplete,
     )
@@ -93,7 +98,7 @@ describe('OrderedChunkWriter', () => {
 
   it('ignores chunks that were already written', () => {
     const onChunk = vi.fn()
-    const writer = new OrderedChunkWriter(onChunk, vi.fn())
+    const writer = new OrderedChunkWriter(2, onChunk, vi.fn())
 
     writer.push(0, new Uint8Array([1]), false)
     writer.push(0, new Uint8Array([1]), false)
@@ -104,6 +109,7 @@ describe('OrderedChunkWriter', () => {
   it('reports the empty chunk of an empty file before completing', () => {
     const calls: string[] = []
     const writer = new OrderedChunkWriter(
+      0,
       (chunk, offset) => calls.push(`chunk ${offset} ${chunk.byteLength}`),
       () => calls.push('complete'),
     )
@@ -112,4 +118,25 @@ describe('OrderedChunkWriter', () => {
 
     expect(calls).toEqual(['chunk 0 0', 'complete'])
   })
+
+  it.each([
+    { offset: 0.5, bytes: [1], final: false },
+    { offset: -1, bytes: [1], final: false },
+    { offset: 1, bytes: [1, 2, 3], final: true },
+    { offset: 0, bytes: [1], final: true },
+    { offset: 0, bytes: [1, 2, 3], final: false },
+    { offset: 0, bytes: [], final: false },
+  ])(
+    'rejects invalid chunk metadata %j before writing',
+    ({ offset, bytes, final }) => {
+      const onChunk = vi.fn()
+      const onComplete = vi.fn()
+      const writer = new OrderedChunkWriter(3, onChunk, onComplete)
+      expect(() => writer.push(offset, Uint8Array.from(bytes), final)).toThrow(
+        'Invalid chunk range or final marker',
+      )
+      expect(onChunk).not.toHaveBeenCalled()
+      expect(onComplete).not.toHaveBeenCalled()
+    },
+  )
 })
