@@ -2,11 +2,14 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import RootLayout from '../../src/app/layout'
-import UploadPage from '../../src/app/page'
-import DownloadPage from '../../src/app/download/[...slug]/page'
-import NotFound from '../../src/app/not-found'
-import ReportedPage from '../../src/app/reported/page'
+import { isNotFound } from '@tanstack/react-router'
+import { UploadPage } from '../../src/routes/index'
+import {
+  DownloadPage,
+  Route as DownloadRoute,
+} from '../../src/routes/download.$'
+import NotFound from '../../src/components/NotFound'
+import { ReportedPage } from '../../src/routes/reported'
 import { getOrCreateChannelRepo } from '../../src/channel'
 import { WebRTCPeerServiceContext } from '../../src/components/WebRTCProvider'
 import {
@@ -16,23 +19,22 @@ import {
   TestRouter,
 } from '../support/providers'
 
+vi.mock('@tanstack/react-start', () => ({
+  createServerFn: () => ({
+    validator: (validate: (data: unknown) => unknown) => ({
+      handler:
+        (fn: (ctx: { data: unknown }) => unknown) =>
+        ({ data }: { data: unknown }) =>
+          fn({ data: validate(data) }),
+    }),
+  }),
+}))
+
 afterEach(() => vi.unstubAllGlobals())
 
 describe('pages', () => {
-  it('renders the application shell', () => {
-    const markup = renderToStaticMarkup(
-      <RootLayout>
-        <p>Test page</p>
-      </RootLayout>,
-    )
-    expect(markup).toContain('<html lang="en">')
-    expect(markup).toContain('<main><p>Test page</p></main>')
-    expect(markup).toContain('Toggle mode')
-  })
-
   it('renders missing and reported deliveries with a link home', async () => {
-    const missing = await NotFound()
-    const { rerender } = render(missing, { wrapper: TestRouter })
+    const { rerender } = render(<NotFound />, { wrapper: TestRouter })
     expect(
       screen.getByText(/this slice of FilePizza got eaten/),
     ).toBeInTheDocument()
@@ -45,23 +47,41 @@ describe('pages', () => {
     expect(screen.getByText(/delivery has been halted/)).toBeInTheDocument()
   })
 
-  it('sets up a valid download and rejects an unknown slug', async () => {
+  it('loads a valid download and rejects an unknown slug', async () => {
     const repo = getOrCreateChannelRepo()
     const channel = await repo.createChannel('test-uploader')
+    const load = (slug: string) =>
+      (
+        DownloadRoute.options.loader as unknown as (ctx: {
+          params: { _splat: string }
+        }) => Promise<unknown>
+      )({ params: { _splat: slug } })
     try {
-      const page = await DownloadPage({
-        params: Promise.resolve({ slug: channel.longSlug.split('/') }),
+      const data = await load(channel.longSlug)
+      expect(data).toEqual({
+        slug: channel.longSlug,
+        uploaderPeerID: 'test-uploader',
       })
-      expect(renderToStaticMarkup(page)).toContain(
+      vi.spyOn(DownloadRoute, 'useLoaderData').mockReturnValue(
+        data as never,
+      )
+      expect(renderToStaticMarkup(<DownloadPage />)).toContain(
         'Initializing WebRTC peer...',
       )
     } finally {
+      vi.restoreAllMocks()
       await repo.destroyChannel(channel.shortSlug)
     }
+    await expect(load('missing')).rejects.toSatisfy(isNotFound)
     await expect(
-      DownloadPage({ params: Promise.resolve({ slug: ['missing'] }) }),
-    ).rejects.toMatchObject({
-      digest: 'NEXT_HTTP_ERROR_FALLBACK;404',
+      (
+        DownloadRoute.options.loader as unknown as (ctx: {
+          params: object
+        }) => Promise<unknown>
+      )({ params: {} }),
+    ).rejects.toSatisfy(isNotFound)
+    expect(await (DownloadRoute.options.head as () => unknown)()).toEqual({
+      meta: [{ title: 'FilePizza • Your files, delivered.' }],
     })
   })
 

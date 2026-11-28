@@ -1,9 +1,7 @@
-'use client'
-
 import React, { JSX, useCallback, useEffect } from 'react'
 import { UploadedFile, UploaderConnectionStatus } from '../types'
 import { useWebRTCPeer } from './WebRTCProvider'
-import QRCode from 'react-qr-code'
+import { QRCode } from 'react-qr-code'
 import Loading from './Loading'
 import StopButton from './StopButton'
 import { useUploaderChannel } from '../hooks/useUploaderChannel'

@@ -1,5 +1,3 @@
-'use client'
-
 import React, { JSX, useState, useCallback, useEffect } from 'react'
 import { useDownloader } from '../hooks/useDownloader'
 import PasswordField from './PasswordField'

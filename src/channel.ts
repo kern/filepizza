@@ -1,4 +1,3 @@
-import 'server-only'
 import config from './config'
 import { getRedisClient } from './redisClient'
 import { generateShortSlug, generateLongSlug } from './slugs'

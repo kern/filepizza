@@ -2,15 +2,12 @@
 
 import { once } from 'node:events'
 import { get } from 'node:http'
-import { createRequire } from 'node:module'
 import type { Server } from 'node:http'
 import { expect, it, vi } from 'vitest'
 
-const require = createRequire(import.meta.url)
-
 it('serves PeerJS IDs using the production server mount path', async () => {
   vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
-  const server: Server = require('../../bin/peerjs.js')
+  const server: Server = (await import('../../bin/peerjs.js')).default
   try {
     if (!server.listening) await once(server, 'listening')
     const body = await new Promise<string>((resolve, reject) => {

@@ -1,5 +1,3 @@
-'use client'
-
 import { JSX, useState } from 'react'
 import CancelButton from './CancelButton'
 

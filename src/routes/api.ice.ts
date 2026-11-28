@@ -1,15 +1,15 @@
-import { NextResponse } from 'next/server'
+import { createFileRoute } from '@tanstack/react-router'
 import crypto from 'crypto'
-import { setTurnCredentials } from '../../../coturn'
+import { setTurnCredentials } from '../coturn'
 
 const turnHost = process.env.TURN_HOST || '127.0.0.1'
 const stunServer = process.env.STUN_SERVER || 'stun:stun.l.google.com:19302'
 const peerjsHost = process.env.PEERJS_HOST || '0.peerjs.com'
 const peerjsPath = process.env.PEERJS_PATH || '/'
 
-export async function POST(): Promise<NextResponse> {
+export async function POST(): Promise<Response> {
   if (!process.env.COTURN_ENABLED) {
-    return NextResponse.json({
+    return Response.json({
       host: peerjsHost,
       path: peerjsPath,
       iceServers: [{ urls: stunServer }],
@@ -24,7 +24,7 @@ export async function POST(): Promise<NextResponse> {
   // Store credentials in Redis
   await setTurnCredentials(username, password, ttl)
 
-  return NextResponse.json({
+  return Response.json({
     host: peerjsHost,
     path: peerjsPath,
     iceServers: [
@@ -37,3 +37,7 @@ export async function POST(): Promise<NextResponse> {
     ],
   })
 }
+
+export const Route = createFileRoute('/api/ice')({
+  server: { handlers: { POST } },
+})
