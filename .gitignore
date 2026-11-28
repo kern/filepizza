@@ -5,6 +5,5 @@ tsconfig.tsbuildinfo
 .env
 coverage/
 .output
-src/routeTree.gen.ts
 test-results/
 playwright-report/
