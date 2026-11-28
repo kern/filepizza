@@ -23,6 +23,29 @@ describe('AddFilesButton', () => {
       target: { files: null },
     })
     expect(onAdd).not.toHaveBeenCalled()
-    expect(screen.getByRole('button')).toBeInTheDocument()
+    expect(screen.getAllByRole('button')).toHaveLength(2)
+  })
+
+  it("opens the folder picker and keeps each file's path inside the folder", () => {
+    const onAdd = vi.fn()
+    const { container } = render(<AddFilesButton onAdd={onAdd} />)
+    const input = container.querySelector(
+      '#add-folder-input',
+    ) as HTMLInputElement
+    expect(input).toHaveAttribute('webkitdirectory')
+    const click = vi.spyOn(input, 'click')
+    fireEvent.click(container.querySelector('#add-folder-button')!)
+    expect(click).toHaveBeenCalled()
+
+    const file = new File(['a'], 'a.txt')
+    Object.defineProperty(file, 'webkitRelativePath', {
+      value: 'photos/a.txt',
+    })
+    fireEvent.change(input, { target: { files: [file] } })
+    expect(onAdd).toHaveBeenCalledTimes(1)
+    expect(onAdd.mock.calls[0][0][0]).toMatchObject({
+      name: 'a.txt',
+      entryFullPath: '/photos/a.txt',
+    })
   })
 })

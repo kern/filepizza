@@ -1,5 +1,9 @@
 import React, { useRef, useCallback, JSX } from 'react'
+import { filesFromInput } from '../fs'
 import { UploadedFile } from '../types'
+
+const linkClass =
+  'underline text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition-colors duration-200'
 
 export default function AddFilesButton({
   onAdd,
@@ -7,15 +11,20 @@ export default function AddFilesButton({
   onAdd: (files: UploadedFile[]) => void
 }): JSX.Element {
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const folderInputRef = useRef<HTMLInputElement>(null)
 
-  const handleClick = useCallback(() => {
+  const handleFilesClick = useCallback(() => {
     fileInputRef.current?.click()
+  }, [])
+
+  const handleFolderClick = useCallback(() => {
+    folderInputRef.current?.click()
   }, [])
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files) {
-        onAdd(Array.from(e.target.files) as UploadedFile[])
+        onAdd(filesFromInput(e.target.files))
         e.target.value = ''
       }
     },
@@ -32,13 +41,30 @@ export default function AddFilesButton({
         multiple
         onChange={handleChange}
       />
+      <input
+        id="add-folder-input"
+        type="file"
+        ref={folderInputRef}
+        className="hidden"
+        webkitdirectory=""
+        onChange={handleChange}
+      />
       <button
         id="add-files-button"
         type="button"
-        onClick={handleClick}
-        className="underline text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition-colors duration-200"
+        onClick={handleFilesClick}
+        className={linkClass}
       >
         Add more files
+      </button>
+      {' · '}
+      <button
+        id="add-folder-button"
+        type="button"
+        onClick={handleFolderClick}
+        className={linkClass}
+      >
+        Add a folder
       </button>
     </>
   )

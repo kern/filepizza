@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { extractFileList, formatSize, getFileName } from '../../src/fs'
+import {
+  extractFileList,
+  filesFromInput,
+  formatSize,
+  getFileName,
+} from '../../src/fs'
 
 function fileEntry(path: string) {
   return {
@@ -84,4 +89,18 @@ it('uses the entry path when a browser file has no name', () => {
   expect(
     getFileName(Object.assign(file, { entryFullPath: '/folder/unnamed' })),
   ).toBe('/folder/unnamed')
+})
+
+describe('filesFromInput', () => {
+  it('keeps the path inside a picked folder and leaves plain files alone', () => {
+    const inFolder = new File(['a'], 'a.txt')
+    Object.defineProperty(inFolder, 'webkitRelativePath', {
+      value: 'photos/a.txt',
+    })
+    const plain = new File(['b'], 'b.txt')
+
+    const [first, second] = filesFromInput([inFolder, plain] as never)
+    expect(first.entryFullPath).toBe('/photos/a.txt')
+    expect(second.entryFullPath).toBeUndefined()
+  })
 })

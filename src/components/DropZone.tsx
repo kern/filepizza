@@ -1,5 +1,5 @@
 import React, { JSX, useState, useCallback, useEffect, useRef } from 'react'
-import { extractFileList } from '../fs'
+import { extractFileList, filesFromInput } from '../fs'
 
 export default function DropZone({
   onDrop,
@@ -9,6 +9,7 @@ export default function DropZone({
   const [isDragging, setIsDragging] = useState(false)
   const [fileCount, setFileCount] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const folderInputRef = useRef<HTMLInputElement>(null)
 
   const handleDragEnter = useCallback((e: DragEvent) => {
     e.preventDefault()
@@ -50,11 +51,14 @@ export default function DropZone({
     fileInputRef.current?.click()
   }, [])
 
+  const handleFolderClick = useCallback(() => {
+    folderInputRef.current?.click()
+  }, [])
+
   const handleFileInputChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files) {
-        const files = Array.from(e.target.files)
-        onDrop(files)
+        onDrop(filesFromInput(e.target.files))
       }
     },
     [onDrop],
@@ -90,6 +94,14 @@ export default function DropZone({
         onChange={handleFileInputChange}
         multiple
       />
+      <input
+        id="drop-zone-folder-input"
+        type="file"
+        ref={folderInputRef}
+        className="hidden"
+        webkitdirectory=""
+        onChange={handleFileInputChange}
+      />
       <button
         id="drop-zone-button"
         className="block cursor-pointer relative py-3 px-6 text-base font-bold text-stone-700 dark:text-stone-200 bg-white dark:bg-stone-800 border-2 border-stone-700 dark:border-stone-700 rounded-lg transition-all duration-300 ease-in-out outline-none hover:shadow-md active:shadow-inner focus:shadow-outline"
@@ -98,6 +110,14 @@ export default function DropZone({
         <span className="text-center text-stone-700 dark:text-stone-200">
           Drop a file to get started
         </span>
+      </button>
+      <button
+        id="drop-zone-folder-button"
+        type="button"
+        onClick={handleFolderClick}
+        className="mt-3 underline text-sm text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition-colors duration-200"
+      >
+        or choose a folder
       </button>
     </>
   )

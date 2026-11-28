@@ -63,3 +63,22 @@ it('ignores a change event without files', () => {
   fireEvent.change(input, { target: { files: null } })
   expect(fn).not.toHaveBeenCalled()
 })
+
+it('opens the folder picker and passes the chosen files to the uploader', () => {
+  const onDrop = vi.fn()
+  const { container } = render(<DropZone onDrop={onDrop} />)
+  const input = container.querySelector(
+    '#drop-zone-folder-input',
+  ) as HTMLInputElement
+  expect(input).toHaveAttribute('webkitdirectory')
+  const click = vi.spyOn(input, 'click')
+  fireEvent.click(container.querySelector('#drop-zone-folder-button')!)
+  expect(click).toHaveBeenCalled()
+
+  const file = new File(['a'], 'a.txt')
+  Object.defineProperty(file, 'webkitRelativePath', { value: 'docs/a.txt' })
+  fireEvent.change(input, { target: { files: [file] } })
+  expect(onDrop.mock.calls[0][0][0]).toMatchObject({
+    entryFullPath: '/docs/a.txt',
+  })
+})

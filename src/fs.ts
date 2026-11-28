@@ -83,6 +83,18 @@ export const formatSize = (bytes: number): string => {
   return `${(bytes / Math.pow(k, i)).toPrecision(3)} ${sizes[i]}`
 }
 
+// Files from an <input type="file"> picker. A folder picked with
+// `webkitdirectory` reports each file's path inside that folder, which we keep
+// in the same field as folders dropped onto the page.
+export const filesFromInput = (list: FileList): UploadedFile[] =>
+  Array.from(list).map((file) => {
+    const uploaded: UploadedFile = file
+    if (file.webkitRelativePath) {
+      uploaded.entryFullPath = `/${file.webkitRelativePath}`
+    }
+    return uploaded
+  })
+
 export const getFileName = (file: UploadedFile): string => {
   return file.name || file.entryFullPath || ''
 }
