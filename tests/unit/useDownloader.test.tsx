@@ -2,7 +2,10 @@ import type { PropsWithChildren } from 'react'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import WebRTCProvider from '../../src/components/WebRTCProvider'
-import { useDownloader } from '../../src/hooks/useDownloader'
+import {
+  UPLOADER_LEFT_MESSAGE,
+  useDownloader,
+} from '../../src/hooks/useDownloader'
 import { MessageType } from '../../src/messages'
 import {
   streamDownloadMultipleFiles,
@@ -160,6 +163,7 @@ describe('useDownloader', () => {
     expect(result.current).toMatchObject({
       isConnected: false,
       isDownloading: false,
+      isStopped: true,
       errorMessage: null,
       bytesDownloaded: 0,
     })
@@ -182,6 +186,22 @@ describe('useDownloader', () => {
     expect(result.current.errorMessage).toBe('Uploader refused transfer')
     expect(connection.open).toBe(false)
   })
+})
+
+it('reports an unexpected close but keeps an earlier error and a finished download', async () => {
+  const left = await openDownloader()
+  act(() => left.connection.accept())
+  act(() => left.connection.close())
+  expect(left.result.current.errorMessage).toBe(UPLOADER_LEFT_MESSAGE)
+  expect(left.result.current.isConnected).toBe(false)
+
+  const refused = await openDownloader()
+  act(() => refused.connection.accept())
+  refused.receive({
+    type: MessageType.Error,
+    error: 'Uploader refused transfer',
+  })
+  expect(refused.result.current.errorMessage).toBe('Uploader refused transfer')
 })
 
 it('reports transport errors on open connections and closes a connection that opens after cleanup', async () => {

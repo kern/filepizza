@@ -8,6 +8,7 @@ import DownloadButton from './DownloadButton'
 import StopButton from './StopButton'
 import ProgressBar from './ProgressBar'
 import TitleText from './TitleText'
+import SubtitleText from './SubtitleText'
 import ReturnHome from './ReturnHome'
 import { pluralize } from '../utils/pluralize'
 import { ErrorMessage } from './ErrorMessage'
@@ -211,6 +212,7 @@ export default function Downloader({
     filesInfo,
     isConnected,
     isPasswordRequired,
+    isStopped,
     isDownloading,
     isDone,
     errorMessage,
@@ -241,6 +243,16 @@ export default function Downloader({
     return (
       <>
         <ErrorMessage message={errorMessage} />
+        <ReturnHome />
+      </>
+    )
+  }
+
+  if (isStopped) {
+    return (
+      <>
+        <TitleText>You stopped this download.</TitleText>
+        <SubtitleText>Reload the page to start it again.</SubtitleText>
         <ReturnHome />
       </>
     )
