@@ -75,7 +75,9 @@ it('stores TURN credentials and reports a Redis channel failure through the API'
     ])
 
     vi.stubEnv('TURN_REALM', '')
-    const { iceServers } = await (await ice()).json()
+    const { iceServers } = await (
+      await ice({ request: new Request('http://localhost/api/ice') })
+    ).json()
     const turn = iceServers[1]
     expect(turn.urls).toEqual([
       expect.stringMatching(/^turn:/),

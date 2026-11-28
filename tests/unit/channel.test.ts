@@ -170,7 +170,9 @@ describe('channel API', () => {
   })
 
   it('offers STUN when TURN is disabled', async () => {
-    const config = await (await ice()).json()
+    const config = await (
+      await ice({ request: new Request('http://localhost/api/ice') })
+    ).json()
     expect(config.iceServers).toEqual([
       { urls: expect.stringMatching(/^stun:/) },
     ])

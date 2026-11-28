@@ -26,7 +26,25 @@ function turnUrls(host: string): string[] {
   return [`turn:${host}:${port}${suffix}`, `turns:${host}:${tlsPort}${suffix}`]
 }
 
-export async function POST(): Promise<Response> {
+// The hostname the visitor used to reach FilePizza. When coturn runs on the
+// same machine (as in docker-compose.production.yml) this is also where TURN
+// is reachable, so self-hosters don't have to set TURN_HOST. It only decides
+// which address the response names; it grants nothing to the caller.
+function requestHostname(request: Request): string | undefined {
+  const forwarded = request.headers.get('x-forwarded-host')?.split(',')[0]
+  const raw = forwarded?.trim() || request.headers.get('host')
+  try {
+    return new URL(raw ? `http://${raw}` : request.url).hostname
+  } catch {
+    return undefined
+  }
+}
+
+export async function POST({
+  request,
+}: {
+  request: Request
+}): Promise<Response> {
   const stunServer = process.env.STUN_SERVER || 'stun:stun.l.google.com:19302'
   const peerjsHost = process.env.PEERJS_HOST || '0.peerjs.com'
   const peerjsPath = process.env.PEERJS_PATH || '/'
@@ -45,7 +63,8 @@ export async function POST(): Promise<Response> {
     })
   }
 
-  const turnHost = process.env.TURN_HOST || '127.0.0.1'
+  const turnHost =
+    process.env.TURN_HOST || requestHostname(request) || '127.0.0.1'
   const secret = process.env.TURN_SECRET
 
   let username: string
