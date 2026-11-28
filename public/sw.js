@@ -76,6 +76,101 @@ function createStream(port) {
   })
 }
 
+// Up to this much of a download is kept so it can be served again from the
+// start. Browsers read a service worker's stream far ahead of the person saving
+// it, and some drop the request (to ask where to save, or to hand the download
+// to another tool) and then ask for the same URL again. Past this size the
+// download can no longer be replayed and streams without being kept.
+const REPLAY_LIMIT = 128 * 1024 * 1024
+
+// How long a download that nobody is reading, or that has finished, stays
+// available for another request before its memory is released.
+const RETRY_WINDOW_MS = 60 * 1000
+
+function serve(url, hijacke) {
+  const replay = (hijacke.replay ??= {
+    reader: hijacke[0].getReader(),
+    // Everything read from the source, in order. Each request walks it from
+    // the start, so no request depends on when another one read a chunk.
+    chunks: [],
+    bytes: 0,
+    retained: true,
+    finished: false,
+    reading: undefined,
+    position: 0,
+    attempt: 0,
+    timer: undefined,
+  })
+  const attempt = ++replay.attempt
+  clearTimeout(replay.timer)
+
+  // Reads one more chunk from the source and appends it to the log. Only one
+  // read is ever in flight, shared by whoever is waiting for it, so a request
+  // that was dropped mid-read still leaves its chunk in the log for the next.
+  const fill = () =>
+    (replay.reading ??= replay.reader.read().then(({ done, value }) => {
+      replay.reading = undefined
+      if (done) {
+        replay.finished = true
+        return
+      }
+      replay.chunks.push(value)
+      replay.bytes += value.byteLength
+      if (replay.retained && replay.bytes > REPLAY_LIMIT) {
+        // Too big to serve again: stop keeping what was already delivered.
+        replay.retained = false
+        for (let i = 0; i < replay.position; i++) replay.chunks[i] = undefined
+      }
+    }))
+
+  // Frees the kept data, and stops the source unless it already finished.
+  const release = (reason) => {
+    map.delete(url)
+    replay.chunks = []
+    if (!replay.finished) replay.reader.cancel(reason)
+  }
+  const releaseLater = (reason) => {
+    clearTimeout(replay.timer)
+    replay.timer = setTimeout(() => release(reason), RETRY_WINDOW_MS)
+  }
+
+  let next = 0
+  return new ReadableStream(
+    {
+      async pull(controller) {
+        // A newer request took over this download.
+        if (replay.attempt !== attempt) return controller.close()
+
+        if (next === replay.chunks.length && !replay.finished) {
+          await fill()
+          if (replay.attempt !== attempt) return controller.close()
+        }
+        if (next < replay.chunks.length) {
+          const chunk = replay.chunks[next]
+          // Once it can't be served again, a delivered chunk is not kept.
+          if (!replay.retained) replay.chunks[next] = undefined
+          next++
+          replay.position = next
+          return controller.enqueue(chunk)
+        }
+
+        controller.close()
+        if (replay.retained) releaseLater()
+        else map.delete(url)
+      },
+      cancel(reason) {
+        if (replay.attempt !== attempt) return
+        // Too big to replay: nobody can ask again, so stop right away.
+        if (!replay.retained) return release(reason)
+        // Otherwise wait a while in case the request comes back.
+        releaseLater(reason)
+      },
+    },
+    // Read from the source only when the browser asks for more.
+    { highWaterMark: 0 },
+  )
+}
+
 self.onfetch = (event) => {
   const url = event.request.url
 
@@ -88,9 +183,14 @@ self.onfetch = (event) => {
 
   if (!hijacke) return null
 
-  const [stream, data, port] = hijacke
+  // A download that outgrew the replay buffer can't be served from the start
+  // again, so a second request for it is refused like any unknown URL.
+  if (hijacke.replay && !hijacke.replay.retained) {
+    map.delete(url)
+    return null
+  }
 
-  map.delete(url)
+  const [, data, port] = hijacke
 
   // Not comfortable letting any user control all headers
   // so we only copy over the length & disposition
@@ -137,7 +237,9 @@ self.onfetch = (event) => {
     )
   }
 
-  event.respondWith(new Response(stream, { headers: responseHeaders }))
+  event.respondWith(
+    new Response(serve(url, hijacke), { headers: responseHeaders }),
+  )
 
   port.postMessage({ debug: 'Download started' })
 }
