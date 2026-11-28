@@ -124,7 +124,7 @@ pnpm update
 ### Testing Strategy
 
 - Unit tests for components and utilities (`tests/unit/`)
-- E2E tests for critical user flows (`tests/e2e/`), run in every browser engine. `errors.test.ts` covers failure cases (WebRTC unavailable, signalling down, disconnects, wrong password), `sharing.test.ts` covers short and long links and several downloaders, and `firefox.test.ts`, `webkit.test.ts` and `firefox-no-webrtc.test.ts` cover engine-specific behaviour
+- E2E tests for critical user flows (`tests/e2e/`), run in every browser engine. `errors.test.ts` covers failure cases (WebRTC unavailable, signalling down, disconnects, wrong password), `sharing.test.ts` covers short and long links and several downloaders, and `firefox.test.ts`, `webkit.test.ts` and `firefox-no-webrtc.test.ts` cover engine-specific behaviour (each runs only in its own project, `firefox-specific`, `webkit-specific` and `firefox-no-webrtc`)
 - Test files follow `*.test.ts[x]` naming convention
 - Unit coverage must stay at 100% per file (`pnpm test:coverage`)
 - E2E tests need a PeerJS signalling server. They use `0.peerjs.com` by default; to run offline, serve a PeerJS server on port 443 (mounted like `bin/peerjs.js`: `/peerjs` with path `/filepizza`) and start the built app with `PEERJS_HOST=localhost PEERJS_PATH=/peerjs/filepizza/`

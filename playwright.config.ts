@@ -1,6 +1,10 @@
 import { defineConfig, devices } from '@playwright/test'
 
+// Specs that only make sense in one engine, each with its own project below.
 const NO_WEBRTC_SPEC = /firefox-no-webrtc\.test\.ts$/
+const FIREFOX_SPEC = /firefox\.test\.ts$/
+const WEBKIT_SPEC = /webkit\.test\.ts$/
+const ENGINE_SPECS = [NO_WEBRTC_SPEC, FIREFOX_SPEC, WEBKIT_SPEC]
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -19,17 +23,27 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-      testIgnore: NO_WEBRTC_SPEC,
+      testIgnore: ENGINE_SPECS,
     },
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
-      testIgnore: NO_WEBRTC_SPEC,
+      testIgnore: ENGINE_SPECS,
     },
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
-      testIgnore: NO_WEBRTC_SPEC,
+      testIgnore: ENGINE_SPECS,
+    },
+    {
+      name: 'firefox-specific',
+      testMatch: FIREFOX_SPEC,
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'webkit-specific',
+      testMatch: WEBKIT_SPEC,
+      use: { ...devices['Desktop Safari'] },
     },
     {
       // Firefox with the real about:config switch from #288 flipped off.
