@@ -20,6 +20,7 @@ vi.mock('peerjs', () => ({
 afterEach(() => vi.unstubAllGlobals())
 
 it('creates the browser peer from the ICE endpoint by default', async () => {
+  vi.stubGlobal('RTCPeerConnection', class {})
   const fetchMock = vi.fn(async () =>
     Response.json({ host: 'relay.test', path: '/p', iceServers: [] }),
   )
@@ -32,4 +33,15 @@ it('creates the browser peer from the ICE endpoint by default', async () => {
     { debug: 3, host: 'relay.test', path: '/p', config: { iceServers: [] } },
   ])
   result.current.stop()
+})
+
+it('refuses to start when the browser has no RTCPeerConnection', async () => {
+  vi.stubGlobal('RTCPeerConnection', undefined)
+  const fetchMock = vi.fn()
+  vi.stubGlobal('fetch', fetchMock)
+  const { result } = renderHook(() => useContext(WebRTCPeerServiceContext))
+  await expect(result.current.get()).rejects.toThrow(
+    /WebRTC is disabled or not supported/,
+  )
+  expect(fetchMock).not.toHaveBeenCalled()
 })
