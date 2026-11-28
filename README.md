@@ -103,6 +103,8 @@ If you don't need TURN, leave `COTURN_ENABLED` unset: FilePizza then uses only t
 
 **What happens when I close my browser?** Keep your browser page open until every recipient finishes downloading. After you close it, the share link stops working. Recipients can still use any files they downloaded in full.
 
+**Why doesn't it work with iCloud Private Relay or a VPN?** WebRTC needs a direct (UDP) path between the two browsers, or a relay it can reach. Private Relay and many VPNs route Safari's traffic through their own proxies, which can stop that path from forming, so peers never connect. If a transfer stalls on "connecting", turn Private Relay or the VPN off for the page (on iOS: Settings → your name → iCloud → Private Relay) and try again. If you self-host, running coturn with TURN over TCP (`TURN_TRANSPORT=tcp`) may give these networks a relay they can use.
+
 **Are my files encrypted?** Yes, all WebRTC communications are automatically encrypted using public-key cryptography because of DTLS. You can add an optional password to your upload for an extra layer of security.
 
 ## License & Acknowledgements
