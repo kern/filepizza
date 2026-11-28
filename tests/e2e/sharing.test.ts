@@ -1,4 +1,5 @@
-import { test, expect, type Browser, type Page } from '@playwright/test'
+import { test, expect } from './fixtures'
+import type { Browser, Page } from '@playwright/test'
 import { readFileSync } from 'fs'
 import { createBrowserContexts, selectFile, startUpload } from './helpers'
 

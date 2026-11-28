@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { createTestFile, uploadFile, addFile } from './helpers'
 
 test('user can add more files before starting upload', async ({ page }) => {
