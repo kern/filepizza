@@ -79,7 +79,7 @@ export function useUploaderChannel(
   useEffect(() => {
     if (!secret || !shortSlug) return
 
-    let timeout: NodeJS.Timeout | null = null
+    let timeout: NodeJS.Timeout
 
     const run = (): void => {
       timeout = setTimeout(() => {
@@ -96,10 +96,8 @@ export function useUploaderChannel(
     run()
 
     return () => {
-      if (timeout) {
-        console.log('[UploaderChannel] clearing renewal timeout')
-        clearTimeout(timeout)
-      }
+      console.log('[UploaderChannel] clearing renewal timeout')
+      clearTimeout(timeout)
     }
   }, [secret, shortSlug, renewMutation, renewInterval])
 

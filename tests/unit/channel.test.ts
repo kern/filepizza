@@ -176,3 +176,17 @@ describe('channel API', () => {
     ])
   })
 })
+
+describe('MemoryChannelRepo timers', () => {
+  it('destroys a channel whose expiry timers are already gone', async () => {
+    const repo = new MemoryChannelRepo()
+    const channel = await repo.createChannel('test-peer', 60)
+    const timeouts = (
+      repo as unknown as { timeouts: Map<string, NodeJS.Timeout> }
+    ).timeouts
+    for (const timeout of timeouts.values()) clearTimeout(timeout)
+    timeouts.clear()
+    await repo.destroyChannel(channel.shortSlug)
+    expect(await repo.fetchChannel(channel.shortSlug)).toBeNull()
+  })
+})
