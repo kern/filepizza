@@ -20,9 +20,40 @@ async function download(page: Page, url: string, savePath: string) {
   }
 }
 
-async function newPage(browser: Browser) {
+function collectLogs(page: Page, prefix: string): string[] {
+  const logs: string[] = []
+  page.on('console', (message) =>
+    logs.push(`${prefix} ${message.type()}: ${message.text()}`),
+  )
+  page.on('pageerror', (error) => logs.push(`${prefix} pageerror: ${error}`))
+  return logs
+}
+
+async function newPage(browser: Browser, prefix = 'downloader') {
   const context = await browser.newContext()
-  return { page: await context.newPage(), close: () => context.close() }
+  const page = await context.newPage()
+  const logs = collectLogs(page, prefix)
+  return { page, logs, close: () => context.close() }
+}
+
+// Waits for a downloader to connect. If it never does, the failure says what
+// the page showed and what everyone logged, since a bare timeout doesn't say
+// whether the handshake, signalling or the uploader was at fault.
+async function expectDownloadButton(page: Page, logs: string[]) {
+  try {
+    await expect(page.locator('#download-button')).toBeVisible({
+      timeout: 15000,
+    })
+  } catch (error) {
+    const text = await page
+      .locator('body')
+      .innerText({ timeout: 1000 })
+      .catch(() => '(page unavailable)')
+    throw new Error(
+      `The download button never appeared.\nPage text: ${text}\nConsole:\n${logs.join('\n')}`,
+      { cause: error },
+    )
+  }
 }
 
 test.describe('share links', () => {
@@ -111,17 +142,18 @@ test.describe('several downloaders', () => {
     browser,
   }, testInfo) => {
     const { uploaderPage, cleanup } = await createBrowserContexts(browser)
-    const downloaders = await Promise.all([1, 2, 3].map(() => newPage(browser)))
+    const uploaderLogs = collectLogs(uploaderPage, 'uploader')
+    const downloaders = await Promise.all(
+      [1, 2, 3].map((n) => newPage(browser, `downloader ${n}`)),
+    )
     try {
       await selectFile(uploaderPage, 'shared.txt', CONTENT)
       const shareUrl = await startUpload(uploaderPage)
 
       // All three connect before anyone downloads, then download together.
       await Promise.all(downloaders.map(({ page }) => page.goto(shareUrl)))
-      for (const { page } of downloaders) {
-        await expect(page.locator('#download-button')).toBeVisible({
-          timeout: 15000,
-        })
+      for (const { page, logs } of downloaders) {
+        await expectDownloadButton(page, [...logs, ...uploaderLogs])
       }
       await expect(
         uploaderPage.getByText('READY', { exact: true }),
