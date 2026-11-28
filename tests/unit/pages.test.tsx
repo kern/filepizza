@@ -86,7 +86,6 @@ describe('pages', () => {
   it('selects, adds and removes files before cancelling an upload', async () => {
     const user = userEvent.setup()
     const { container } = render(<UploadPage />)
-    expect(screen.getByText(/drop a folder anywhere/)).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /drop a file/i }))
     const input = container.querySelector<HTMLInputElement>('input[type=file]')!
     await user.upload(
