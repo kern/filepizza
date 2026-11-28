@@ -31,13 +31,13 @@ pnpm dev
 - `pnpm test` - Run unit tests with Vitest
 - `pnpm test:coverage` - Run unit tests with coverage (100% per-file thresholds are enforced)
 - `pnpm test:watch` - Run tests in watch mode
-- `pnpm test:e2e` - Run E2E tests with Playwright against the production build (run `pnpm build` first)
+- `pnpm test:e2e` - Run E2E tests with Playwright in Chromium, Firefox and WebKit against the production build (run `pnpm build` first, and `pnpm exec playwright install` once for the browsers). Run one engine with `pnpm test:e2e --project=webkit`.
 
 ### Code Quality
 
 - `pnpm lint:check` - Check Oxlint rules
 - `pnpm lint:fix` - Fix Oxlint issues
-- `pnpm format` - Format code with Oxfmt
+- `pnpm format` - Format the whole repo with Oxfmt (generated and vendored files are ignored in `.oxfmtrc.json`)
 - `pnpm format:check` - Check code formatting
 - `pnpm type:check` - TypeScript type checking
 
@@ -124,7 +124,7 @@ pnpm update
 ### Testing Strategy
 
 - Unit tests for components and utilities (`tests/unit/`)
-- E2E tests for critical user flows (`tests/e2e/`)
+- E2E tests for critical user flows (`tests/e2e/`), run in every browser engine. `errors.test.ts` covers failure cases (WebRTC unavailable, signalling down, disconnects, wrong password), `sharing.test.ts` covers short and long links and several downloaders, and `firefox.test.ts`, `webkit.test.ts` and `firefox-no-webrtc.test.ts` cover engine-specific behaviour
 - Test files follow `*.test.ts[x]` naming convention
 - Unit coverage must stay at 100% per file (`pnpm test:coverage`)
 - E2E tests need a PeerJS signalling server. They use `0.peerjs.com` by default; to run offline, serve a PeerJS server on port 443 (mounted like `bin/peerjs.js`: `/peerjs` with path `/filepizza`) and start the built app with `PEERJS_HOST=localhost PEERJS_PATH=/peerjs/filepizza/`

@@ -9,7 +9,6 @@
     ".claude",
     "public",
     "pnpm-lock.yaml",
-    "src/routeTree.gen.ts",
-    "pw.tmp.config.ts"
+    "src/routeTree.gen.ts"
   ]
 }
