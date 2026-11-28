@@ -15,14 +15,15 @@ test('serves security headers on pages and static assets', async ({
 })
 
 test('blocks third-party scripts and frames', async ({ page }) => {
-  const violations: string[] = []
-  page.on('console', (message) => {
-    if (/content security policy/i.test(message.text())) {
-      violations.push(message.text())
-    }
-  })
   await page.goto('http://localhost:3000/')
+  // The securitypolicyviolation event fires in every engine; the console
+  // message for a blocked request does not (Firefox doesn't report it there).
   await page.evaluate(() => {
+    const seen: string[] = []
+    ;(window as unknown as { __violations: string[] }).__violations = seen
+    document.addEventListener('securitypolicyviolation', (event) => {
+      seen.push(event.effectiveDirective)
+    })
     const script = document.createElement('script')
     script.src = 'https://third-party.example/script.js'
     document.head.appendChild(script)
@@ -30,7 +31,17 @@ test('blocks third-party scripts and frames', async ({ page }) => {
     frame.src = 'https://third-party.example/'
     document.body.appendChild(frame)
   })
-  await expect.poll(() => violations.length).toBeGreaterThanOrEqual(2)
-  expect(violations.some((v) => v.includes('script-src'))).toBe(true)
-  expect(violations.some((v) => v.includes('frame-src'))).toBe(true)
+
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => (window as unknown as { __violations: string[] }).__violations,
+      ),
+    )
+    .toEqual(
+      expect.arrayContaining([
+        expect.stringMatching(/^script-src/),
+        'frame-src',
+      ]),
+    )
 })
