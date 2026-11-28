@@ -68,6 +68,29 @@ The server can be customized with the following environment variables:
 - `PEERJS_PORT` – Port of the self-hosted PeerJS server. Defaults to PeerJS's own default (`443`).
 - `PEERJS_PATH` – Path to self-hosted PeerJS server. Defaults to `/`.
 
+## Self-hosting
+
+`docker-compose.production.yml` runs FilePizza with Redis and a coturn TURN server. A few settings need to point at your own machine, because the server hands them to every visitor's browser:
+
+1. **Create a `.env` file** next to the compose file. The `filepizza` service reads it, and Compose refuses to start without it. A minimal one:
+
+   ```
+   # A hostname or IP that visitors' browsers can reach, not localhost.
+   TURN_HOST=turn.example.com
+   # Must match the realm coturn runs with (add --realm=turn.example.com to its command).
+   TURN_REALM=turn.example.com
+   ```
+
+   `TURN_HOST` defaults to `127.0.0.1`, which is each visitor's own computer. Left unset, peers connect but nothing transfers when either side is behind a NAT, which is the most common cause of a self-hosted instance stuck at "connected".
+
+2. **Open the TURN ports** on your firewall: `3478` (TCP and UDP), `5349` (TCP and UDP) and the relay range `60000-60128` (UDP).
+
+3. **Serve it over HTTPS** so downloads can stream to disk. See the FAQ below.
+
+4. **Signalling server:** by default the browsers use the public PeerJS cloud (`0.peerjs.com`) to find each other. To run your own, start `pnpm start:peerjs` (`bin/peerjs.js`) and set `PEERJS_HOST`, `PEERJS_PORT` and `PEERJS_PATH` to its address.
+
+If you don't need TURN, leave `COTURN_ENABLED` unset: FilePizza then uses only the STUN server (`STUN_SERVER`), which works for peers that can reach each other directly, for example on the same network.
+
 ## FAQ
 
 **How are my files sent?** Your files are sent directly from your browser to the downloader's browser. They never pass through our servers. FilePizza uses WebRTC to send files. This requires that the uploader leave their browser window open until the transfer is complete.
