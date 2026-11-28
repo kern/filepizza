@@ -290,3 +290,68 @@ it('finishes a download that outgrew the replay limit without keeping it', async
   expect((await response.arrayBuffer()).byteLength).toBe(200 * 1024 * 1024)
   expect(worker.fetch(path)).toBeUndefined()
 })
+
+// A source that only produces data when the test says so.
+function manualSource() {
+  const encoder = new TextEncoder()
+  let controller!: ReadableStreamDefaultController<Uint8Array>
+  const stream = new ReadableStream<Uint8Array>(
+    {
+      start(c) {
+        controller = c
+      },
+    },
+    { highWaterMark: 0 },
+  )
+  return {
+    stream,
+    enqueue: (chunk: string) => controller.enqueue(encoder.encode(chunk)),
+    close: () => controller.close(),
+  }
+}
+
+it('keeps a chunk that was being read when its request was dropped', async () => {
+  const worker = await startWorker()
+  const manual = manualSource()
+  worker.send({
+    url: 'http://filepizza.test/files/inflight',
+    readableStream: manual.stream,
+  })
+
+  // The first request is waiting on the source when the browser drops it...
+  const reader = worker.fetch('/files/inflight')!.body!.getReader()
+  const pending = reader.read()
+  await new Promise((resolve) => setTimeout(resolve, 0))
+  await reader.cancel()
+  await pending
+
+  // ...and the request that replaces it needs every chunk, in order, including
+  // the one the dropped request was waiting for.
+  const retry = worker.fetch('/files/inflight')!.text()
+  // The retry is waiting on the source too when the data arrives.
+  await new Promise((resolve) => setTimeout(resolve, 0))
+  manual.enqueue('ab')
+  manual.enqueue('cd')
+  manual.enqueue('ef')
+  manual.close()
+  expect(await retry).toBe('abcdef')
+})
+
+it('ends an older request that was waiting on the source when a newer one took over', async () => {
+  const worker = await startWorker()
+  const manual = manualSource()
+  worker.send({
+    url: 'http://filepizza.test/files/waiting',
+    readableStream: manual.stream,
+  })
+
+  const older = worker.fetch('/files/waiting')!.text()
+  // Let the older request start waiting on the source before the newer arrives.
+  await new Promise((resolve) => setTimeout(resolve, 0))
+  const newer = worker.fetch('/files/waiting')!.text()
+  manual.enqueue('ab')
+  manual.enqueue('cd')
+  manual.close()
+  expect(await older).toBe('')
+  expect(await newer).toBe('abcd')
+})

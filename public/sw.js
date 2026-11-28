@@ -90,15 +90,38 @@ const RETRY_WINDOW_MS = 60 * 1000
 function serve(url, hijacke) {
   const replay = (hijacke.replay ??= {
     reader: hijacke[0].getReader(),
+    // Everything read from the source, in order. Each request walks it from
+    // the start, so no request depends on when another one read a chunk.
     chunks: [],
     bytes: 0,
     retained: true,
     finished: false,
+    reading: undefined,
+    position: 0,
     attempt: 0,
     timer: undefined,
   })
   const attempt = ++replay.attempt
   clearTimeout(replay.timer)
+
+  // Reads one more chunk from the source and appends it to the log. Only one
+  // read is ever in flight, shared by whoever is waiting for it, so a request
+  // that was dropped mid-read still leaves its chunk in the log for the next.
+  const fill = () =>
+    (replay.reading ??= replay.reader.read().then(({ done, value }) => {
+      replay.reading = undefined
+      if (done) {
+        replay.finished = true
+        return
+      }
+      replay.chunks.push(value)
+      replay.bytes += value.byteLength
+      if (replay.retained && replay.bytes > REPLAY_LIMIT) {
+        // Too big to serve again: stop keeping what was already delivered.
+        replay.retained = false
+        for (let i = 0; i < replay.position; i++) replay.chunks[i] = undefined
+      }
+    }))
 
   // Frees the kept data, and stops the source unless it already finished.
   const release = (reason) => {
@@ -118,25 +141,19 @@ function serve(url, hijacke) {
         // A newer request took over this download.
         if (replay.attempt !== attempt) return controller.close()
 
+        if (next === replay.chunks.length && !replay.finished) {
+          await fill()
+          if (replay.attempt !== attempt) return controller.close()
+        }
         if (next < replay.chunks.length) {
-          return controller.enqueue(replay.chunks[next++])
+          const chunk = replay.chunks[next]
+          // Once it can't be served again, a delivered chunk is not kept.
+          if (!replay.retained) replay.chunks[next] = undefined
+          next++
+          replay.position = next
+          return controller.enqueue(chunk)
         }
-        if (!replay.finished) {
-          const { done, value } = await replay.reader.read()
-          if (!done) {
-            if (replay.retained) {
-              replay.chunks.push(value)
-              next = replay.chunks.length
-              replay.bytes += value.byteLength
-              if (replay.bytes > REPLAY_LIMIT) {
-                replay.chunks = []
-                replay.retained = false
-              }
-            }
-            return controller.enqueue(value)
-          }
-          replay.finished = true
-        }
+
         controller.close()
         if (replay.retained) releaseLater()
         else map.delete(url)
