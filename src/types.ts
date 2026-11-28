@@ -17,6 +17,7 @@ export interface UploaderTransport {
   readonly peer: string
   readonly open: boolean
   readonly metadata?: { type?: string }
+  readonly peerConnection?: RTCPeerConnection
   send(message: Message): void
   close(): void
   on(event: 'data', listener: (data: unknown) => void): void

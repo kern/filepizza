@@ -7,6 +7,7 @@ import {
 } from '../types'
 import { decodeMessage, Message, MessageType } from '../messages'
 import { getFileName } from '../fs'
+import { closeWhenConnectionFails } from '../utils/connection-health'
 
 // TODO(@kern): Test for better values
 export const MAX_CHUNK_SIZE = 256 * 1024 // 256 KB
@@ -378,7 +379,9 @@ export function useUploaderConnections(
                 bytesReceived,
               )
 
-              const file = files.find((file) => getFileName(file) === fileName)
+              const file = files.find(
+                (candidate) => getFileName(candidate) === fileName,
+              )
               if (!file) break
 
               updateConnection((draft) => {
@@ -465,8 +468,10 @@ export function useUploaderConnections(
 
       conn.on('data', onData)
       conn.on('close', onClose)
+      const stopWatching = closeWhenConnectionFails(conn)
 
       cleanupHandlers.push(() => {
+        stopWatching()
         cancelTransfer()
         conn.off('data', onData)
         conn.off('close', onClose)

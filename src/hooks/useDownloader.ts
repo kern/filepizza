@@ -10,8 +10,12 @@ import {
   streamDownloadMultipleFiles,
 } from '../utils/download'
 import { OrderedChunkWriter, toUint8Array } from '../utils/ordered-chunks'
+import { closeWhenConnectionFails } from '../utils/connection-health'
 import { getDeviceInfo } from '../utils/device-info'
 import { setRotating } from './useRotatingSpinner'
+export const UPLOADER_LEFT_MESSAGE =
+  'The uploader stopped sharing or lost their connection before the download finished. Ask them to share the link again.'
+
 const cleanErrorMessage = (errorMessage: string): string =>
   errorMessage.startsWith('Could not connect to peer')
     ? 'Could not connect to the uploader. Did they close their browser?'
@@ -34,6 +38,7 @@ export function useDownloader(
   filesInfo: Array<{ fileName: string; size: number; type: string }> | null
   isConnected: boolean
   isPasswordRequired: boolean
+  isStopped: boolean
   isDownloading: boolean
   isDone: boolean
   errorMessage: string | null
@@ -57,6 +62,8 @@ export function useDownloader(
   const [isConnected, setIsConnected] = useState(false)
   const [isPasswordRequired, setIsPasswordRequired] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
+  const [isStopped, setIsStopped] = useState(false)
+  const stoppedByUser = useRef(false)
   const [isDone, setDone] = useState(false)
   const [bytesDownloaded, setBytesDownloaded] = useState(0)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -65,6 +72,7 @@ export function useDownloader(
     console.log('[Downloader] connecting to uploader', uploaderPeerID)
     const conn = peer.connect(uploaderPeerID, { reliable: true })
     setDataConnection(conn)
+    const stopWatching = closeWhenConnectionFails(conn)
 
     const handleOpen = () => {
       console.log('[Downloader] connection opened')
@@ -110,6 +118,13 @@ export function useDownloader(
 
     const handleClose = () => {
       console.log('[Downloader] connection closed')
+      // A close nobody asked for (the uploader stopped, left or dropped off)
+      // must not leave the page offering a download that can't start. Closes
+      // after an error keep that error, and a finished download shows its own
+      // page, so only the first message sticks.
+      if (!stoppedByUser.current) {
+        setErrorMessage((current) => current ?? UPLOADER_LEFT_MESSAGE)
+      }
       setRotating(false)
       setDataConnection(null)
       setIsConnected(false)
@@ -131,6 +146,7 @@ export function useDownloader(
 
     return () => {
       console.log('[Downloader] cleaning up connection')
+      stopWatching()
       if (conn.open) {
         conn.close()
       } else {
@@ -277,6 +293,8 @@ export function useDownloader(
 
   const stopDownload = useCallback(() => {
     // TODO(@kern): Continue here with stop / pause logic
+    stoppedByUser.current = true
+    setIsStopped(true)
     if (dataConnection) {
       console.log('[Downloader] pausing download')
       dataConnection.send({ type: MessageType.Pause })
@@ -297,6 +315,7 @@ export function useDownloader(
     filesInfo,
     isConnected,
     isPasswordRequired,
+    isStopped,
     isDownloading,
     isDone,
     errorMessage,

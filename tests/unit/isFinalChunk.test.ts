@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import { isFinalChunk, MAX_CHUNK_SIZE } from '../../src/hooks/useUploaderConnections'
+import {
+  isFinalChunk,
+  MAX_CHUNK_SIZE,
+} from '../../src/hooks/useUploaderConnections'
 
 describe('isFinalChunk', () => {
   it('marks last chunk when file size is exact multiple of chunk size', () => {

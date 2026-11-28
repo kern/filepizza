@@ -62,9 +62,7 @@ describe('pages', () => {
         slug: channel.longSlug,
         uploaderPeerID: 'test-uploader',
       })
-      vi.spyOn(DownloadRoute, 'useLoaderData').mockReturnValue(
-        data as never,
-      )
+      vi.spyOn(DownloadRoute, 'useLoaderData').mockReturnValue(data as never)
       expect(renderToStaticMarkup(<DownloadPage />)).toContain(
         'Initializing WebRTC peer...',
       )

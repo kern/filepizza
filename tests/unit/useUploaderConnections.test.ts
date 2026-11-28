@@ -17,6 +17,7 @@ class TestConnection
 {
   readonly peer = 'test-downloader'
   open = true
+  peerConnection?: RTCPeerConnection
   readonly messages: Message[] = []
 
   constructor(readonly metadata?: { type?: string }) {
@@ -113,14 +114,21 @@ function setupTransfer(files: File[], password = '') {
     logger,
     state: () =>
       result.current.find((entry) => entry.dataConnection === connection)!,
+    stateOf: (other: TestConnection) =>
+      result.current.find((entry) => entry.dataConnection === other)!,
     chunks: () =>
       connection.messages.filter(
         (message) => message.type === MessageType.Chunk,
       ),
-    start: (fileName: string, offset = 0) =>
-      receive({ type: MessageType.Start, fileName, offset }),
-    acknowledge: (fileName: string, offset: number, bytesReceived: number) =>
-      receive({ type: MessageType.ChunkAck, fileName, offset, bytesReceived }),
+    start: (name: string, offset = 0) =>
+      receive({ type: MessageType.Start, fileName: name, offset }),
+    acknowledge: (name: string, offset: number, bytesReceived: number) =>
+      receive({
+        type: MessageType.ChunkAck,
+        fileName: name,
+        offset,
+        bytesReceived,
+      }),
     receive,
     // Reading a slice is asynchronous, so timers have to be run with await.
     sendNextChunk: () => act(() => vi.advanceTimersToNextTimerAsync()),
@@ -384,6 +392,32 @@ describe('useUploaderConnections connection lifecycle', () => {
       status: UploaderConnectionStatus.Paused,
       completedFiles: 0,
     })
+  })
+
+  it('marks a downloader as closed when its ICE connection fails', () => {
+    const transfer = setupTransfer([largeFile()])
+    const peerConnection = Object.assign(new EventTarget(), {
+      iceConnectionState: 'connected',
+      connectionState: 'connected',
+    }) as unknown as RTCPeerConnection
+    const dropped = new TestConnection()
+    dropped.peerConnection = peerConnection
+    transfer.connect(dropped)
+    expect(transfer.stateOf(dropped).status).not.toBe(
+      UploaderConnectionStatus.Closed,
+    )
+    ;(peerConnection as { iceConnectionState: string }).iceConnectionState =
+      'failed'
+    act(() => {
+      peerConnection.dispatchEvent(new Event('iceconnectionstatechange'))
+    })
+
+    expect(dropped.open).toBe(false)
+    expect(transfer.stateOf(dropped).status).toBe(
+      UploaderConnectionStatus.Closed,
+    )
+    // Other downloaders are unaffected.
+    expect(transfer.state().status).not.toBe(UploaderConnectionStatus.Closed)
   })
 
   it('forwards a report to active peers and redirects the uploader', () => {
