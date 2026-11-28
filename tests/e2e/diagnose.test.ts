@@ -10,15 +10,27 @@ const probe = () => {
     return
   }
   const Wrapped = function (this: unknown, ...args: unknown[]) {
-    const pc = new (Original as unknown as new (...a: unknown[]) => RTCPeerConnection)(...args)
+    const pc = new (Original as unknown as new (
+      ...a: unknown[]
+    ) => RTCPeerConnection)(...args)
     const id = Math.random().toString(36).slice(2, 6)
     console.log('DIAG pc', id, 'config', JSON.stringify(args[0]))
     const log = (what: string) => console.log('DIAG', id, what)
-    pc.addEventListener('iceconnectionstatechange', () => log('ice=' + pc.iceConnectionState))
-    pc.addEventListener('icegatheringstatechange', () => log('gather=' + pc.iceGatheringState))
-    pc.addEventListener('connectionstatechange', () => log('conn=' + pc.connectionState))
-    pc.addEventListener('signalingstatechange', () => log('sig=' + pc.signalingState))
-    pc.addEventListener('icecandidate', (e) => log('cand ' + (e.candidate ? e.candidate.candidate : 'END')))
+    pc.addEventListener('iceconnectionstatechange', () =>
+      log('ice=' + pc.iceConnectionState),
+    )
+    pc.addEventListener('icegatheringstatechange', () =>
+      log('gather=' + pc.iceGatheringState),
+    )
+    pc.addEventListener('connectionstatechange', () =>
+      log('conn=' + pc.connectionState),
+    )
+    pc.addEventListener('signalingstatechange', () =>
+      log('sig=' + pc.signalingState),
+    )
+    pc.addEventListener('icecandidate', (e) =>
+      log('cand ' + (e.candidate ? e.candidate.candidate : 'END')),
+    )
     pc.addEventListener('icecandidateerror', (e) => {
       const err = e as RTCPeerConnectionIceErrorEvent
       log('candErr ' + err.errorCode + ' ' + err.errorText + ' ' + err.url)
@@ -29,19 +41,63 @@ const probe = () => {
   window.RTCPeerConnection = Wrapped
 }
 
+// The fix under test: peers on one machine can't resolve each other's mDNS
+// (<uuid>.local) host candidates, so point them at the machine's own address.
+const rewriteMdns = (address: string) => {
+  const original = RTCPeerConnection.prototype.addIceCandidate
+  RTCPeerConnection.prototype.addIceCandidate = function (
+    this: RTCPeerConnection,
+    candidate?: RTCIceCandidateInit | null,
+  ) {
+    if (candidate && typeof candidate.candidate === 'string') {
+      const init: RTCIceCandidateInit = {
+        candidate: candidate.candidate.replace(
+          /[0-9a-f-]{36}\.local/g,
+          address,
+        ),
+        sdpMid: candidate.sdpMid,
+        sdpMLineIndex: candidate.sdpMLineIndex,
+        usernameFragment: candidate.usernameFragment,
+      }
+      return original.call(this, new RTCIceCandidate(init))
+    }
+    return original.call(this, candidate)
+  } as typeof original
+}
+
+function runnerAddress(): string {
+  for (const list of Object.values(networkInterfaces())) {
+    for (const entry of list ?? []) {
+      if (entry.family === 'IPv4' && !entry.internal) return entry.address
+    }
+  }
+  return '127.0.0.1'
+}
+
 test('webkit peer connection diagnostics', async ({ browser }, testInfo) => {
   console.log('DIAG interfaces', JSON.stringify(networkInterfaces()))
+  console.log('DIAG using address', runnerAddress())
   const up = await (await browser.newContext()).newPage()
   const down = await (await browser.newContext()).newPage()
-  for (const [tag, page] of [['UP', up], ['DOWN', down]] as const) {
+  for (const [tag, page] of [
+    ['UP', up],
+    ['DOWN', down],
+  ] as const) {
     await page.addInitScript(probe)
+    await page.addInitScript(rewriteMdns, runnerAddress())
     page.on('console', (m) => {
       const t = m.text()
-      if (/DIAG|PeerJS|\[WebRTCProvider\]|\[Downloader\]|\[UploaderConnections\]/.test(t)) {
+      if (
+        /DIAG|PeerJS|\[WebRTCProvider\]|\[Downloader\]|\[UploaderConnections\]/.test(
+          t,
+        )
+      ) {
         console.log(tag, t.slice(0, 300))
       }
     })
-    page.on('pageerror', (e) => console.log(tag, 'PAGEERROR', e.message.slice(0, 200)))
+    page.on('pageerror', (e) =>
+      console.log(tag, 'PAGEERROR', e.message.slice(0, 200)),
+    )
   }
   console.log('DIAG UA', await up.evaluate(() => navigator.userAgent))
 
@@ -51,12 +107,19 @@ test('webkit peer connection diagnostics', async ({ browser }, testInfo) => {
   await down.goto(url)
   let connected = true
   try {
-    await expect(down.locator('#download-button')).toBeVisible({ timeout: 20000 })
+    await expect(down.locator('#download-button')).toBeVisible({
+      timeout: 20000,
+    })
   } catch {
     connected = false
   }
   console.log('DIAG RESULT connected=' + connected)
-  console.log('DIAG downloader page:', (await down.locator('main').innerText()).replace(/\n+/g, ' | ').slice(0, 300))
+  console.log(
+    'DIAG downloader page:',
+    (await down.locator('main').innerText())
+      .replace(/\n+/g, ' | ')
+      .slice(0, 300),
+  )
   expect(connected).toBe(true)
   void testInfo
 })
