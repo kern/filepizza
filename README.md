@@ -19,13 +19,17 @@ A hosted instance of FilePizza is available at [file.pizza](https://file.pizza).
 
 ## Development
 
+Requires [Node.js](https://nodejs.org/) 22.22 or newer and [pnpm](https://pnpm.io/).
+
 ```
 $ git clone https://github.com/kern/filepizza.git
 $ pnpm install
-$ pnpm dev
-$ pnpm build
-$ pnpm start
+$ pnpm dev        # development server on http://localhost:3000
+$ pnpm build      # production build into .output/
+$ pnpm start      # run the production build
 ```
+
+Run `pnpm lint:check`, `pnpm format:check`, `pnpm type:check`, `pnpm test:coverage` and `pnpm test:e2e` (after `pnpm build`) before opening a pull request, or `pnpm ci` to run everything. See [CLAUDE.md](CLAUDE.md) for more on the project layout.
 
 ## Running with Docker
 
@@ -37,18 +41,20 @@ $ pnpm docker:down
 
 ## Stack
 
-* TanStack Start
-* Tailwind
+* [TanStack Start](https://tanstack.com/start) (TanStack Router, Vite and Nitro)
+* React 19 and Tailwind CSS v4
 * TypeScript
-* React
 * PeerJS for WebRTC
 * View Transitions
+* Oxlint and Oxfmt for linting and formatting
+* Vitest and Playwright for tests
 * Redis (optional)
 
 ## Configuration
 
 The server can be customized with the following environment variables:
 
+- `PORT` – Port the production server listens on. Defaults to `3000`.
 - `REDIS_URL` – Connection string for a Redis instance used to store channel metadata. If not set, FilePizza falls back to in-memory storage.
 - `COTURN_ENABLED` – When set to `true`, enables TURN support for connecting peers behind NAT.
 - `TURN_HOST` – Hostname or IP address of the TURN server. Defaults to `127.0.0.1`.
