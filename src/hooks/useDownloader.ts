@@ -10,6 +10,7 @@ import {
   streamDownloadMultipleFiles,
 } from '../utils/download'
 import { OrderedChunkWriter, toUint8Array } from '../utils/ordered-chunks'
+import { closeWhenConnectionFails } from '../utils/connection-health'
 import { getDeviceInfo } from '../utils/device-info'
 import { setRotating } from './useRotatingSpinner'
 export const UPLOADER_LEFT_MESSAGE =
@@ -71,6 +72,7 @@ export function useDownloader(
     console.log('[Downloader] connecting to uploader', uploaderPeerID)
     const conn = peer.connect(uploaderPeerID, { reliable: true })
     setDataConnection(conn)
+    const stopWatching = closeWhenConnectionFails(conn)
 
     const handleOpen = () => {
       console.log('[Downloader] connection opened')
@@ -144,6 +146,7 @@ export function useDownloader(
 
     return () => {
       console.log('[Downloader] cleaning up connection')
+      stopWatching()
       if (conn.open) {
         conn.close()
       } else {

@@ -16,8 +16,9 @@ import { peerService, TestPeer } from '../support/providers'
 const first = { fileName: 'a.txt', type: 'text/plain', size: 2 }
 const second = { fileName: '/b.txt', type: 'text/plain', size: 1 }
 
-async function openDownloader() {
+async function openDownloader(peerConnection?: RTCPeerConnection) {
   const peer = new TestPeer()
+  peer.connection.peerConnection = peerConnection
   const service = peerService(peer)
   await service.get()
   const location = { href: '/' }
@@ -202,6 +203,25 @@ it('reports an unexpected close but keeps an earlier error and a finished downlo
     error: 'Uploader refused transfer',
   })
   expect(refused.result.current.errorMessage).toBe('Uploader refused transfer')
+})
+
+it('treats a failed ICE connection as the uploader leaving', async () => {
+  const peerConnection = Object.assign(new EventTarget(), {
+    iceConnectionState: 'connected',
+    connectionState: 'connected',
+  }) as unknown as RTCPeerConnection
+  const download = await openDownloader(peerConnection)
+  act(() => download.connection.accept())
+  expect(download.result.current.errorMessage).toBeNull()
+
+  ;(peerConnection as { iceConnectionState: string }).iceConnectionState =
+    'failed'
+  act(() => {
+    peerConnection.dispatchEvent(new Event('iceconnectionstatechange'))
+  })
+
+  expect(download.connection.open).toBe(false)
+  expect(download.result.current.errorMessage).toBe(UPLOADER_LEFT_MESSAGE)
 })
 
 it('reports transport errors on open connections and closes a connection that opens after cleanup', async () => {
