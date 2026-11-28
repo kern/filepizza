@@ -2,12 +2,19 @@
 
 import { createHmac } from 'node:crypto'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { POST as ice } from '../../src/routes/api.ice'
+import { POST as post } from '../../src/routes/api.ice'
 import { setTurnCredentials } from '../../src/coturn'
 
 vi.mock('../../src/coturn', () => ({ setTurnCredentials: vi.fn() }))
 
 const NOW = Date.UTC(2026, 0, 1)
+
+// The browser reached FilePizza at pizza.example.com (the URL host) unless a
+// test sets headers.
+const ice = (headers?: Record<string, string>) =>
+  post({
+    request: new Request('http://pizza.example.com/api/ice', { headers }),
+  })
 
 beforeEach(() => {
   vi.stubEnv('COTURN_ENABLED', 'true')
@@ -40,7 +47,10 @@ describe('/api/ice', () => {
       urls: 'stun:stun.l.google.com:19302',
     })
     const turn = config.iceServers[1]
-    expect(turn.urls).toEqual(['turn:127.0.0.1:3478', 'turns:127.0.0.1:5349'])
+    expect(turn.urls).toEqual([
+      'turn:pizza.example.com:3478',
+      'turns:pizza.example.com:5349',
+    ])
     expect(setTurnCredentials).toHaveBeenCalledExactlyOnceWith(
       turn.username,
       turn.credential,
@@ -80,6 +90,26 @@ describe('/api/ice', () => {
   it('ignores an unrecognised transport', async () => {
     vi.stubEnv('TURN_TRANSPORT', 'sctp')
     const config = await (await ice()).json()
+    expect(config.iceServers[1].urls[0]).toBe('turn:pizza.example.com:3478')
+  })
+
+  it('defaults TURN_HOST to the host the visitor used, ignoring its port', async () => {
+    const config = await (await ice({ host: 'files.example.org:8080' })).json()
+    expect(config.iceServers[1].urls[0]).toBe('turn:files.example.org:3478')
+  })
+
+  it('prefers the first X-Forwarded-Host when behind a proxy', async () => {
+    const config = await (
+      await ice({
+        host: 'internal:3000',
+        'x-forwarded-host': 'public.example.net, proxy.internal',
+      })
+    ).json()
+    expect(config.iceServers[1].urls[0]).toBe('turn:public.example.net:3478')
+  })
+
+  it('falls back to localhost when the host cannot be parsed', async () => {
+    const config = await (await ice({ host: 'bad host' })).json()
     expect(config.iceServers[1].urls[0]).toBe('turn:127.0.0.1:3478')
   })
 

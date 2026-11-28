@@ -57,7 +57,7 @@ The server can be customized with the following environment variables:
 - `PORT` – Port the production server listens on. Defaults to `3000`.
 - `REDIS_URL` – Connection string for a Redis instance used to store channel metadata. If not set, FilePizza falls back to in-memory storage.
 - `COTURN_ENABLED` – When set to `true`, enables TURN support for connecting peers behind NAT.
-- `TURN_HOST` – Hostname or IP address of the TURN server. Defaults to `127.0.0.1`.
+- `TURN_HOST` – Hostname or IP address of the TURN server, as visitors' browsers reach it. Defaults to the host the visitor used to reach FilePizza (honouring `X-Forwarded-Host`), which is right when coturn runs on the same machine, and falls back to `127.0.0.1` if that can't be determined.
 - `TURN_PORT` – Port of the TURN server. Defaults to `3478`.
 - `TURNS_PORT` – Port of the TURN-over-TLS server. Defaults to `5349`.
 - `TURN_TRANSPORT` – Set to `udp` or `tcp` to restrict the TURN URLs to that transport. By default no transport is requested.
@@ -67,6 +67,29 @@ The server can be customized with the following environment variables:
 - `PEERJS_HOST` – Hostname or IP address to the self-hosted PeerJS server. Defaults to `0.peerjs.com`.
 - `PEERJS_PORT` – Port of the self-hosted PeerJS server. Defaults to PeerJS's own default (`443`).
 - `PEERJS_PATH` – Path to self-hosted PeerJS server. Defaults to `/`.
+
+## Self-hosting
+
+`docker-compose.production.yml` runs FilePizza with Redis and a coturn TURN server. Out of the box it works when visitors reach FilePizza at the same address as coturn. The server hands the ICE and signalling settings to each visitor's browser, so anything that points at "localhost" would point at the visitor's own computer.
+
+1. **Open the TURN ports** on your firewall: `3478` (TCP and UDP), `5349` (TCP and UDP) and the relay range `60000-60128` (UDP).
+
+2. **Serve it over HTTPS** so downloads can stream to disk. See the FAQ below.
+
+3. **Optional settings** go in a `.env` file next to the compose file (it's read if present):
+
+   ```
+   # Only if coturn is reachable at a different address than FilePizza itself.
+   TURN_HOST=turn.example.com
+   # Realm shared by FilePizza and coturn. Defaults to file.pizza.
+   TURN_REALM=turn.example.com
+   ```
+
+   `TURN_HOST` defaults to the address the visitor used to reach the site, so a single-machine setup needs nothing. If you put coturn on another host, set it. If peers show as connected but nothing transfers when either side is behind a NAT, check `TURN_HOST` first.
+
+4. **Signalling server:** by default the browsers use the public PeerJS cloud (`0.peerjs.com`) to find each other. To run your own, start `pnpm start:peerjs` (`bin/peerjs.js`) and set `PEERJS_HOST`, `PEERJS_PORT` and `PEERJS_PATH` to its address.
+
+If you don't need TURN, leave `COTURN_ENABLED` unset: FilePizza then uses only the STUN server (`STUN_SERVER`), which works for peers that can reach each other directly, for example on the same network.
 
 ## FAQ
 

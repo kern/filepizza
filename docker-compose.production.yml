@@ -18,7 +18,7 @@ services:
     environment:
       - DETECT_EXTERNAL_IP=yes
       - DETECT_RELAY_IP=yes
-    command: -n --log-file=stdout --redis-userdb="ip=redis connect_timeout=30" --min-port=60000 --max-port=60128
+    command: -n --log-file=stdout --redis-userdb="ip=redis connect_timeout=30" --realm=${TURN_REALM:-file.pizza} --min-port=60000 --max-port=60128
     networks:
       - filepizza
   filepizza:
@@ -35,7 +35,8 @@ services:
     depends_on:
       - redis
     env_file:
-      - .env
+      - path: .env
+        required: false
 
 networks:
   filepizza:
