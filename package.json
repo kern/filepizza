@@ -69,7 +69,7 @@
     "peer": "^1.0.2",
     "playwright": "^1.53.2",
     "tailwindcss": "^4.3.5",
-    "typescript": "^5.0.0",
+    "typescript": "^7.0.0",
     "vite": "^8.4.0",
     "vitest": "^5.1.2"
   },
