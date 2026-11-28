@@ -1,5 +1,5 @@
-/// <reference types="@playwright/test" />
-import { test, expect, type Browser } from '@playwright/test'
+import { test, expect } from './fixtures'
+import type { Browser } from '@playwright/test'
 import {
   createBrowserContexts,
   disableWebRTC,

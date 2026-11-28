@@ -1,5 +1,4 @@
-/// <reference types="@playwright/test" />
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { selectFile } from './helpers'
 
 // Runs only in the `firefox-no-webrtc` project (see playwright.config.ts),

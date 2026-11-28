@@ -1,5 +1,4 @@
-/// <reference types="@playwright/test" />
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 
 test('home page loads', async ({ page }) => {
   await page.goto('http://localhost:3000/')

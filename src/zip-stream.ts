@@ -61,7 +61,7 @@ const pump = (zipObj) =>
   })
 
 export function createZipStream(
-  underlyingSource: UnderlyingSource<any>,
+  underlyingSource: UnderlyingSource<unknown>,
 ): ReadableStream {
   const files = Object.create(null)
   const filenames = []

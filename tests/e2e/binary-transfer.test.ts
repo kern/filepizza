@@ -1,5 +1,5 @@
-/// <reference types="@playwright/test" />
-import { test, expect, Page } from '@playwright/test'
+import { test, expect } from './fixtures'
+import type { Page } from '@playwright/test'
 import { createHash, randomBytes } from 'crypto'
 import { writeFileSync, readFileSync } from 'fs'
 import { startUpload, createBrowserContexts } from './helpers'
