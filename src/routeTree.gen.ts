@@ -16,6 +16,7 @@ import { Route as ApiDestroyRouteImport } from './routes/api.destroy'
 import { Route as ApiIceRouteImport } from './routes/api.ice'
 import { Route as ApiRenewRouteImport } from './routes/api.renew'
 import { Route as DownloadSplatRouteImport } from './routes/download.$'
+import { Route as ApiChannelSplatRouteImport } from './routes/api.channel.$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +53,11 @@ const DownloadSplatRoute = DownloadSplatRouteImport.update({
   path: '/download/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiChannelSplatRoute = ApiChannelSplatRouteImport.update({
+  id: '/api/channel/$',
+  path: '/api/channel/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/api/ice': typeof ApiIceRoute
   '/api/renew': typeof ApiRenewRoute
   '/download/$': typeof DownloadSplatRoute
+  '/api/channel/$': typeof ApiChannelSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/api/ice': typeof ApiIceRoute
   '/api/renew': typeof ApiRenewRoute
   '/download/$': typeof DownloadSplatRoute
+  '/api/channel/$': typeof ApiChannelSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/api/ice': typeof ApiIceRoute
   '/api/renew': typeof ApiRenewRoute
   '/download/$': typeof DownloadSplatRoute
+  '/api/channel/$': typeof ApiChannelSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/api/ice'
     | '/api/renew'
     | '/download/$'
+    | '/api/channel/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/api/ice'
     | '/api/renew'
     | '/download/$'
+    | '/api/channel/$'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/api/ice'
     | '/api/renew'
     | '/download/$'
+    | '/api/channel/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +131,7 @@ export interface RootRouteChildren {
   ApiIceRoute: typeof ApiIceRoute
   ApiRenewRoute: typeof ApiRenewRoute
   DownloadSplatRoute: typeof DownloadSplatRoute
+  ApiChannelSplatRoute: typeof ApiChannelSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -172,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DownloadSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/channel/$': {
+      id: '/api/channel/$'
+      path: '/api/channel/$'
+      fullPath: '/api/channel/$'
+      preLoaderRoute: typeof ApiChannelSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -183,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiIceRoute: ApiIceRoute,
   ApiRenewRoute: ApiRenewRoute,
   DownloadSplatRoute: DownloadSplatRoute,
+  ApiChannelSplatRoute: ApiChannelSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

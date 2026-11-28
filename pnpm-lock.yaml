@@ -81,6 +81,9 @@ importers:
       nitro:
         specifier: 3.0.261103-rc
         version: 3.0.261103-rc
+      node-datachannel:
+        specifier: ^0.33.6
+        version: 0.33.6
       oxfmt:
         specifier: ^0.80.0
         version: 0.80.0
@@ -217,6 +220,55 @@ packages:
   '@msgpack/msgpack@2.8.0':
     resolution: {integrity: sha512-h9u4u/jiIRKbq25PM+zymTyW6bhTzELvOoUd+AvYriWOAKpLGnIamaET3pnHYoI5iYphAHBI4ayx0MehR+VVPQ==}
     engines: {node: '>= 10'}
+
+  '@node-datachannel/android-arm64@0.33.6':
+    resolution: {integrity: sha512-UzSnd1vSN//3pqyvuufbaIQemvRfIHn/7DAy7wjoYk9tzkJp4SMk1FrNhkhmev89SH/h7yTac6PlGxGe5oHcKw==}
+    cpu: [arm64]
+    os: [android]
+
+  '@node-datachannel/darwin-arm64@0.33.6':
+    resolution: {integrity: sha512-vE2fN6D0BJJ3yZo5guJo2j1q7JeQbl+VyIs6vbkjEp654tQtTo3y7a4l3xB0bwDD27TOlkOlaSLJQRj6ZXqQdQ==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@node-datachannel/darwin-x64@0.33.6':
+    resolution: {integrity: sha512-EtRB2THMR11XMzbNhMEwaZtipaUxFz+PgeVx7hE+er6Ai1Fzzv7XexrMWDG11ahdpEZ8fAxlxuyELs33/WH1Cg==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@node-datachannel/linux-arm64-gnu@0.33.6':
+    resolution: {integrity: sha512-phMRjx8NEfW70i768LCQDEF2C6Q2vtYsS4DPXv/zbb2cJClaU5fjKFQfQ1XBCNIi1ClfpSd3Cl/rn/7SS+paTQ==}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@node-datachannel/linux-arm64-musl@0.33.6':
+    resolution: {integrity: sha512-T9bqllJ9YkpgqgRFEfsPpfgfMDXdA7CIiJ4c1XXGPLSeqVFgDbf/WCewkE7q4xA+tKRLoOOtc2XgMGwVnlxXVQ==}
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+
+  '@node-datachannel/linux-x64-gnu@0.33.6':
+    resolution: {integrity: sha512-NUTbne64++ZxwEJ9uppAAmYnFAfJAggf7gboioPdhr13P17GTQRCUgmipYrh1V0D4333x6NCBZyQaNv0n4WmpQ==}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@node-datachannel/linux-x64-musl@0.33.6':
+    resolution: {integrity: sha512-dlWP4ycOJrTAl9UvxGofq0zwPhl6iAr1b0ZcBUgDfb2CXmbcJWCvg6OsJ6u8BVSV41eNXALmaRpU0wttas/f1g==}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+
+  '@node-datachannel/win32-arm64-msvc@0.33.6':
+    resolution: {integrity: sha512-ttly7XRUrSOcOOGJvtm9gh2beAPUNOBOUc3Hk82LfMHHP7jJMkXNDns/ML+UVGommAcNyPhoZkRH62O7tSVQYw==}
+    cpu: [arm64]
+    os: [win32]
+
+  '@node-datachannel/win32-x64-msvc@0.33.6':
+    resolution: {integrity: sha512-N5GW6XH11Iuu+kyHLTiCMcCHdwWwpKqvtYril0LzQm6xBgmGQN3JXxFmgi4g4usw1nLy6WhBWADjbhSXJiiEMA==}
+    cpu: [x64]
+    os: [win32]
 
   '@oozcitak/dom@2.0.2':
     resolution: {integrity: sha512-GjpKhkSYC3Mj4+lfwEyI1dqnsKTgwGy48ytZEhm4A/xnH/8z9M3ZVXKr/YGQi3uCLs1AEBS+x5T2JPiueEDW8w==}
@@ -1743,6 +1795,10 @@ packages:
     engines: {node: '>=22.22.0'}
     hasBin: true
 
+  node-datachannel@0.33.6:
+    resolution: {integrity: sha512-n7RzImzysrOVFx/lXfkQQ4fL0wsuPXBFc8KM69V29iyIor/UX7Ej+edzNGWJm+3mApZG9nkLi7FsGAZhQCDA4w==}
+    engines: {node: '>=18.20.0'}
+
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
@@ -2497,6 +2553,33 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.6.0
 
   '@msgpack/msgpack@2.8.0': {}
+
+  '@node-datachannel/android-arm64@0.33.6':
+    optional: true
+
+  '@node-datachannel/darwin-arm64@0.33.6':
+    optional: true
+
+  '@node-datachannel/darwin-x64@0.33.6':
+    optional: true
+
+  '@node-datachannel/linux-arm64-gnu@0.33.6':
+    optional: true
+
+  '@node-datachannel/linux-arm64-musl@0.33.6':
+    optional: true
+
+  '@node-datachannel/linux-x64-gnu@0.33.6':
+    optional: true
+
+  '@node-datachannel/linux-x64-musl@0.33.6':
+    optional: true
+
+  '@node-datachannel/win32-arm64-msvc@0.33.6':
+    optional: true
+
+  '@node-datachannel/win32-x64-msvc@0.33.6':
+    optional: true
 
   '@oozcitak/dom@2.0.2':
     dependencies:
@@ -3816,6 +3899,20 @@ snapshots:
       ocache: 0.3.2
       rou3: 1.0.0
       srvx: 1.0.8
+
+  node-datachannel@0.33.6:
+    dependencies:
+      detect-libc: 2.1.2
+    optionalDependencies:
+      '@node-datachannel/android-arm64': 0.33.6
+      '@node-datachannel/darwin-arm64': 0.33.6
+      '@node-datachannel/darwin-x64': 0.33.6
+      '@node-datachannel/linux-arm64-gnu': 0.33.6
+      '@node-datachannel/linux-arm64-musl': 0.33.6
+      '@node-datachannel/linux-x64-gnu': 0.33.6
+      '@node-datachannel/linux-x64-musl': 0.33.6
+      '@node-datachannel/win32-arm64-msvc': 0.33.6
+      '@node-datachannel/win32-x64-msvc': 0.33.6
 
   node-domexception@1.0.0: {}
 

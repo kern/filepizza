@@ -19,7 +19,9 @@ flowchart LR
 1. The uploader creates a channel with the server and receives a slug that
    encodes its PeerJS identifier.
 2. The downloader resolves the slug via the server to obtain the uploader's
-   PeerJS identifier.
+   PeerJS identifier. The download page does this in its loader; other clients
+   can call `GET /api/channel/<slug>`, which answers `{ "uploaderPeerID": ... }`
+   or 404.
 3. All subsequent messages travel directly between peers over a reliable
    WebRTC data channel.
 
@@ -209,4 +211,5 @@ Done
 
 With these message definitions and sequences you can implement a compatible
 uploader or downloader for FilePizza or adapt the protocol for other
-applications.
+applications. The command line client in `cli/` (`send.ts` is an uploader,
+`receive.ts` a downloader) is a complete example outside the browser.

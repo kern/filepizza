@@ -12,6 +12,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: 'pnpm'
+      - uses: oven-sh/setup-bun@v2
       - run: pnpm install
       - run: pnpm exec playwright install --with-deps
       - run: pnpm lint:check
@@ -19,4 +20,7 @@ jobs:
       - run: pnpm type:check
       - run: pnpm test:coverage
       - run: pnpm build
+      # The command line client compiles to one executable; check it still does.
+      - run: pnpm build:cli
+      - run: ./dist/filepizza --version
       - run: pnpm test:e2e
