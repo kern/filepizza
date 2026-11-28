@@ -35,7 +35,7 @@ pnpm dev
 
 ### Code Quality
 
-- `pnpm lint:check` - Check Oxlint rules
+- `pnpm lint:check` - Check Oxlint rules across the whole repo (source, tests, configs and scripts)
 - `pnpm lint:fix` - Fix Oxlint issues
 - `pnpm format` - Format the whole repo with Oxfmt (generated and vendored files are ignored in `.oxfmtrc.json`)
 - `pnpm format:check` - Check code formatting

@@ -1,4 +1,3 @@
-/// <reference types="@playwright/test" />
 import { test, expect } from '@playwright/test'
 
 test('serves security headers on pages and static assets', async ({
