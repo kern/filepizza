@@ -1,10 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": [
-    "typescript",
-    "react",
-    "import"
-  ],
+  "plugins": ["typescript", "react", "import"],
   "categories": {
     "correctness": "error"
   },
@@ -15,15 +11,10 @@
         "argsIgnorePattern": "^_"
       }
     ],
-    "typescript/no-explicit-any": "warn",
-    "no-shadow": "warn",
+    "typescript/no-explicit-any": "error",
+    "no-shadow": "error",
     "react/immutability": "off",
     "react/set-state-in-effect": "off"
   },
-  "ignorePatterns": [
-    "legacy",
-    "node_modules",
-    ".next",
-    "src/routeTree.gen.ts"
-  ]
+  "ignorePatterns": ["src/routeTree.gen.ts"]
 }

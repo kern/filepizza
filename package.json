@@ -2,18 +2,25 @@
   "name": "filepizza",
   "version": "2.0.0",
   "description": "Free peer-to-peer file transfers in your browser.",
-  "author": "Alex Kern <alex@kern.io> (http://kern.io)",
-  "license": "BSD-3-Clause",
-  "type": "module",
   "homepage": "https://github.com/kern/filepizza",
+  "bugs": {
+    "url": "https://github.com/kern/filepizza/issues"
+  },
+  "license": "BSD-3-Clause",
+  "author": "Alex Kern <alex@kern.io> (http://kern.io)",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:kern/filepizza.git"
+  },
+  "type": "module",
   "scripts": {
     "dev": "vite dev",
     "dev:full": "docker compose up redis coturn -d && COTURN_ENABLED=true REDIS_URL=redis://localhost:6379 vite dev",
     "build": "vite build",
     "start": "node .output/server/index.mjs",
     "start:peerjs": "./bin/peerjs.js",
-    "lint:check": "oxlint src",
-    "lint:fix": "oxlint src --fix",
+    "lint:check": "oxlint",
+    "lint:fix": "oxlint --fix",
     "docker:build": "docker compose build",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
@@ -21,21 +28,14 @@
     "docker:ps": "docker compose ps",
     "docker:restart": "docker compose restart",
     "docker:clean": "docker compose down -v --rmi all",
-    "format": "oxfmt src",
-    "format:check": "oxfmt --check src",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "type:check": "tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "ci": "pnpm lint:check && pnpm format:check && pnpm type:check && pnpm test:coverage && pnpm build && pnpm test:e2e && pnpm docker:build"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:kern/filepizza.git"
-  },
-  "bugs": {
-    "url": "https://github.com/kern/filepizza/issues"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.55.2",

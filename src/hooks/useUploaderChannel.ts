@@ -36,12 +36,12 @@ export function useUploaderChannel(
         )
         throw new Error('Network response was not ok')
       }
-      const data = await response.json()
+      const created = await response.json()
       console.log('[UploaderChannel] channel created successfully:', {
-        longSlug: data.longSlug,
-        shortSlug: data.shortSlug,
+        longSlug: created.longSlug,
+        shortSlug: created.shortSlug,
       })
-      return data
+      return created
     },
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -70,9 +70,9 @@ export function useUploaderChannel(
         )
         throw new Error('Network response was not ok')
       }
-      const data = await response.json()
+      const renewed = await response.json()
       console.log('[UploaderChannel] channel renewed successfully')
-      return data
+      return renewed
     },
   })
 

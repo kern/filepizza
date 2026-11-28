@@ -22,6 +22,7 @@ export class TestDownloadConnection
 {
   readonly peer = 'test-uploader'
   open = false
+  peerConnection?: RTCPeerConnection
   readonly messages: Message[] = []
 
   send(message: Message) {

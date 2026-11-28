@@ -1,7 +1,7 @@
 # FilePizza File Transfer Protocol
 
 This document explains the message-based protocol that FilePizza uses to
-transfer files directly between browsers over a WebRTC data channel.  It
+transfer files directly between browsers over a WebRTC data channel. It
 covers the complete conversation required to build either an uploader or a
 downloader and includes examples for common scenarios.
 
@@ -26,7 +26,7 @@ flowchart LR
 ## Message Types
 
 Every message is a JSON object with a `type` field that matches one of the
-values in the table below.  Fields marked with `?` are optional.
+values in the table below. Fields marked with `?` are optional.
 
 ```mermaid
 classDiagram
@@ -133,7 +133,7 @@ sequenceDiagram
 
 ## Pause and Resume
 
-A downloader may pause an in‑progress transfer.  To resume, it reconnects and
+A downloader may pause an in‑progress transfer. To resume, it reconnects and
 requests the remainder of the file starting at the last acknowledged offset.
 
 ```mermaid
@@ -153,7 +153,7 @@ sequenceDiagram
 
 A special PeerJS connection with metadata `{ type: "report" }` causes the
 uploader to broadcast a `Report` message to all connected downloaders and to
-redirect its own UI to a reported page.  Downloaders receiving this message
+redirect its own UI to a reported page. Downloaders receiving this message
 should abort the transfer.
 
 ```mermaid
