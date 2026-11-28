@@ -58,6 +58,10 @@ The server can be customized with the following environment variables:
 - `REDIS_URL` – Connection string for a Redis instance used to store channel metadata. If not set, FilePizza falls back to in-memory storage.
 - `COTURN_ENABLED` – When set to `true`, enables TURN support for connecting peers behind NAT.
 - `TURN_HOST` – Hostname or IP address of the TURN server. Defaults to `127.0.0.1`.
+- `TURN_PORT` – Port of the TURN server. Defaults to `3478`.
+- `TURNS_PORT` – Port of the TURN-over-TLS server. Defaults to `5349`.
+- `TURN_TRANSPORT` – Set to `udp` or `tcp` to restrict the TURN URLs to that transport. By default no transport is requested.
+- `TURN_SECRET` – Shared secret for coturn's `use-auth-secret` mode (`static-auth-secret`). When set, FilePizza hands out time-limited credentials derived from it and doesn't write them to Redis. When unset, credentials are stored in Redis for coturn's `redis-userdb`.
 - `TURN_REALM` – Realm used when generating TURN credentials. Defaults to `file.pizza`.
 - `STUN_SERVER` – STUN server URL to use when `COTURN_ENABLED` is disabled. Defaults to `stun:stun.l.google.com:19302`.
 - `PEERJS_HOST` – Hostname or IP address to the self-hosted PeerJS server. Defaults to `0.peerjs.com`.
