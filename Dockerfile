@@ -1,5 +1,5 @@
 # Pin the Node.js version so builds are reproducible. Bump deliberately for security releases.
-ARG NODE_VERSION=24.22.1
+ARG NODE_VERSION=26.13.1
 # Pin pnpm too: newer releases fail installs on unapproved dependency build scripts.
 ARG PNPM_VERSION=10.28.0
 

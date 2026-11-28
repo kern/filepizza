@@ -28,7 +28,17 @@ class FakeChannel {
 }
 
 let frames: HTMLIFrameElement[] = []
-let handshakes: Array<{ message: any; origin: string; ports: unknown[] }> = []
+type Handshake = {
+  message: {
+    transferringReadable: boolean
+    pathname: string
+    headers: Record<string, string | number>
+  }
+  origin: string
+  ports: unknown[]
+}
+
+let handshakes: Handshake[] = []
 
 function readBlob(blob: Blob): Promise<ArrayBuffer> {
   return new Promise((resolve) => {
@@ -62,8 +72,11 @@ function stubBrowser({
     frames.push(node)
     Object.defineProperty(node, 'contentWindow', {
       value: {
-        postMessage: (message: any, origin: string, ports: unknown[]) =>
-          handshakes.push({ message, origin, ports }),
+        postMessage: (
+          message: Handshake['message'],
+          origin: string,
+          ports: unknown[],
+        ) => handshakes.push({ message, origin, ports }),
       },
     })
     if (node.src.endsWith('/stream.html')) {

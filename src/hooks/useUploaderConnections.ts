@@ -379,7 +379,9 @@ export function useUploaderConnections(
                 bytesReceived,
               )
 
-              const file = files.find((file) => getFileName(file) === fileName)
+              const file = files.find(
+                (candidate) => getFileName(candidate) === fileName,
+              )
               if (!file) break
 
               updateConnection((draft) => {
