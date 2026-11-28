@@ -120,10 +120,15 @@ function setupTransfer(files: File[], password = '') {
       connection.messages.filter(
         (message) => message.type === MessageType.Chunk,
       ),
-    start: (fileName: string, offset = 0) =>
-      receive({ type: MessageType.Start, fileName, offset }),
-    acknowledge: (fileName: string, offset: number, bytesReceived: number) =>
-      receive({ type: MessageType.ChunkAck, fileName, offset, bytesReceived }),
+    start: (name: string, offset = 0) =>
+      receive({ type: MessageType.Start, fileName: name, offset }),
+    acknowledge: (name: string, offset: number, bytesReceived: number) =>
+      receive({
+        type: MessageType.ChunkAck,
+        fileName: name,
+        offset,
+        bytesReceived,
+      }),
     receive,
     // Reading a slice is asynchronous, so timers have to be run with await.
     sendNextChunk: () => act(() => vi.advanceTimersToNextTimerAsync()),
