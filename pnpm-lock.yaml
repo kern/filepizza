@@ -67,7 +67,7 @@ importers:
         version: 4.1.11
       web-streams-polyfill:
         specifier: ^4.0.0
-        version: 4.1.0
+        version: 4.5.1
       webrtcsupport:
         specifier: ^2.2.0
         version: 2.2.0
@@ -3481,8 +3481,8 @@ packages:
     resolution: {integrity: sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==}
     engines: {node: '>= 8'}
 
-  web-streams-polyfill@4.1.0:
-    resolution: {integrity: sha512-A7Jxrg7+eV+eZR/CIdESDnRGFb6/bcKukGvJBB5snI6cw3is1c2qamkYstC1bY1p08TyMRlN9eTMkxmnKJBPBw==}
+  web-streams-polyfill@4.5.1:
+    resolution: {integrity: sha512-pFmV/G8K9uKW3I3xx3vqpKYLBer7K1wZej5uU66zhtjzG1bfE6e+OHNxhmGb9UsXe+geX4/lndxJDgs7wbYO9g==}
     engines: {node: '>= 8'}
 
   webidl-conversions@7.0.0:
@@ -7249,7 +7249,7 @@ snapshots:
 
   web-streams-polyfill@3.3.3: {}
 
-  web-streams-polyfill@4.1.0: {}
+  web-streams-polyfill@4.5.1: {}
 
   webidl-conversions@7.0.0: {}
 
