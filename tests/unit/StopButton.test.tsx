@@ -6,7 +6,9 @@ import StopButton from '../../src/components/StopButton'
 
 describe('StopButton', () => {
   it('labels correctly when downloading', () => {
-    const { getByText } = render(<StopButton onClick={() => {}} isDownloading />)
+    const { getByText } = render(
+      <StopButton onClick={() => {}} isDownloading />,
+    )
     expect(getByText('Stop Download')).toBeInTheDocument()
   })
 

@@ -59,19 +59,28 @@ for (const testCase of testCases) {
     const fileSize = Math.floor(CHUNK_SIZE * testCase.fileSizeMultiplier)
     const testFile = createTestFile(
       `test-${testCase.fillChar.toLowerCase()}-${testCase.expectedChunks}chunks.txt`,
-      testCase.fillChar.repeat(fileSize)
+      testCase.fillChar.repeat(fileSize),
     )
 
-    const { uploaderPage, downloaderPage, cleanup } = await createBrowserContexts(browser)
+    const { uploaderPage, downloaderPage, cleanup } =
+      await createBrowserContexts(browser)
 
     try {
       // Set up precise chunk and progress monitoring
-      const monitor = await monitorChunkProgress(uploaderPage, downloaderPage, fileSize)
+      const monitor = await monitorChunkProgress(
+        uploaderPage,
+        downloaderPage,
+        fileSize,
+      )
 
       await uploadFile(uploaderPage, testFile)
       const shareUrl = await startUpload(uploaderPage)
-      const downloadPath = await downloadFile(downloaderPage, shareUrl, testFile)
-      
+      const downloadPath = await downloadFile(
+        downloaderPage,
+        shareUrl,
+        testFile,
+      )
+
       await verifyFileIntegrity(downloadPath, testFile)
       await verifyTransferCompletion(downloaderPage)
 
@@ -79,13 +88,24 @@ for (const testCase of testCases) {
       await downloaderPage.waitForTimeout(1000)
 
       // Verify precise progress tracking for both upload and download
-      verifyPreciseProgress(monitor.uploadChunks, testCase.expectedChunks, 'upload')
-      verifyPreciseProgress(monitor.downloadChunks, testCase.expectedChunks, 'download')
+      verifyPreciseProgress(
+        monitor.uploadChunks,
+        testCase.expectedChunks,
+        'upload',
+      )
+      verifyPreciseProgress(
+        monitor.downloadChunks,
+        testCase.expectedChunks,
+        'download',
+      )
 
       // Verify final completion shows exactly 100% on both sides
-      await expect(uploaderPage.locator('#progress-percentage')).toHaveText('100%')
-      await expect(downloaderPage.locator('#progress-percentage')).toHaveText('100%')
-
+      await expect(uploaderPage.locator('#progress-percentage')).toHaveText(
+        '100%',
+      )
+      await expect(downloaderPage.locator('#progress-percentage')).toHaveText(
+        '100%',
+      )
     } finally {
       await cleanup()
     }

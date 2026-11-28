@@ -123,4 +123,3 @@ describe('themeScript', () => {
     vi.restoreAllMocks()
   })
 })
-

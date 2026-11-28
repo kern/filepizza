@@ -172,7 +172,9 @@ describe('createWriteStream', () => {
 
   it('treats an HTMLElement constructor as Safari', async () => {
     stubBrowser()
-    vi.stubGlobal('HTMLElement', { toString: () => '[object HTMLElementConstructor]' })
+    vi.stubGlobal('HTMLElement', {
+      toString: () => '[object HTMLElementConstructor]',
+    })
     const { createWriteStream } = await load()
     createWriteStream('file.bin')
     expect(FakeChannel.all).toHaveLength(0)

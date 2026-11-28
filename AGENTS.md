@@ -19,10 +19,12 @@ pnpm dev
 ## Available Commands
 
 ### Development
+
 - `pnpm dev` - Start the Vite development server (http://localhost:3000)
 - `pnpm dev:full` - Start with Redis and COTURN for full WebRTC testing
 
 ### Building & Testing
+
 - `pnpm build` - Build for production (Nitro server output in `.output/`)
 - `pnpm start` - Run the production build (`node .output/server/index.mjs`)
 - `pnpm start:peerjs` - Run the optional self-hosted PeerJS signalling server (`bin/peerjs.js`)
@@ -32,6 +34,7 @@ pnpm dev
 - `pnpm test:e2e` - Run E2E tests with Playwright against the production build (run `pnpm build` first)
 
 ### Code Quality
+
 - `pnpm lint:check` - Check Oxlint rules
 - `pnpm lint:fix` - Fix Oxlint issues
 - `pnpm format` - Format code with Oxfmt
@@ -39,11 +42,13 @@ pnpm dev
 - `pnpm type:check` - TypeScript type checking
 
 ### Docker
+
 - `pnpm docker:build` - Build Docker image
 - `pnpm docker:up` - Start containers
 - `pnpm docker:down` - Stop containers
 
 ### CI Pipeline
+
 - `pnpm ci` - Run full CI pipeline (lint, format, type-check, test, build, e2e, docker)
 
 ## Tech Stack
@@ -87,11 +92,13 @@ docs/                       # Protocol documentation
 ### Using pnpm
 
 This project uses pnpm as the package manager. Benefits include:
+
 - Faster installs and smaller disk usage
 - Strict dependency resolution
 - Built-in workspace support
 
 Always use `pnpm` instead of `npm` or `yarn`:
+
 ```bash
 pnpm install package-name
 pnpm remove package-name
@@ -125,6 +132,7 @@ pnpm update
 ### WebRTC Development
 
 For full WebRTC testing with TURN/STUN:
+
 ```bash
 pnpm dev:full
 ```

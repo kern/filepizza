@@ -1,6 +1,6 @@
 <a href="https://xkcd.com/949/"><img src="http://imgs.xkcd.com/comics/file_transfer.png" alt="XKCD 949" width="30%" align="right" /></a> <img src="public/images/wordmark.png" alt="FilePizza wordmark" width="50%" /> <h3>Peer-to-peer file transfers in your browser</h3>
 
-*Cooked up by [Alex Kern](https://kern.io) & [Neeraj Baid](https://github.com/neerajbaid) while eating Sliver @ UC Berkeley.*
+_Cooked up by [Alex Kern](https://kern.io) & [Neeraj Baid](https://github.com/neerajbaid) while eating Sliver @ UC Berkeley._
 
 Using [WebRTC](http://www.webrtc.org), FilePizza eliminates the initial upload step required by other web-based file sharing services. Because data is never stored in an intermediary server, the transfer is fast, private, and secure.
 
@@ -8,14 +8,14 @@ A hosted instance of FilePizza is available at [file.pizza](https://file.pizza).
 
 ## What's new with FilePizza v2
 
-* A new UI with dark mode support, now built on modern browser technologies.
-* Works on most mobile browsers, including Mobile Safari.
-* Transfers are now directly from the uploader to the downloader's browser (WebRTC without WebTorrent) with faster handshakes.
-* Uploaders can monitor the progress of the transfer and stop it if they want.
-* Better security and safety measures with password protection and reporting.
-* Support for uploading multiple files at once, which downloaders receive as a zip file.
-* Streaming downloads with a Service Worker.
-* Out-of-process storage of server state using Redis.
+- A new UI with dark mode support, now built on modern browser technologies.
+- Works on most mobile browsers, including Mobile Safari.
+- Transfers are now directly from the uploader to the downloader's browser (WebRTC without WebTorrent) with faster handshakes.
+- Uploaders can monitor the progress of the transfer and stop it if they want.
+- Better security and safety measures with password protection and reporting.
+- Support for uploading multiple files at once, which downloaders receive as a zip file.
+- Streaming downloads with a Service Worker.
+- Out-of-process storage of server state using Redis.
 
 ## Development
 
@@ -41,14 +41,14 @@ $ pnpm docker:down
 
 ## Stack
 
-* [TanStack Start](https://tanstack.com/start) (TanStack Router, Vite and Nitro)
-* React 19 and Tailwind CSS v4
-* TypeScript
-* PeerJS for WebRTC
-* View Transitions
-* Oxlint and Oxfmt for linting and formatting
-* Vitest and Playwright for tests
-* Redis (optional)
+- [TanStack Start](https://tanstack.com/start) (TanStack Router, Vite and Nitro)
+- React 19 and Tailwind CSS v4
+- TypeScript
+- PeerJS for WebRTC
+- View Transitions
+- Oxlint and Oxfmt for linting and formatting
+- Vitest and Playwright for tests
+- Redis (optional)
 
 ## Configuration
 
