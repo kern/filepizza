@@ -9,6 +9,7 @@ import {
   streamDownloadSingleFile,
   streamDownloadMultipleFiles,
 } from '../utils/download'
+import { OrderedChunkWriter, toUint8Array } from '../utils/ordered-chunks'
 import {
   browserName,
   browserVersion,
@@ -175,29 +176,7 @@ export function useDownloader(
     console.log('[Downloader] starting download')
     setIsDownloading(true)
 
-    const fileStreamByPath: Record<
-      string,
-      {
-        stream: ReadableStream<Uint8Array>
-        enqueue: (chunk: Uint8Array) => void
-        close: () => void
-      }
-    > = {}
-    const fileStreams = filesInfo.map((info) => {
-      let controller!: ReadableStreamDefaultController<Uint8Array>
-      const stream = new ReadableStream<Uint8Array>({
-        start(ctrl) {
-          controller = ctrl
-        },
-      })
-      fileStreamByPath[info.fileName] = {
-        stream,
-        enqueue: (chunk) => controller.enqueue(chunk),
-        close: () => controller.close(),
-      }
-      return stream
-    })
-
+    const chunkCountByFile: Record<string, number> = {}
     let nextFileIndex = 0
     const startNextFileOrFinish = () => {
       if (nextFileIndex >= filesInfo.length) return
@@ -213,10 +192,47 @@ export function useDownloader(
       nextFileIndex++
     }
 
-    let chunkCountByFile: Record<string, number> = {}
+    const chunkWriterByFile = new Map<string, OrderedChunkWriter>()
+    const fileStreams = filesInfo.map((info) => {
+      let controller!: ReadableStreamDefaultController<Uint8Array>
+      const stream = new ReadableStream<Uint8Array>({
+        start(ctrl) {
+          controller = ctrl
+        },
+      })
+      const chunkWriter = new OrderedChunkWriter(
+        info.size,
+        // Acknowledge here rather than on arrival: the uploader only accepts
+        // acks in offset order.
+        (chunk, offset) => {
+          controller.enqueue(chunk)
+          setBytesDownloaded((bd) => bd + chunk.byteLength)
+          const ackMessage: Message = {
+            type: MessageType.ChunkAck,
+            fileName: info.fileName,
+            offset,
+            bytesReceived: chunk.byteLength,
+          }
+          dataConnection.send(ackMessage)
+          console.log(
+            `[Downloader] sent ack for ${info.fileName} (${offset}, ${chunk.byteLength} bytes)`,
+          )
+        },
+        () => {
+          console.log(
+            `[Downloader] finished receiving ${info.fileName} after ${chunkCountByFile[info.fileName]} chunks`,
+          )
+          controller.close()
+          startNextFileOrFinish()
+        },
+      )
+      chunkWriterByFile.set(info.fileName, chunkWriter)
+      return { stream, controller }
+    })
+
     processChunk.current = (message: z.infer<typeof ChunkMessage>) => {
-      const fileStream = fileStreamByPath[message.fileName]
-      if (!fileStream) {
+      const chunkWriter = chunkWriterByFile.get(message.fileName)
+      if (!chunkWriter) {
         console.error('[Downloader] no stream found for', message.fileName)
         return
       }
@@ -226,39 +242,25 @@ export function useDownloader(
         chunkCountByFile[message.fileName] = 0
       }
       chunkCountByFile[message.fileName]++
-      console.log(
-        `[Downloader] received chunk ${chunkCountByFile[message.fileName]} for ${message.fileName} (${message.offset}-${message.offset + (message.bytes as ArrayBuffer).byteLength}) final=${message.final}`,
-      )
 
-      const chunkSize = (message.bytes as ArrayBuffer).byteLength
-      setBytesDownloaded((bd) => bd + chunkSize)
-      fileStream.enqueue(new Uint8Array(message.bytes as ArrayBuffer))
-
-      // Send acknowledgment to uploader
-      const ackMessage: Message = {
-        type: MessageType.ChunkAck,
-        fileName: message.fileName,
-        offset: message.offset,
-        bytesReceived: chunkSize,
-      }
-      dataConnection.send(ackMessage)
-      console.log(
-        `[Downloader] sent ack for chunk ${chunkCountByFile[message.fileName]} (${message.offset}, ${chunkSize} bytes)`,
-      )
-
-      if (message.final) {
+      try {
+        const bytes = toUint8Array(message.bytes)
         console.log(
-          `[Downloader] finished receiving ${message.fileName} after ${chunkCountByFile[message.fileName]} chunks`,
+          `[Downloader] received chunk ${chunkCountByFile[message.fileName]} for ${message.fileName} (${message.offset}-${message.offset + bytes.byteLength}) final=${message.final}`,
         )
-        fileStream.close()
-        startNextFileOrFinish()
+        chunkWriter.push(message.offset, bytes, message.final)
+      } catch (error) {
+        processChunk.current = null
+        for (const { controller } of fileStreams) {
+          controller.error(error)
+        }
       }
     }
 
     const downloads = filesInfo.map((info, i) => ({
       name: info.fileName.replace(/^\//, ''),
       size: info.size,
-      stream: () => fileStreams[i],
+      stream: () => fileStreams[i].stream,
     }))
 
     const downloadPromise =
@@ -269,12 +271,18 @@ export function useDownloader(
     downloadPromise
       .then(() => {
         console.log('[Downloader] all files downloaded')
+        processChunk.current = null
         dataConnection.send({ type: MessageType.Done } as z.infer<
           typeof Message
         >)
         setDone(true)
       })
-      .catch((err) => console.error('[Downloader] download error:', err))
+      .catch((error) => {
+        console.error('[Downloader] download error:', error)
+        processChunk.current = null
+        setErrorMessage('The download could not be completed.')
+        dataConnection.close()
+      })
 
     startNextFileOrFinish()
   }, [dataConnection, filesInfo, downloadSingle, downloadMultiple])

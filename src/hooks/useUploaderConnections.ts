@@ -91,6 +91,16 @@ export function useUploaderConnections(
 
       activeConnections.add(conn)
       let sendChunkTimeout: NodeJS.Timeout | null = null
+      // Bumped whenever the transfer is interrupted, so that a chunk which is
+      // still being read from disk gets dropped instead of sent.
+      let transferId = 0
+      const cancelTransfer = () => {
+        transferId++
+        if (sendChunkTimeout) {
+          clearTimeout(sendChunkTimeout)
+          sendChunkTimeout = null
+        }
+      }
       const newConn = {
         status: UploaderConnectionStatus.Pending,
         dataConnection: conn,
@@ -260,12 +270,37 @@ export function useUploaderConnections(
               const sendNextChunkAsync = () => {
                 if (sendChunkTimeout !== null) return
 
-                sendChunkTimeout = setTimeout(() => {
-                  sendChunkTimeout = null
+                const scheduledTransferId = transferId
+                // Stays set while the slice is being read, so that only one
+                // chunk is ever in flight.
+                sendChunkTimeout = setTimeout(async () => {
                   if (!conn.open) return
 
                   const end = Math.min(file.size, offset + MAX_CHUNK_SIZE)
                   const final = isFinalChunk(offset, file.size)
+
+                  // Read the slice before handing it to PeerJS. Given a Blob,
+                  // PeerJS reads it asynchronously while packing the message,
+                  // which lets a later chunk overtake an earlier one.
+                  let bytes: ArrayBuffer
+                  try {
+                    bytes = await file.slice(offset, end).arrayBuffer()
+                  } catch (err) {
+                    if (scheduledTransferId !== transferId) return
+                    logger.error(
+                      '[UploaderConnections] failed to read chunk:',
+                      err,
+                    )
+                    const error: Message = {
+                      type: MessageType.Error,
+                      error: `The uploader could not read ${fileName}. Was it moved or changed?`,
+                    }
+                    conn.send(error)
+                    return
+                  }
+                  if (scheduledTransferId !== transferId || !conn.open) return
+                  sendChunkTimeout = null
+
                   chunkCount++
                   // Log for e2e testing
                   logger.log(
@@ -275,7 +310,7 @@ export function useUploaderConnections(
                     type: MessageType.Chunk,
                     fileName,
                     offset,
-                    bytes: file.slice(offset, end),
+                    bytes,
                     final,
                   }
                   conn.send(request)
@@ -322,10 +357,7 @@ export function useUploaderConnections(
                   return draft
                 }
 
-                if (sendChunkTimeout) {
-                  clearTimeout(sendChunkTimeout)
-                  sendChunkTimeout = null
-                }
+                cancelTransfer()
 
                 return {
                   ...draft,
@@ -412,9 +444,7 @@ export function useUploaderConnections(
       const onClose = (): void => {
         logger.log('[UploaderConnections] connection closed')
         activeConnections.delete(conn)
-        if (sendChunkTimeout) {
-          clearTimeout(sendChunkTimeout)
-        }
+        cancelTransfer()
 
         updateConnection((draft) => {
           if (
@@ -437,6 +467,7 @@ export function useUploaderConnections(
       conn.on('close', onClose)
 
       cleanupHandlers.push(() => {
+        cancelTransfer()
         conn.off('data', onData)
         conn.off('close', onClose)
         conn.close()

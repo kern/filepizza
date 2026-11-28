@@ -19,12 +19,16 @@ async function openDownloader() {
   await service.get()
   const location = { href: '/' }
   const output: number[] = []
+  const abortReasons: unknown[] = []
   let filename = ''
   const openDestination = (name: string) => {
     filename = name
     return new WritableStream<Uint8Array>({
       write(bytes) {
         output.push(...bytes)
+      },
+      abort(reason) {
+        abortReasons.push(reason)
       },
     })
   }
@@ -70,6 +74,7 @@ async function openDownloader() {
     chunk,
     location,
     output,
+    abortReasons,
     filename: () => filename,
   }
 }
@@ -190,4 +195,104 @@ it('reports transport errors on open connections and closes a connection that op
   pending.unmount()
   pending.connection.accept()
   expect(pending.connection.open).toBe(false)
+})
+
+it('writes and acknowledges chunks in offset order when they arrive out of order', async () => {
+  const { result, connection, receive, chunk, output } = await openDownloader()
+  const messages = () =>
+    connection.messages.map((message) =>
+      message.type === MessageType.ChunkAck
+        ? `ack ${message.fileName} ${message.offset}`
+        : message.type === MessageType.Start
+          ? `start ${message.fileName}`
+          : message.type,
+    )
+  act(() => connection.accept())
+  receive({
+    type: MessageType.Info,
+    files: [{ ...first, size: 5 }, second],
+  })
+  act(result.current.startDownload)
+
+  // The final chunk overtakes the two before it, and one of them is repeated.
+  chunk(first.fileName, 4, [69], true)
+  chunk(first.fileName, 2, [67, 68], false)
+  chunk(first.fileName, 2, [67, 68], false)
+  expect(result.current.bytesDownloaded).toBe(0)
+  expect(messages()).toEqual([MessageType.RequestInfo, 'start a.txt'])
+
+  chunk(first.fileName, 0, [65, 66], false)
+  expect(result.current.bytesDownloaded).toBe(5)
+  expect(messages().slice(2)).toEqual([
+    'ack a.txt 0',
+    'ack a.txt 2',
+    'ack a.txt 4',
+    'start /b.txt',
+  ])
+
+  chunk(second.fileName, 0, [70], true)
+  await waitFor(() => expect(result.current.isDone).toBe(true))
+  // The ZIP stores files uncompressed, so each appears verbatim.
+  expect(Buffer.from(output).includes(Buffer.from('ABCDE'))).toBe(true)
+})
+
+it('rejects a premature final chunk instead of completing a truncated download', async () => {
+  const { result, connection, receive, chunk, output, abortReasons } =
+    await openDownloader()
+  act(() => connection.accept())
+  receive({ type: MessageType.Info, files: [{ ...first, size: 5 }] })
+  act(result.current.startDownload)
+
+  chunk(first.fileName, 0, [65, 66], false)
+  await waitFor(() => expect(output).toEqual([65, 66]))
+  chunk(first.fileName, 2, [67], true)
+
+  await waitFor(() =>
+    expect(result.current.errorMessage).toBe(
+      'The download could not be completed.',
+    ),
+  )
+  expect(result.current.isDone).toBe(false)
+  expect(result.current.isDownloading).toBe(false)
+  expect(connection.open).toBe(false)
+  expect(output).toEqual([65, 66])
+  expect(abortReasons).toEqual([
+    new Error('Invalid chunk range or final marker'),
+  ])
+  expect(connection.messages.map(({ type }) => type)).not.toContain(
+    MessageType.Done,
+  )
+})
+
+it('aborts the ZIP destination when a later file contains an invalid final chunk', async () => {
+  const { result, connection, receive, chunk, abortReasons } =
+    await openDownloader()
+  act(() => connection.accept())
+  receive({
+    type: MessageType.Info,
+    files: [first, { ...second, size: 2 }],
+  })
+  act(result.current.startDownload)
+
+  chunk(first.fileName, 0, [65, 66], true)
+  expect(connection.messages.at(-1)).toEqual({
+    type: MessageType.Start,
+    fileName: second.fileName,
+    offset: 0,
+  })
+
+  chunk(second.fileName, 0, [67], true)
+  await waitFor(() =>
+    expect(result.current.errorMessage).toBe(
+      'The download could not be completed.',
+    ),
+  )
+  expect(abortReasons).toEqual([
+    new Error('Invalid chunk range or final marker'),
+  ])
+  expect(result.current.isDone).toBe(false)
+  expect(result.current.bytesDownloaded).toBe(2)
+  expect(connection.messages.map(({ type }) => type)).not.toContain(
+    MessageType.Done,
+  )
 })

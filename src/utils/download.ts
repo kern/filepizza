@@ -39,7 +39,12 @@ export async function streamDownloadSingleFile(
     const res = await reader.read()
     return res.done ? writer.close() : writer.write(res.value).then(pump)
   }
-  await pump()
+  try {
+    await pump()
+  } catch (error) {
+    await writer.abort(error)
+    throw error
+  }
 }
 
 export function streamDownloadMultipleFiles(
