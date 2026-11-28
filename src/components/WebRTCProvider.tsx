@@ -68,9 +68,22 @@ export const useWebRTCPeer = (): WebRTCPeerValue => {
   return value
 }
 
+export const WEBRTC_UNSUPPORTED_MESSAGE =
+  'WebRTC is disabled or not supported in this browser. Enable WebRTC (in Firefox, set media.peerconnection.enabled to true) and reload the page.'
+
+// PeerJS reports a missing WebRTC implementation as a 'browser-incompatible'
+// error. Errors it wraps (e.g. an unreachable signalling server) arrive with an
+// empty message, so fall back to a description built from the error type.
+function describePeerError(error: Error & { type?: string }): string {
+  if (error.type === 'browser-incompatible') return WEBRTC_UNSUPPORTED_MESSAGE
+  if (error.message) return error.message
+  return `Could not connect to the signalling server (${error.type ?? 'unknown error'}). Check your network connection and reload the page.`
+}
+
 export function createPeerService(
   request: typeof fetch,
   createPeer: (options: PeerOptions) => WebRTCPeer,
+  isSupported: () => boolean = () => true,
 ) {
   let peer: WebRTCPeer | null = null
 
@@ -78,6 +91,7 @@ export function createPeerService(
     current: () => peer,
     async get(): Promise<WebRTCPeer> {
       if (!peer) {
+        if (!isSupported()) throw new Error(WEBRTC_UNSUPPORTED_MESSAGE)
         const response = await request('/api/ice', { method: 'POST' })
         const { host, path, iceServers } = await response.json()
         console.log('[WebRTCProvider] ICE servers:', iceServers)
@@ -88,13 +102,24 @@ export function createPeerService(
 
       const currentPeer = peer
       if (!currentPeer.id) {
-        await new Promise<void>((resolve) => {
-          const listener = (id: string) => {
+        await new Promise<void>((resolve, reject) => {
+          const onOpen = (id: string) => {
             console.log('[WebRTCProvider] Peer ID:', id)
-            currentPeer.off('open', listener)
+            currentPeer.off('open', onOpen)
+            currentPeer.off('error', onError)
             resolve()
           }
-          currentPeer.on('open', listener)
+          // Without this the UI waits forever when the signalling server
+          // can't be reached or WebRTC is unavailable.
+          const onError = (error: Error) => {
+            currentPeer.off('open', onOpen)
+            currentPeer.off('error', onError)
+            currentPeer.destroy()
+            peer = null
+            reject(new Error(describePeerError(error)))
+          }
+          currentPeer.on('open', onOpen)
+          currentPeer.on('error', onError)
         })
       }
       return currentPeer
@@ -109,6 +134,7 @@ export function createPeerService(
 const browserPeerService = createPeerService(
   (input, init) => fetch(input, init),
   (options) => new Peer(options),
+  () => typeof RTCPeerConnection === 'function',
 )
 
 export const WebRTCPeerServiceContext = React.createContext(browserPeerService)
