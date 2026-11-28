@@ -9,12 +9,27 @@ const ENGINE_SPECS = [NO_WEBRTC_SPEC, FIREFOX_SPEC, WEBKIT_SPEC]
 export default defineConfig({
   testDir: './tests/e2e',
   workers: 1, // Run tests serially to avoid WebRTC port conflicts
-  webServer: {
-    command: 'node .output/server/index.mjs',
-    url: 'http://localhost:3000',
-    timeout: 120 * 1000,
-    reuseExistingServer: true,
-  },
+  // Nothing here depends on a public service: the app talks to the repo's own
+  // PeerJS server (bin/peerjs.js, port 9000) instead of 0.peerjs.com.
+  webServer: [
+    {
+      command: 'node bin/peerjs.js',
+      url: 'http://localhost:9000/peerjs/filepizza/',
+      timeout: 60 * 1000,
+      reuseExistingServer: true,
+    },
+    {
+      command: 'node .output/server/index.mjs',
+      url: 'http://localhost:3000',
+      timeout: 120 * 1000,
+      reuseExistingServer: true,
+      env: {
+        PEERJS_HOST: 'localhost',
+        PEERJS_PORT: '9000',
+        PEERJS_PATH: '/peerjs/filepizza/',
+      },
+    },
+  ],
   use: {
     baseURL: 'http://localhost:3000',
   },

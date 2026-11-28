@@ -30,11 +30,17 @@ export async function POST(): Promise<Response> {
   const stunServer = process.env.STUN_SERVER || 'stun:stun.l.google.com:19302'
   const peerjsHost = process.env.PEERJS_HOST || '0.peerjs.com'
   const peerjsPath = process.env.PEERJS_PATH || '/'
+  // Only sent when set, so PeerJS keeps its own default (443) otherwise.
+  const peerjsPort = Number(process.env.PEERJS_PORT) || undefined
+  const signalling = {
+    host: peerjsHost,
+    ...(peerjsPort ? { port: peerjsPort } : {}),
+    path: peerjsPath,
+  }
 
   if (!process.env.COTURN_ENABLED) {
     return Response.json({
-      host: peerjsHost,
-      path: peerjsPath,
+      ...signalling,
       iceServers: [{ urls: stunServer }],
     })
   }
@@ -54,8 +60,7 @@ export async function POST(): Promise<Response> {
   }
 
   return Response.json({
-    host: peerjsHost,
-    path: peerjsPath,
+    ...signalling,
     iceServers: [
       { urls: stunServer },
       { urls: turnUrls(turnHost), username, credential },

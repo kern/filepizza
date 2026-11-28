@@ -93,11 +93,18 @@ export function createPeerService(
       if (!peer) {
         if (!isSupported()) throw new Error(WEBRTC_UNSUPPORTED_MESSAGE)
         const response = await request('/api/ice', { method: 'POST' })
-        const { host, path, iceServers } = await response.json()
+        const { host, port, path, iceServers } = await response.json()
         console.log('[WebRTCProvider] ICE servers:', iceServers)
         console.log('[WebRTCProvider] host:', host)
         console.log('[WebRTCProvider] path:', path)
-        peer = createPeer({ debug: 3, host, path, config: { iceServers } })
+        peer = createPeer({
+          debug: 3,
+          host,
+          // An explicit undefined would override PeerJS's default port.
+          ...(port ? { port } : {}),
+          path,
+          config: { iceServers },
+        })
       }
 
       const currentPeer = peer
