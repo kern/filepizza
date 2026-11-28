@@ -1,4 +1,4 @@
-import { useTheme } from 'next-themes'
+import { useTheme } from './ThemeProvider'
 import { JSX } from 'react'
 function LightModeIcon(): JSX.Element {
   return (

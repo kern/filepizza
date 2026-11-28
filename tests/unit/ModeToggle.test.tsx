@@ -5,24 +5,21 @@ import { ThemeProvider } from '../../src/components/ThemeProvider'
 
 describe('ModeToggle', () => {
   afterEach(() => {
-    localStorage.removeItem('test-mode')
+    localStorage.clear()
+    document.documentElement.classList.remove('dark')
   })
 
   it('toggles the active theme in both directions', () => {
     const { getByRole } = render(
-      <ThemeProvider
-        defaultTheme="light"
-        enableSystem={false}
-        storageKey="test-mode"
-      >
+      <ThemeProvider defaultTheme="light">
         <ModeToggle />
       </ThemeProvider>,
     )
     const button = getByRole('button', { name: 'Toggle mode' })
 
     fireEvent.click(button)
-    expect(document.documentElement).toHaveAttribute('data-theme', 'dark')
+    expect(document.documentElement).toHaveClass('dark')
     fireEvent.click(button)
-    expect(document.documentElement).toHaveAttribute('data-theme', 'light')
+    expect(document.documentElement).not.toHaveClass('dark')
   })
 })
