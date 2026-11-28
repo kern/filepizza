@@ -39,6 +39,9 @@ function InitialState({
         <TitleText>Peer-to-peer file transfers in your browser.</TitleText>
       </div>
       <DropZone onDrop={onDrop} />
+      <SubtitleText>
+        You can also drop a folder anywhere on this page.
+      </SubtitleText>
       <TermsAcceptance />
     </PageWrapper>
   )
