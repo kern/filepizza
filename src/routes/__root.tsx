@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-router'
 import Footer from '../components/Footer'
 import stylesHref from '../styles.css?url'
-import { ThemeProvider } from '../components/ThemeProvider'
+import { ThemeProvider, themeScript } from '../components/ThemeProvider'
 import { ModeToggle } from '../components/ModeToggle'
 import FilePizzaQueryClientProvider from '../components/QueryClientProvider'
 
@@ -30,6 +30,7 @@ export const Route = createRootRoute({
       { property: 'og:description', content: description },
       { property: 'og:image', content: 'https://file.pizza/images/fb.png' },
     ],
+    scripts: [{ children: themeScript }],
     links: [
       { rel: 'stylesheet', href: stylesHref },
       { rel: 'icon', href: '/favicon.ico' },
@@ -49,7 +50,7 @@ export function RootDocument({
         <HeadContent />
       </head>
       <body>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider>
           <FilePizzaQueryClientProvider>
             <main>{children}</main>
             <Footer />
