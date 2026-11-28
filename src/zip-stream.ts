@@ -3,7 +3,7 @@
 // Disabling typechecking for now since this was originally JavaScript, should
 // find some time to add types later.
 //
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// oxlint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
 class Crc32 {
@@ -74,9 +74,9 @@ export function createZipStream(
   function next() {
     activeZipIndex++
     activeZipObject = files[filenames[activeZipIndex]]
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    // oxlint-disable-next-line @typescript-eslint/no-use-before-define
     if (activeZipObject) processNextChunk()
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    // oxlint-disable-next-line @typescript-eslint/no-use-before-define
     else if (closed) closeZip()
   }
 
@@ -167,7 +167,7 @@ export function createZipStream(
 
       if (!activeZipObject) {
         activeZipObject = zipObject
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        // oxlint-disable-next-line @typescript-eslint/no-use-before-define
         processNextChunk()
       }
     },
@@ -176,7 +176,7 @@ export function createZipStream(
         throw new TypeError(
           'Cannot close a readable stream that has already been requested to be closed',
         )
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      // oxlint-disable-next-line @typescript-eslint/no-use-before-define
       if (!activeZipObject) closeZip()
       closed = true
     },

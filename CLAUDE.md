@@ -29,9 +29,9 @@ pnpm dev
 - `pnpm test:e2e` - Run E2E tests with Playwright
 
 ### Code Quality
-- `pnpm lint:check` - Check ESLint rules
-- `pnpm lint:fix` - Fix ESLint issues
-- `pnpm format` - Format code with Prettier
+- `pnpm lint:check` - Check Oxlint rules
+- `pnpm lint:fix` - Fix Oxlint issues
+- `pnpm format` - Format code with Oxfmt
 - `pnpm format:check` - Check code formatting
 - `pnpm type:check` - TypeScript type checking
 
@@ -83,8 +83,8 @@ pnpm update
 
 ### Code Style
 
-- ESLint + TypeScript ESLint for linting
-- Prettier for formatting
+- Oxlint for linting
+- Oxfmt for formatting
 - Husky + lint-staged for pre-commit hooks
 - Prefer TypeScript over JavaScript
 - Use kebab-case for files, PascalCase for components

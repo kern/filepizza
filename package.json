@@ -11,8 +11,8 @@
     "build": "next build && cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/",
     "start": "next start",
     "start:peerjs": "./bin/peerjs.js",
-    "lint:check": "eslint 'src/**/*.ts[x]'",
-    "lint:fix": "eslint 'src/**/*.ts[x]' --fix",
+    "lint:check": "oxlint src",
+    "lint:fix": "oxlint src --fix",
     "docker:build": "docker compose build",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
@@ -20,8 +20,8 @@
     "docker:ps": "docker compose ps",
     "docker:restart": "docker compose restart",
     "docker:clean": "docker compose down -v --rmi all",
-    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
+    "format": "oxfmt src",
+    "format:check": "oxfmt --check src",
     "type:check": "tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
@@ -61,7 +61,6 @@
     "zod": "^4.0.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.30.0",
     "@playwright/test": "^1.53.2",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -69,21 +68,15 @@
     "@types/debug": "^4.1.12",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
-    "@typescript-eslint/eslint-plugin": "^8.18.2",
-    "@typescript-eslint/parser": "^8.18.2",
     "@vitejs/plugin-react": "^4.6.0",
     "@vitest/coverage-v8": "^3.2.4",
-    "eslint": "^9.17.0",
-    "eslint-config-next": "~15.5.11",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-react": "^7.37.3",
     "husky": "^9.0.0",
     "jsdom": "^26.1.0",
     "lint-staged": "^16.0.0",
+    "oxfmt": "^0.80.0",
+    "oxlint": "^1.95.0",
     "playwright": "^1.53.2",
-    "prettier": "^3.0.0",
     "typescript": "^5.0.0",
-    "typescript-eslint": "^8.18.2",
     "vitest": "^3.2.4"
   },
   "husky": {
@@ -93,9 +86,8 @@
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "eslint --fix",
-      "prettier --write",
-      "git add"
+      "oxlint --fix",
+      "oxfmt"
     ]
   }
 }
