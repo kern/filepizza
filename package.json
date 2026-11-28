@@ -55,7 +55,7 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/node": "^24.19.4",
-    "@types/react": "^19.0.2",
+    "@types/react": "^19.3.3",
     "@vitejs/plugin-react": "^6.3.0",
     "@vitest/coverage-v8": "^5.1.2",
     "express": "^5.3.0",
