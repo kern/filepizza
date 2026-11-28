@@ -43,8 +43,8 @@
     "@tanstack/react-start": "^1.169.7",
     "ioredis": "^5.4.2",
     "peerjs": "^1.5.4",
-    "react": "~19.2.3",
-    "react-dom": "~19.2.3",
+    "react": "~19.3.0",
+    "react-dom": "~19.3.0",
     "react-qr-code": "^2.0.15",
     "zod": "^4.0.0"
   },
