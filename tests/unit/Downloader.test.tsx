@@ -74,4 +74,58 @@ describe('Downloader', () => {
       '/',
     )
   })
+
+  it('explains when the uploader goes away before the download is done', async () => {
+    const { receive, open, peer } = await renderDownloader()
+    open()
+    receive({
+      type: MessageType.Info,
+      files: [{ fileName: 'test.txt', type: 'text/plain', size: 2 }],
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Download' }))
+    expect(
+      screen.getByRole('button', { name: 'Stop Download' }),
+    ).toBeInTheDocument()
+
+    act(() => peer.connection.close())
+
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      /uploader stopped sharing or lost their connection/,
+    )
+    expect(screen.queryByRole('button', { name: 'Download' })).toBeNull()
+    expect(screen.getByRole('link', { name: /serve up/i })).toHaveAttribute(
+      'href',
+      '/',
+    )
+  })
+
+  it('does not offer a download that can no longer start after the uploader leaves', async () => {
+    const { receive, open, peer } = await renderDownloader()
+    open()
+    receive({
+      type: MessageType.Info,
+      files: [{ fileName: 'test.txt', type: 'text/plain', size: 2 }],
+    })
+    expect(screen.getByRole('button', { name: 'Download' })).toBeInTheDocument()
+
+    act(() => peer.connection.close())
+
+    expect(screen.queryByRole('button', { name: 'Download' })).toBeNull()
+    expect(screen.getByRole('alert')).toBeInTheDocument()
+  })
+
+  it('says so when the downloader stops the download themselves', async () => {
+    const { receive, open } = await renderDownloader()
+    open()
+    receive({
+      type: MessageType.Info,
+      files: [{ fileName: 'test.txt', type: 'text/plain', size: 2 }],
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Download' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Stop Download' }))
+
+    expect(screen.getByText('You stopped this download.')).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Download' })).toBeNull()
+  })
 })

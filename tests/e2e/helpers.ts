@@ -66,10 +66,7 @@ export async function uploadFile(
   )
 }
 
-export async function addFile(
-  page: Page,
-  testFile: TestFile,
-): Promise<void> {
+export async function addFile(page: Page, testFile: TestFile): Promise<void> {
   await page.evaluate(
     ({ testContent, testFileName }) => {
       const input = document.querySelector(
@@ -318,3 +315,66 @@ export function verifyPreciseProgress(
   }
 }
 
+/**
+ * Makes the page look like a browser with WebRTC turned off, before any of
+ * the app's scripts run.
+ */
+export async function disableWebRTC(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    for (const name of ['RTCPeerConnection', 'webkitRTCPeerConnection']) {
+      Object.defineProperty(window, name, {
+        value: undefined,
+        configurable: true,
+        writable: true,
+      })
+    }
+  })
+}
+
+/**
+ * Silently drops everything the page sends over a WebRTC data channel once it
+ * has sent `afterBytes`. The handshake and the first chunk get through, then the
+ * transfer stalls with the remaining data never arriving, which lets a test
+ * disconnect a peer mid-transfer without racing the transfer.
+ */
+export async function stallDataChannel(
+  page: Page,
+  afterBytes: number,
+): Promise<void> {
+  await page.addInitScript((limit) => {
+    const send = RTCDataChannel.prototype.send as (data: unknown) => void
+    let sent = 0
+    RTCDataChannel.prototype.send = function (
+      this: RTCDataChannel,
+      data: string | Blob | ArrayBuffer | ArrayBufferView,
+    ) {
+      const size =
+        typeof data === 'string'
+          ? data.length
+          : 'byteLength' in data
+            ? data.byteLength
+            : data.size
+      if (sent + size > limit) return
+      sent += size
+      send.call(this, data)
+    }
+  }, afterBytes)
+}
+
+/** Picks a file for upload without going through the drop zone. */
+export async function selectFile(
+  page: Page,
+  name: string,
+  content: Buffer | string,
+): Promise<void> {
+  await page.goto('/')
+  await expect(page.locator('#drop-zone-button')).toBeVisible()
+  await page.locator('input[type="file"]').setInputFiles({
+    name,
+    mimeType: 'application/octet-stream',
+    buffer: Buffer.from(content),
+  })
+  await expect(page.getByText(/You are about to start uploading/i)).toBeVisible(
+    { timeout: 10000 },
+  )
+}

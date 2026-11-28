@@ -19,6 +19,7 @@ beforeEach(() => {
   vi.stubEnv('STUN_SERVER', '')
   vi.stubEnv('PEERJS_HOST', '')
   vi.stubEnv('PEERJS_PATH', '')
+  vi.stubEnv('PEERJS_PORT', '')
   vi.setSystemTime(NOW)
 })
 
@@ -33,6 +34,8 @@ describe('/api/ice', () => {
     const config = await (await ice()).json()
     expect(config.host).toBe('0.peerjs.com')
     expect(config.path).toBe('/')
+    // No port is sent, so PeerJS keeps its default.
+    expect(config).not.toHaveProperty('port')
     expect(config.iceServers[0]).toEqual({
       urls: 'stun:stun.l.google.com:19302',
     })
@@ -53,10 +56,12 @@ describe('/api/ice', () => {
     vi.stubEnv('STUN_SERVER', 'stun:stun.example.com:3478')
     vi.stubEnv('PEERJS_HOST', 'peers.example.com')
     vi.stubEnv('PEERJS_PATH', '/signal')
+    vi.stubEnv('PEERJS_PORT', '9000')
 
     const config = await (await ice()).json()
     expect(config.host).toBe('peers.example.com')
     expect(config.path).toBe('/signal')
+    expect(config.port).toBe(9000)
     expect(config.iceServers[0]).toEqual({
       urls: 'stun:stun.example.com:3478',
     })

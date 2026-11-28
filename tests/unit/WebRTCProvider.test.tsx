@@ -65,6 +65,28 @@ describe('WebRTCProvider', () => {
     expect(await screen.findByText('ICE unavailable')).toBeInTheDocument()
   })
 
+  it('passes a custom signalling port to the peer', async () => {
+    const createPeer = vi.fn(() => new TestPeer('with-port'))
+    const service = createPeerService(
+      async () =>
+        Response.json({
+          host: 'relay.test',
+          port: 9000,
+          path: '/peer',
+          iceServers: [],
+        }),
+      createPeer,
+    )
+    await service.get()
+    expect(createPeer).toHaveBeenCalledExactlyOnceWith({
+      debug: 3,
+      host: 'relay.test',
+      port: 9000,
+      path: '/peer',
+      config: { iceServers: [] },
+    })
+  })
+
   it('explains when WebRTC is disabled or unsupported', async () => {
     const createPeer = vi.fn(() => new TestPeer())
     const service = createPeerService(

@@ -9,11 +9,15 @@ import { setRotating } from '../../src/hooks/useRotatingSpinner'
 describe('Spinner', () => {
   it('reflects rotating state', () => {
     // @ts-ignore
-    act(() => { setRotating(true) })
-// @ts-ignore
+    act(() => {
+      setRotating(true)
+    })
+    // @ts-ignore
     const { getByLabelText } = render(<Spinner />)
     expect(getByLabelText('Rotating pizza')).toBeInTheDocument()
     // @ts-ignore
-    act(() => { setRotating(false) })
+    act(() => {
+      setRotating(false)
+    })
   })
 })
