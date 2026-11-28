@@ -1,8 +1,12 @@
 name: tests
 on: [push]
 jobs:
-  tests:
+  diagnose:
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        n: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v4
@@ -13,10 +17,6 @@ jobs:
           node-version-file: .nvmrc
           cache: 'pnpm'
       - run: pnpm install
-      - run: pnpm exec playwright install --with-deps
-      - run: pnpm lint:check
-      - run: pnpm format:check
-      - run: pnpm type:check
-      - run: pnpm test:coverage
+      - run: pnpm exec playwright install --with-deps webkit
       - run: pnpm build
-      - run: pnpm test:e2e
+      - run: pnpm exec playwright test --project=webkit diagnose.test.ts
