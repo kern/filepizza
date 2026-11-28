@@ -1,4 +1,3 @@
-/// <reference types="@playwright/test" />
 import { test, expect, type Browser, type Page } from '@playwright/test'
 import { readFileSync } from 'fs'
 import { createBrowserContexts, selectFile, startUpload } from './helpers'

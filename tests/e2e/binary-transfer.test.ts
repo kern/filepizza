@@ -1,4 +1,3 @@
-/// <reference types="@playwright/test" />
 import { test, expect, Page } from '@playwright/test'
 import { createHash, randomBytes } from 'crypto'
 import { writeFileSync, readFileSync } from 'fs'

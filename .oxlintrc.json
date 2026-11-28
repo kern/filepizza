@@ -16,5 +16,5 @@
     "react/immutability": "off",
     "react/set-state-in-effect": "off"
   },
-  "ignorePatterns": ["legacy", "node_modules", ".next", "src/routeTree.gen.ts"]
+  "ignorePatterns": ["src/routeTree.gen.ts"]
 }

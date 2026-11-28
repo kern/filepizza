@@ -1,4 +1,3 @@
-/// <reference types="@playwright/test" />
 import { test, expect } from '@playwright/test'
 import {
   createTestFile,
