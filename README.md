@@ -16,6 +16,7 @@ A hosted instance of FilePizza is available at [file.pizza](https://file.pizza).
 - Support for uploading multiple files at once, which downloaders receive as a zip file.
 - Streaming downloads with a Service Worker.
 - Out-of-process storage of server state using Redis.
+- A [command line client](#command-line-client) for sending and receiving from a terminal.
 
 ## Development
 
@@ -38,6 +39,25 @@ $ pnpm docker:build
 $ pnpm docker:up
 $ pnpm docker:down
 ```
+
+## Command line client
+
+`filepizza` sends and receives files from a terminal, and works with the website: a link from `filepizza send` opens in any browser, and `filepizza receive` takes a link made on the website. It is written in TypeScript and compiled with [Bun](https://bun.sh) into one executable.
+
+```
+$ pnpm install
+$ pnpm build:cli                   # needs Bun; writes dist/filepizza
+$ ./dist/filepizza send photo.jpg notes/
+Share link: https://file.pizza/download/abcd1234
+$ ./dist/filepizza receive https://file.pizza/download/abcd1234
+```
+
+- `send <file or folder>...` shares files, and folders with everything in them, until you press Ctrl-C. `--once` exits after one download has finished, which suits scripts.
+- `receive <link>` saves the files into the current folder, or the one given with `--output`. It also takes just the code from the end of a link, with `--server` naming the site. It will not overwrite existing files unless you pass `--force`.
+- `--server <url>` picks the FilePizza server (default `https://file.pizza`, or `$FILEPIZZA_SERVER`), so it works with a [self-hosted](#self-hosting) one.
+- `--password <text>` protects a share, or answers its prompt. Set `$FILEPIZZA_PASSWORD` instead where you can: command line arguments are visible to other users of the machine.
+
+Like the website, it needs the sender to stay online while the transfer runs, and the files go directly between the two machines. The executable is built for the machine that builds it, because its WebRTC library ships a native addon for each platform. During development, `pnpm cli send ...` runs it without compiling.
 
 ## Stack
 
