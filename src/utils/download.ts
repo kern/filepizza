@@ -49,7 +49,7 @@ export function streamDownloadMultipleFiles(
   const readableZipStream = createZipStream({
     start(ctrl) {
       for (const file of files) {
-        ctrl.enqueue(file as unknown as ArrayBufferView)
+        ctrl.enqueue(file)
       }
       ctrl.close()
     },
