@@ -1,4 +1,3 @@
-import { EventEmitter } from 'node:events'
 import type { PropsWithChildren } from 'react'
 import {
   createMemoryHistory,
@@ -16,8 +15,47 @@ import {
 import type { UploaderTransport } from '../../src/types'
 import type { Message } from '../../src/messages'
 
+type Listener<Args extends unknown[]> = (...args: Args) => void
+
+// A minimal typed emitter with the `on`/`off`/`once`/`emit` shape the app's
+// transport interfaces declare. Node's EventEmitter typings changed in
+// @types/node 26 in a way that no longer lines up with them.
+class TypedEmitter<Events extends Record<string, unknown[]>> {
+  private readonly listeners = new Map<keyof Events, Set<Listener<never[]>>>()
+
+  on<E extends keyof Events>(event: E, listener: Listener<Events[E]>): this {
+    const set = this.listeners.get(event) ?? new Set()
+    set.add(listener as unknown as Listener<unknown[]>)
+    this.listeners.set(event, set)
+    return this
+  }
+
+  off<E extends keyof Events>(event: E, listener: Listener<Events[E]>): this {
+    this.listeners
+      .get(event)
+      ?.delete(listener as unknown as Listener<unknown[]>)
+    return this
+  }
+
+  once<E extends keyof Events>(event: E, listener: Listener<Events[E]>): this {
+    const wrapper = (...args: Events[E]) => {
+      this.off(event, wrapper)
+      ;(listener as unknown as Listener<Events[E]>)(...args)
+    }
+    return this.on(event, wrapper)
+  }
+
+  emit<E extends keyof Events>(event: E, ...args: Events[E]): boolean {
+    const set = this.listeners.get(event)
+    for (const listener of [...(set ?? [])]) {
+      ;(listener as unknown as Listener<Events[E]>)(...args)
+    }
+    return Boolean(set?.size)
+  }
+}
+
 export class TestDownloadConnection
-  extends EventEmitter<{ data: [unknown]; close: []; open: []; error: [Error] }>
+  extends TypedEmitter<{ data: [unknown]; close: []; open: []; error: [Error] }>
   implements DownloadTransport
 {
   readonly peer = 'test-uploader'
@@ -41,7 +79,7 @@ export class TestDownloadConnection
 }
 
 export class TestPeer
-  extends EventEmitter<{
+  extends TypedEmitter<{
     connection: [UploaderTransport]
     open: [string]
     error: [Error]
