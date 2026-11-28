@@ -19,7 +19,7 @@ A hosted instance of FilePizza is available at [file.pizza](https://file.pizza).
 
 ## Development
 
-Requires [Node.js](https://nodejs.org/) 22.22 or newer and [pnpm](https://pnpm.io/).
+Requires [Node.js](https://nodejs.org/) 24 or newer and [pnpm](https://pnpm.io/).
 
 ```
 $ git clone https://github.com/kern/filepizza.git

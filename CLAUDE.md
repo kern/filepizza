@@ -4,7 +4,7 @@ A peer-to-peer file transfer application built with modern web technologies.
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/) (v22.22+; CI and Docker use v24)
+- [Node.js](https://nodejs.org/) (v24+, the current LTS; also set in `.nvmrc` and `engines`)
 - [pnpm](https://pnpm.io/) (preferred package manager)
 
 ## Quick Start
