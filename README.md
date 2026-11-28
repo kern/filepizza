@@ -76,6 +76,8 @@ The server can be customized with the following environment variables:
 
 **How big can my files be?** As big as your browser can handle.
 
+**Why is my download held in memory when I self-host?** Streaming downloads (writing straight to disk, so very large files work) rely on a service worker, which browsers only allow on secure origins: `https://` or `http://localhost`. When FilePizza is served from a plain-HTTP address such as a private IP (`http://192.168.x.x`), or from Safari, the downloader's browser buffers the whole file in memory and saves it at the end, so big files can fail. Serve your instance over HTTPS (for example behind a reverse proxy with a certificate) to get streaming downloads.
+
 **What happens when I close my browser?** Keep your browser page open until every recipient finishes downloading. After you close it, the share link stops working. Recipients can still use any files they downloaded in full.
 
 **Are my files encrypted?** Yes, all WebRTC communications are automatically encrypted using public-key cryptography because of DTLS. You can add an optional password to your upload for an extra layer of security.
