@@ -41,7 +41,7 @@
     "@tanstack/react-query": "^5.55.2",
     "@tanstack/react-router": "^1.170.46",
     "@tanstack/react-start": "^1.169.7",
-    "ioredis": "^5.4.2",
+    "ioredis": "^6.0.0",
     "peerjs": "^1.5.4",
     "react": "~19.3.0",
     "react-dom": "~19.3.0",
@@ -69,7 +69,7 @@
     "peer": "^1.0.2",
     "playwright": "^1.53.2",
     "tailwindcss": "^4.3.5",
-    "typescript": "^5.0.0",
+    "typescript": "^7.0.0",
     "vite": "^8.4.0",
     "vitest": "^5.1.2"
   },

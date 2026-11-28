@@ -49,10 +49,11 @@ function encodeFilename(filename: string): string {
 }
 
 function createBlobWriter(filename: string): WritableStream<Uint8Array> {
-  let chunks: Uint8Array[] = []
+  let chunks: Uint8Array<ArrayBuffer>[] = []
   return new WritableStream({
     write(chunk) {
-      chunks.push(chunk)
+      // These come from data-channel ArrayBuffers, never a SharedArrayBuffer.
+      chunks.push(chunk as Uint8Array<ArrayBuffer>)
     },
     close() {
       const link = document.createElement('a')
