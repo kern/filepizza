@@ -29,7 +29,7 @@ $ pnpm build      # production build into .output/
 $ pnpm start      # run the production build
 ```
 
-Run `pnpm lint:check`, `pnpm format:check`, `pnpm type:check`, `pnpm test:coverage` and `pnpm test:e2e` (after `pnpm build`) before opening a pull request, or `pnpm ci` to run everything. See [CLAUDE.md](CLAUDE.md) for more on the project layout.
+Run `pnpm lint:check`, `pnpm format:check`, `pnpm type:check`, `pnpm test:coverage` and `pnpm test:e2e` (after `pnpm build`) before opening a pull request, or `pnpm ci` to run everything. See [AGENTS.md](AGENTS.md) for more on the project layout.
 
 ## Running with Docker
 
