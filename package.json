@@ -4,6 +4,7 @@
   "description": "Free peer-to-peer file transfers in your browser.",
   "author": "Alex Kern <alex@kern.io> (http://kern.io)",
   "license": "BSD-3-Clause",
+  "type": "module",
   "homepage": "https://github.com/kern/filepizza",
   "scripts": {
     "dev": "vite dev",
