@@ -51,7 +51,7 @@ pnpm dev
 - **Testing**: Vitest (unit) + Playwright (E2E)
 - **WebRTC**: PeerJS
 - **State Management**: TanStack Query
-- **Themes**: next-themes; route navigation uses View Transitions
+- **Themes**: in-house `ThemeProvider` (class-based dark mode); route navigation uses View Transitions
 - **Storage**: Redis (optional)
 
 ## Project Structure
@@ -111,7 +111,6 @@ This starts Redis and COTURN containers for testing peer connections behind NAT.
 - `tailwindcss` - CSS framework
 - `@tanstack/react-query` - Server state management
 - `peerjs` - WebRTC abstraction
-- `next-themes` - Theme switching
 - `zod` - Schema validation
 - `vitest` - Testing framework
 - `playwright` - E2E testing

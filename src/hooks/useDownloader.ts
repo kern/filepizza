@@ -10,14 +10,7 @@ import {
   streamDownloadMultipleFiles,
 } from '../utils/download'
 import { OrderedChunkWriter, toUint8Array } from '../utils/ordered-chunks'
-import {
-  browserName,
-  browserVersion,
-  osName,
-  osVersion,
-  mobileVendor,
-  mobileModel,
-} from 'react-device-detect'
+import { getDeviceInfo } from '../utils/device-info'
 import { setRotating } from './useRotatingSpinner'
 const cleanErrorMessage = (errorMessage: string): string =>
   errorMessage.startsWith('Could not connect to peer')
@@ -78,12 +71,7 @@ export function useDownloader(
       setIsConnected(true)
       conn.send({
         type: MessageType.RequestInfo,
-        browserName,
-        browserVersion,
-        osName,
-        osVersion,
-        mobileVendor,
-        mobileModel,
+        ...getDeviceInfo(navigator.userAgent),
       } as z.infer<typeof Message>)
     }
 

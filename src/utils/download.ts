@@ -1,14 +1,5 @@
 import { createZipStream } from '../zip-stream'
-
-if (typeof window !== 'undefined' && typeof ReadableStream === 'undefined') {
-  await import('web-streams-polyfill/polyfill')
-}
-
-const streamSaver =
-  typeof window !== 'undefined' ? (await import('streamsaver')).default : null
-if (typeof window !== 'undefined') {
-  streamSaver.mitm = `${window.location.protocol}//${window.location.host}/stream.html`
-}
+import { createWriteStream } from './stream-saver'
 
 type DownloadFileStream = {
   name: string
@@ -24,7 +15,7 @@ type OpenDestination = (
 export async function streamDownloadSingleFile(
   file: DownloadFileStream,
   filename: string,
-  openDestination: OpenDestination = streamSaver.createWriteStream,
+  openDestination: OpenDestination = createWriteStream,
 ): Promise<void> {
   const fileStream = openDestination(filename, {
     size: file.size,
@@ -48,7 +39,7 @@ export async function streamDownloadSingleFile(
 export function streamDownloadMultipleFiles(
   files: Array<DownloadFileStream>,
   filename: string,
-  openDestination: OpenDestination = streamSaver.createWriteStream,
+  openDestination: OpenDestination = createWriteStream,
 ): Promise<void> {
   const totalSize = files.reduce((acc, file) => acc + file.size, 0)
   const fileStream = openDestination(filename, {
