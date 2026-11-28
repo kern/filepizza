@@ -11,8 +11,8 @@
         "argsIgnorePattern": "^_"
       }
     ],
-    "typescript/no-explicit-any": "warn",
-    "no-shadow": "warn",
+    "typescript/no-explicit-any": "error",
+    "no-shadow": "error",
     "react/immutability": "off",
     "react/set-state-in-effect": "off"
   },
